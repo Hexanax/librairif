@@ -1,6 +1,6 @@
 /*
 
-Autocompletion
+Autocompletion -> "Prince" is the current research
 Select DISTINCT STR(?n) where {
  {{
     ?uri dbp:name ?n.
