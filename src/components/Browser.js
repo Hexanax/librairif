@@ -17,8 +17,7 @@ export default function Browser() {
         const data = new FormData(event.currentTarget);
         // eslint-disable-next-line no-console
         console.log({
-          email: data.get("email"),
-          password: data.get("password"),
+          book: data.get("searchBook"),
         });
     };
 
@@ -48,9 +47,9 @@ export default function Browser() {
                 margin="normal"
                 required
                 fullWidth
-                id="email"
+                id="searchBook"
                 label="Search book"
-                name="search"
+                name="searchBook"
                 autoFocus
                 />
                 <Button
