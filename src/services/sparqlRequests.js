@@ -27,3 +27,32 @@ export async function getBookInfo(pageId){
     }
 }
 
+
+export async function queryAuthor() {
+    let url = 'http://dbpedia.org/sparql';
+    let query = [
+        'SELECT ?name, GROUP_CONCAT(DISTINCT ?listGenres, ";"), GROUP_CONCAT(DISTINCT ?listBooks, ";") WHERE {',
+        '?writer a dbo:Writer.',
+        '?writer dbp:name ?name.',
+        '?writer dbp:occupation ?occupation.',
+        '?writer dbo:thumbnail ?image.',
+        '?writer ^dbp:author ?books.',
+        '?books rdfs:label ?listBooks.',
+        '?writer dbo:genre ?genres.',
+        '?genres rdfs:label ?listGenres.',
+        'FILTER(lang(?listBooks) = "en").',
+        'FILTER(lang(?listGenres) = "en").',
+        'FILTER (regex(?name, "Antoine de"))',
+        '}',
+    ].join('');
+
+    let queryURL = encodeURI(url + '?query=' + query + '&format=json');
+    queryURL = queryURL.replace(/#/g, '%23');
+    try{
+        const response = axios.get(queryURL);
+        console.log(response);
+        return response;
+    }catch(error){
+        console.log(error);
+    }
+}
