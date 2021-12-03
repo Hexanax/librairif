@@ -17,53 +17,52 @@ export default function Browser() {
         const data = new FormData(event.currentTarget);
         // eslint-disable-next-line no-console
         console.log({
-          email: data.get("email"),
-          password: data.get("password"),
+            book: data.get("searchBook"),
         });
     };
 
     return (
-    <ThemeProvider theme={theme}>
-        <Container component="main" maxWidth="xs">
-            <CssBaseline />
-            <Books/>
-            <Box
-            sx={{
-                marginTop: 8,
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-            }}
-            >
-            <Typography component="h1" variant="h5">
-                LibrarIf
-            </Typography>
-            <Box
-                component="form"
-                onSubmit={handleSubmit}
-                noValidate
-                sx={{ mt: 1 }}
-            >
-                <TextField
-                margin="normal"
-                required
-                fullWidth
-                id="email"
-                label="Search book"
-                name="search"
-                autoFocus
-                />
-                <Button
-                type="submit"
-                fullWidth
-                variant="contained"
-                sx={{ mt: 3, mb: 2 }}
+        <ThemeProvider theme={theme}>
+            <Container component="main" maxWidth="xs">
+                <CssBaseline />
+                <Books/>
+                <Box
+                    sx={{
+                        marginTop: 8,
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                    }}
                 >
-                Search{" "}
-                </Button>
-            </Box>
-            </Box>
-        </Container>
+                    <Typography component="h1" variant="h5">
+                        LibrarIf
+                    </Typography>
+                    <Box
+                        component="form"
+                        onSubmit={handleSubmit}
+                        noValidate
+                        sx={{ mt: 1 }}
+                    >
+                        <TextField
+                            margin="normal"
+                            required
+                            fullWidth
+                            id="searchBook"
+                            label="Search book"
+                            name="searchBook"
+                            autoFocus
+                        />
+                        <Button
+                            type="submit"
+                            fullWidth
+                            variant="contained"
+                            sx={{ mt: 3, mb: 2 }}
+                        >
+                            Search{" "}
+                        </Button>
+                    </Box>
+                </Box>
+            </Container>
         </ThemeProvider>
     );
 }
