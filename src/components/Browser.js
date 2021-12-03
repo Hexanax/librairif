@@ -6,6 +6,7 @@ import TextField from "@mui/material/TextField";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
+import Books from "./Books";
 
 const theme = createTheme();
 
@@ -25,6 +26,7 @@ export default function Browser() {
     <ThemeProvider theme={theme}>
         <Container component="main" maxWidth="xs">
             <CssBaseline />
+            <Books/>
             <Box
             sx={{
                 marginTop: 8,
