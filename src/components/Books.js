@@ -1,7 +1,7 @@
-import {getBookInfo} from '../doctrine/sparqlRequests'
+import {getBookInfo} from '../services/sparqlRequests'
 import {useEffect, useState} from "react";
 
-const Books = ({wikiPageId}) => {
+const Books = ({resourceURI}) => {
 
     const [bookInfo, setBookInfo] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
@@ -10,21 +10,29 @@ const Books = ({wikiPageId}) => {
 
         const loadBookInfo = async () => {
             setIsLoading(true);
-            const response = await getBookInfo(wikiPageId);
+            const response = await getBookInfo(resourceURI);
             setBookInfo(response)
             setIsLoading(false);
         }
-            loadBookInfo();
+        loadBookInfo();
     }, []);
 
     useEffect(() => {
         console.log(bookInfo);
         setIsLoading(false)
-    },[bookInfo])
+    }, [bookInfo])
 
     const render = () => {
         return (
-                <span>hello</span>
+            <div>
+                {isLoading &&
+                <div>
+
+                </div>}
+                {!isLoading &&
+                <div>
+                </div>}
+            </div>
         )
     }
     return (
