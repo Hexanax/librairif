@@ -8,27 +8,31 @@ const Books = ({wikiPageId}) => {
 
     useEffect(() => {
 
-        const loadBookInfo = async() => {
+        const loadBookInfo = async () => {
             setIsLoading(true);
             const response = await getBookInfo(wikiPageId);
             setBookInfo(response)
             setIsLoading(false);
         }
-        loadBookInfo();
-    },[])
+            loadBookInfo();
+    }, []);
 
     useEffect(() => {
         console.log(bookInfo);
         setIsLoading(false)
     },[bookInfo])
 
-    const render = () =>{
-        return(
-            <div>
-
-            </div>
+    const render = () => {
+        return (
+                <span>hello</span>
         )
     }
+    return (
+        <div>
+            {render()}
+        </div>
+    )
+
 }
 
 export default Books

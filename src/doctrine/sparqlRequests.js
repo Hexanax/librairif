@@ -1,6 +1,6 @@
-import axios from 'Axios'
+import axios from 'axios'
 
-async function getBookInfo(pageId){
+export async function getBookInfo(pageId){
     var content = "SELECT ?name ?titleOrig ?releaseDate ?imageURL ?abstract ?author\n" +
         "WHERE {\n" +
         "?book a dbo:Book.\n" +
@@ -16,7 +16,7 @@ async function getBookInfo(pageId){
         "?book dbo:author ?author.\n" +
         "}"
     var url_base = "http://dbpedia.org/sparql";
-    var url = url_base + "?query=" + encodeURIComponent(contenu_requete) + "&format=json";
+    var url = url_base + "?query=" + encodeURIComponent(content) + "&format=json";
 
     try{
         const response = axios.get(url);
