@@ -4,13 +4,22 @@ import { useEffect, useState } from "react";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import BookResult from "./BookResult";
+import Container from "./BookResult";
+import { getSearchResults } from "../services/sparqlRequests";
 
-function SearchPage() {
-  const handleSubmit = (event) => {
+export default function SearchPage() {
+  const [searchResults, setSearchResults] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
+    console.log(event);
+    const data = event.currentTarget;
     const searchInput = data.get("search");
-
+    setIsLoading(true);
+    const response = await getSearchResults();
+    setSearchResults(response);
+    setIsLoading(false);
     // eslint-disable-next-line no-console
     console.log({
       searchInput: searchInput,
@@ -29,7 +38,7 @@ function SearchPage() {
     BookResult(data),
   ];
   return (
-    <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
+    <Box noValidate sx={{ mt: 1 }}>
       <TextField
         margin="normal"
         required
@@ -39,22 +48,31 @@ function SearchPage() {
         name="search"
         autoFocus
       />
-      <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
+      <Button
+        onClick={handleSubmit}
+        type="submit"
+        variant="contained"
+        sx={{ mt: 3, mb: 2 }}
+      >
         Search{" "}
       </Button>
       <Box
         sx={{
           display: "flex",
-          flexWrap: "nowrap",
-          p: 1,
-          m: 1,
+          flexWrap: "wrap",
           bgcolor: "background.paper",
         }}
       >
-        {results}
+        {searchResults.map((obj) => {
+          const data = {
+            title: obj.name.value,
+            author: obj.authorName.value,
+            img: obj.imageURL.value,
+            releaseDate: obj.releaseDate.value,
+          };
+          return BookResult(data);
+        })}
       </Box>
     </Box>
   );
 }
-
-export default SearchPage;

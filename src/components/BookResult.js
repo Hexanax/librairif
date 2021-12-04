@@ -4,11 +4,10 @@ import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
 import Typography from "@mui/material/Typography";
 import { CardActionArea } from "@mui/material";
-import { margin } from "@mui/system";
 
 function BookResult(data) {
   return (
-    <Card sx={{ width: 200, margin: 2 }}>
+    <Card sx={{ width: 195, margin: 1 }}>
       <CardActionArea>
         <CardMedia component="img" image={data.img} alt="book cover" />
         <CardContent>

@@ -17,6 +17,35 @@ export async function getBookInfo(resourceURI){
     return await axiosQuery(content);
 }
 
+export async function getSearchResults() {
+  //TODO CHANGE HARDCODED URI
+  const book = `dbr:${"The_Little_Prince"}`;
+  const content = `SELECT ?name ?releaseDate ?imageURL ?authorName
+  WHERE {
+  ?book a dbo:Book.
+  ?book dbp:name ?name.
+  ?book dbp:titleOrig ?titleOrig.
+  ?book dbp:releaseDate ?releaseDate.
+  FILTER(lang(?releaseDate) = "en")
+  ?book dbo:thumbnail ?imageURL.
+  ?book dbo:abstract ?abstract.
+  FILTER(lang(?abstract) = "en")
+  ?book dbo:author ?author.
+  ?author dbp:name ?authorName
+  } LIMIT 100`;
+  const url_base = "http://dbpedia.org/sparql";
+  const url =
+    url_base + "?query=" + encodeURIComponent(content) + "&format=json";
+
+  try {
+    const response = await axios.get(url);
+    const data = response.data.results.bindings;
+    return data;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 
 export async function queryAuthor() {
     let query = [
