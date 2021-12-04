@@ -67,32 +67,36 @@ export async function queryAuthor() {
 }
 
 export async function researchQuery(bookName, author) {
-    let query = [
-        'SELECT ?name ?author MIN(?titleOrig) MIN(?imageURL) MIN(?abstract)',
-        'WHERE {',
-        '?book a dbo:Book.',
-        '?book dbp:name ?name.',
-        '?book dbo:author ?author.',
-        '?book dbp:titleOrig ?titleOrig.',
-        '?book dbo:thumbnail ?imageURL.',
-        '?book dbo:abstract ?abstract.',
-        'FILTER(lang(?name) = "en")',
-        'FILTER(lang(?abstract) = "en")',
-        `FILTER (regex(?name, "${bookName}"))`,
-        `FILTER (regex(?author, "${author}"))`,
-        '} GROUP BY ?name ?author'].join('');
-    return await axiosQuery(query);
+  let query = [
+    "SELECT ?name ?authorName ?releaseDate MIN(?titleOrig) MIN(?imageURL) MIN(?abstract)",
+    "WHERE {",
+    "?book a dbo:Book.",
+    "?book dbp:name ?name.",
+    "?book dbo:author ?author.",
+    "?book dbp:titleOrig ?titleOrig.",
+    "?book dbp:releaseDate ?releaseDate.",
+    "?book dbo:thumbnail ?imageURL.",
+    "?book dbo:abstract ?abstract.",
+    "?author dbp:name ?authorName.",
+    'FILTER(lang(?name) = "en")',
+    'FILTER(lang(?abstract) = "en")',
+    `FILTER (regex(?name, "${bookName}"))`,
+    `FILTER (regex(?author, "${author}"))`,
+    "} GROUP BY ?name ?authorName ?releaseDate",
+  ].join("");
+  return await axiosQuery(query);
 }
 
 async function axiosQuery(query) {
-    let url = 'http://dbpedia.org/sparql';
-    let queryURL = encodeURI(url + '?query=' + query + '&format=json');
-    queryURL = queryURL.replace(/#/g, '%23');
-    return new Promise((resolve, reject) => {
-        axios.get(queryURL)
-            .then(response => resolve(response))
-            .catch(err => {
-                console.error(err);
-            });
-    });
+  let url = "http://dbpedia.org/sparql";
+  let queryURL = encodeURI(url + "?query=" + query + "&format=json");
+  queryURL = queryURL.replace(/#/g, "%23");
+  return new Promise((resolve, reject) => {
+    axios
+      .get(queryURL)
+      .then((response) => resolve(response.data.results.bindings))
+      .catch((err) => {
+        console.error(err);
+      });
+  });
 }

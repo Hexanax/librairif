@@ -3,23 +3,30 @@ import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
 import Typography from "@mui/material/Typography";
-import { CardActionArea } from "@mui/material";
+import { CardActionArea, Grid } from "@mui/material";
 
-function BookResult(data) {
+function BookResult(index, data) {
   return (
-    <Card sx={{ width: 195, margin: 1 }}>
-      <CardActionArea>
-        <CardMedia component="img" image={data.img} alt="book cover" />
-        <CardContent>
-          <Typography gutterBottom variant="h5" component="div">
-            {data.title}
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            {data.author}
-          </Typography>
-        </CardContent>
-      </CardActionArea>
-    </Card>
+    <Grid item key={index}>
+      <Card sx={{ height: 430, width: 195 }}>
+        <CardActionArea>
+          <CardMedia
+            component="img"
+            height="250"
+            image={data.img}
+            alt="miniature"
+          />
+          <CardContent>
+            <Typography gutterBottom variant="h5" component="div">
+              {data.title}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              {data.author} - {data.releaseDate}
+            </Typography>
+          </CardContent>
+        </CardActionArea>
+      </Card>
+    </Grid>
   );
 }
 

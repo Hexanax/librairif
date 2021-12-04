@@ -4,8 +4,8 @@ import { useEffect, useState } from "react";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import BookResult from "./BookResult";
-import Container from "./BookResult";
-import { getSearchResults } from "../services/sparqlRequests";
+import { researchQuery } from "../services/sparqlRequests";
+import Results from "./Results";
 
 export default function SearchPage() {
   const [searchResults, setSearchResults] = useState([]);
@@ -17,7 +17,7 @@ export default function SearchPage() {
     const data = new FormData(event.currentTarget);
     const searchInput = data.get("search");
     setIsLoading(true);
-    const response = await getSearchResults();
+    const response = await researchQuery(searchInput, "");
     setSearchResults(response);
     setIsLoading(false);
     // eslint-disable-next-line no-console
@@ -46,15 +46,7 @@ export default function SearchPage() {
           bgcolor: "background.paper",
         }}
       >
-        {searchResults.map((obj) => {
-          const data = {
-            title: obj.name.value,
-            author: obj.authorName.value,
-            img: obj.imageURL.value,
-            releaseDate: obj.releaseDate.value,
-          };
-          return BookResult(data);
-        })}
+        <Results books={searchResults} />
       </Box>
     </Box>
   );
