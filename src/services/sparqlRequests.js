@@ -1,4 +1,4 @@
-import axios from 'axios'
+import axios from 'axios';
 
 export async function getBookInfo(resourceURI){
     //TODO CHANGE HARDCODED URI
@@ -13,23 +13,12 @@ export async function getBookInfo(resourceURI){
         dbp:author ?author.
         FILTER(lang(?abstract) = "en")
         FILTER(lang(?releaseDate) = "en")
-        }`
-    const url_base = "http://dbpedia.org/sparql";
-    const url = url_base + "?query=" + encodeURIComponent(content) + "&format=json";
-
-    try{
-        const response = await axios.get(url);
-        const data = response.data.results.bindings;
-        console.log(data);
-        return response;
-    }catch(error){
-        console.log(error);
-    }
+        }`;
+    return await axiosQuery(content);
 }
 
 
 export async function queryAuthor() {
-    let url = 'http://dbpedia.org/sparql';
     let query = [
         'SELECT ?name, GROUP_CONCAT(DISTINCT ?listGenres, ";"), GROUP_CONCAT(DISTINCT ?listBooks, ";") WHERE {',
         '?writer a dbo:Writer.',
@@ -45,14 +34,36 @@ export async function queryAuthor() {
         'FILTER (regex(?name, "Antoine de"))',
         '}',
     ].join('');
+    return await axiosQuery(query);
+}
 
+export async function researchQuery(bookName, author) {
+    let query = [
+        'SELECT ?name ?author MIN(?titleOrig) MIN(?imageURL) MIN(?abstract)',
+        'WHERE {',
+        '?book a dbo:Book.',
+        '?book dbp:name ?name.',
+        '?book dbo:author ?author.',
+        '?book dbp:titleOrig ?titleOrig.',
+        '?book dbo:thumbnail ?imageURL.',
+        '?book dbo:abstract ?abstract.',
+        'FILTER(lang(?name) = "en")',
+        'FILTER(lang(?abstract) = "en")',
+        `FILTER (regex(?name, "${bookName}"))`,
+        `FILTER (regex(?author, "${author}"))`,
+        '} GROUP BY ?name ?author'].join('');
+    return await axiosQuery(query);
+}
+
+async function axiosQuery(query) {
+    let url = 'http://dbpedia.org/sparql';
     let queryURL = encodeURI(url + '?query=' + query + '&format=json');
     queryURL = queryURL.replace(/#/g, '%23');
-    try{
-        const response = axios.get(queryURL);
-        console.log(response);
-        return response;
-    }catch(error){
-        console.log(error);
-    }
+    return new Promise((resolve, reject) => {
+        axios.get(queryURL)
+            .then(response => resolve(response))
+            .catch(err => {
+                console.error(err);
+            });
+    });
 }

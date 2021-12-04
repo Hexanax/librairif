@@ -1,34 +1,33 @@
-import * as React from "react";
-import { CardActionArea, Grid, Card, CardContent, CardMedia, Typography, Divider } from '@mui/material';
+import React, {useState} from "react";
+import { CardActionArea, Grid, Card, CardContent, CardMedia, Typography } from '@mui/material';
+import { researchQuery } from "../services/sparqlRequests";
 
-
-let books = [{ name: 'Le prince', author: 'Nicolas Machiavel', img: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/Machiavelli_Principe_Cover_Page.jpg/300px-Machiavelli_Principe_Cover_Page.jpg" },
-    { name: 'Le prince', author: 'Nicolas Machiavel', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/Machiavelli_Principe_Cover_Page.jpg/300px-Machiavelli_Principe_Cover_Page.jpg' },
-    { name: 'Le prince', author: 'Nicolas Machiavel', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/Machiavelli_Principe_Cover_Page.jpg/300px-Machiavelli_Principe_Cover_Page.jpg' }
-    ];
-export default function Results() {
-    
+export default function Results(props) {
+    const [books, setBooks] = useState(props.books);
+    const response = researchQuery("The", "Mach");
+    console.log(response);
     return (
         <Grid container spacing={5}
             direction="row"
-            justifyContent="space-around"
+            justifyContent="flex-start"
             alignItems="flex-start">
             {books.map((item, index) => (
                 <Grid item key={index} >
-                    <Card sx={{ maxWidth: 600, maxHeight: 1000 }}>
+                    <Card sx={{ maxWidth: 500, maxHeight: 500 }}>
                         <CardActionArea>
                             <CardMedia
                                 component="img"
                                 height="300"
+                                width="300"
                                 image={item.img}
                                 alt="miniature"
                             />
                             <CardContent>
                                 <Typography gutterBottom variant="h5" component="div">
-                                    { item.name }
+                                    { item.name.value }
                                 </Typography>
                                 <Typography variant="body2" color="text.secondary">
-                                    { item.author }
+                                    { item.author.value }
                                 </Typography>
                             </CardContent>
                         </CardActionArea>
