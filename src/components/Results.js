@@ -1,11 +1,17 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import { CardActionArea, Grid, Card, CardContent, CardMedia, Typography } from '@mui/material';
 import { researchQuery } from "../services/sparqlRequests";
 
 export default function Results(props) {
     const [books, setBooks] = useState(props.books);
-    const response = researchQuery("The", "Mach");
-    console.log(response);
+    useEffect(() => {
+        const loadResults = async () => {
+            const response = await researchQuery("The", "");
+            console.log(response);
+            setBooks(response.data.results.bindings);
+        }
+        loadResults();
+    },[]);
     return (
         <Grid container spacing={5}
             direction="row"
@@ -19,7 +25,7 @@ export default function Results(props) {
                                 component="img"
                                 height="300"
                                 width="300"
-                                image={item.img}
+                                image={item["callret-3"].value}
                                 alt="miniature"
                             />
                             <CardContent>
