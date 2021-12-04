@@ -14,7 +14,7 @@ export default function SearchPage() {
   const handleSubmit = async (event) => {
     event.preventDefault();
     console.log(event);
-    const data = event.currentTarget;
+    const data = new FormData(event.currentTarget);
     const searchInput = data.get("search");
     setIsLoading(true);
     const response = await getSearchResults();
@@ -25,20 +25,8 @@ export default function SearchPage() {
       searchInput: searchInput,
     });
   };
-  const data = {
-    title: "Book Title",
-    author: "Author Name",
-    img: "http://commons.wikimedia.org/wiki/Special:FilePath/Atheïstisch_manifest.jpg?width=300",
-  };
-  var results = [
-    BookResult(data),
-    BookResult(data),
-    BookResult(data),
-    BookResult(data),
-    BookResult(data),
-  ];
   return (
-    <Box noValidate sx={{ mt: 1 }}>
+    <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
       <TextField
         margin="normal"
         required
@@ -48,12 +36,7 @@ export default function SearchPage() {
         name="search"
         autoFocus
       />
-      <Button
-        onClick={handleSubmit}
-        type="submit"
-        variant="contained"
-        sx={{ mt: 3, mb: 2 }}
-      >
+      <Button type="submit" variant="contained" sx={{ mt: 3, mb: 2 }}>
         Search{" "}
       </Button>
       <Box
