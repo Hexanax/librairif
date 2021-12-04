@@ -8,8 +8,8 @@ import { CardActionArea, Grid } from "@mui/material";
 function BookResult(index, data) {
   return (
     <Grid item key={index}>
-      <Card sx={{ height: 430, width: 195 }}>
-        <CardActionArea>
+      <Card>
+        <CardActionArea sx={{ height: 430, width: 195 }}>
           <CardMedia
             component="img"
             height="250"

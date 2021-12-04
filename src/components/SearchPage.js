@@ -6,6 +6,7 @@ import Button from "@mui/material/Button";
 import BookResult from "./BookResult";
 import { researchQuery } from "../services/sparqlRequests";
 import Results from "./Results";
+import SearchIcon from "@mui/icons-material/Search";
 
 export default function SearchPage() {
   const [searchResults, setSearchResults] = useState([]);
@@ -26,17 +27,41 @@ export default function SearchPage() {
     });
   };
   return (
-    <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
+    <Box
+      component="form"
+      onSubmit={handleSubmit}
+      noValidate
+      sx={{
+        mt: 1,
+        width: 1,
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+      }}
+    >
       <TextField
         margin="normal"
         required
         fullWidth
         id="search"
-        label="Search book"
         name="search"
-        autoFocus
+        sx={{
+          border: "1px solid #D8D8D8",
+          boxSizing: "border-box",
+          boxShadow: "0px 0px 8px rgba(135, 135, 135, 0.25)",
+          borderRadius: 2,
+          "&:hover": {
+            boxShadow: "0px 0px 16px rgba(135, 135, 135, 0.25)",
+          },
+        }}
       />
-      <Button type="submit" variant="contained" sx={{ mt: 3, mb: 2 }}>
+      <Button
+        type="submit"
+        variant="contained"
+        size="large"
+        endIcon={<SearchIcon />}
+        sx={{ mt: 3, mb: 2, width: "300px" }}
+      >
         Search{" "}
       </Button>
       <Box

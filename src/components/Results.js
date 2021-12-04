@@ -15,7 +15,7 @@ export default function Results({ books }) {
   return (
     <Grid
       container
-      spacing={1}
+      spacing={2}
       direction="row"
       justifyContent="flex-start"
       alignItems="flex-start"

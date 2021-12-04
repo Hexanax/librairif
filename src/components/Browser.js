@@ -1,13 +1,11 @@
 import * as React from "react";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
-import CssBaseline from "@mui/material/CssBaseline";
+
 import Box from "@mui/material/Box";
+import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import Books from "./Books";
 import SearchPage from "./SearchPage";
-
-const theme = createTheme();
 
 export default function Browser() {
   const handleSubmit = (event) => {
@@ -20,16 +18,24 @@ export default function Browser() {
   };
 
   return (
-    <ThemeProvider theme={theme}>
-      <Container component="main" maxWidth="md">
-        <CssBaseline />
-        <Books />
+    <Grid
+      container
+      spacing={0}
+      direction="column"
+      alignItems="center"
+      justifyContent="center"
+      style={{ minHeight: "100vh" }}
+    >
+      <Grid item>
         <Box
           sx={{
             marginTop: 8,
             display: "flex",
             flexDirection: "row",
             alignItems: "center",
+            ml: 4,
+            mr: 4,
+            ml: 8,
           }}
         >
           <Box
@@ -39,13 +45,13 @@ export default function Browser() {
               alignItems: "center",
             }}
           >
-            <Typography component="h1" variant="h5">
-              LibrarIf
+            <Typography component="h1" variant="h1">
+              LibrairIf
             </Typography>
             <SearchPage />
           </Box>
         </Box>
-      </Container>
-    </ThemeProvider>
+      </Grid>
+    </Grid>
   );
 }
