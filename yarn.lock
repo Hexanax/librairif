@@ -2732,6 +2732,13 @@ autoprefixer@^9.6.1:
     postcss "^7.0.32"
     postcss-value-parser "^4.1.0"
 
+autosuggest-highlight@^3.2.0:
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/autosuggest-highlight/-/autosuggest-highlight-3.2.0.tgz#0ebe9aff321bcf0b716d6cee592f6f23e108cf0f"
+  integrity sha512-BI38Ju70l3XP7c/eZHOhEy1eUK0Bpweepcr+/ru1e0LOK2nWdEl8HysyNwibfNqcLFSNZ9t2Jcv3pjiSB+UG1Q==
+  dependencies:
+    diacritic "0.0.2"
+
 aws-sign2@~0.7.0:
   version "0.7.0"
   resolved "https://registry.yarnpkg.com/aws-sign2/-/aws-sign2-0.7.0.tgz#b46e890934a9591f2d2f6f86d7e6a9f1b3fe76a8"
@@ -4284,6 +4291,11 @@ detect-port-alt@1.1.6:
   dependencies:
     address "^1.0.1"
     debug "^2.6.0"
+
+diacritic@0.0.2:
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/diacritic/-/diacritic-0.0.2.tgz#fc2a887b5a5bc0a0a854fb614c7c2f209061ee04"
+  integrity sha1-/CqIe1pbwKCoVPthTHwvIJBh7gQ=
 
 diff-sequences@^26.6.2:
   version "26.6.2"
