@@ -10,23 +10,7 @@ export default function Results() {
 
     let {searchInput} = useParams();
     let navigate = useNavigate();
-
-
     const [books, setBooks] = useState(null);
-
-    // const handleSubmit = async (event) => {
-    //     event.preventDefault();
-    //     console.log(event);
-    //     const data = new FormData(event.currentTarget);
-    //     const searchInput = data.get("search");
-    //     setIsLoading(true);
-    //     const response = await researchQuery(searchInput, "");
-    //     setSearchResults(response);
-    //     setIsLoading(false);
-    //     // eslint-disable-next-line no-console
-    //     console.log({
-    //         searchInput: searchInput,
-    //     });
 
     useEffect(() => {
         const loadResults = async () => {

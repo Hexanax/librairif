@@ -4,7 +4,6 @@ import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
 import Typography from "@mui/material/Typography";
 import {CardActionArea, Grid} from "@mui/material";
-import {useNavigate} from "react-router-dom";
 
 function BookResult(index, data, navigate) {
 

@@ -4,9 +4,7 @@ import Box from "@mui/material/Box";
 import {useEffect, useState} from "react";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
-import BookResult from "./BookResult";
 import { researchQuery, autocompleteQuery } from "../services/sparqlRequests";
-import Results from "./Results";
 import SearchIcon from "@mui/icons-material/Search";
 import {useNavigate} from "react-router-dom"
 
@@ -28,10 +26,8 @@ function sleep(delay = 0) {
 
 export default function SearchPage() {
 
+    //used to push a new page to the history stack
     let navigate = useNavigate();
-    const [bookTitle, setBookTitle] = useState("");
-    const [searchResults, setSearchResults] = useState([]);
-    const [isLoading, setIsLoading] = useState(false);
 
   /**
    * Searches the list of corresponding books that match with textfield value
@@ -40,20 +36,15 @@ export default function SearchPage() {
   const handleSubmit = (event) => {
         event.preventDefault();
         const data = new FormData(event.currentTarget);
-        // eslint-disable-next-line no-console
-        console.log({
-            book: data.get("search"),
-        });
-        setBookTitle(data.get("search"));
         navigate(`/bookSearch/${data.get("search")}`);
     };
 
   //Autocomplete parameters (source :https://mui.com/components/autocomplete/)
-  const [open, setOpen] = React.useState(false);
-  const [options, setOptions] = React.useState([]);
-  const [value, setValue] = React.useState("");
-  const [inputValue, setInputValue] = React.useState("");
-  const [highlightedOption, setHighlightedOption] = React.useState(0);
+  const [open, setOpen] = useState(false);
+  const [options, setOptions] = useState([]);
+  const [value, setValue] = useState("");
+  const [inputValue, setInputValue] = useState("");
+  const [highlightedOption, setHighlightedOption] = useState(0);
 
   const loading = open && options.length === 0;
 
@@ -84,7 +75,7 @@ export default function SearchPage() {
     }
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!open) {
       setOptions([]);
     } else {
