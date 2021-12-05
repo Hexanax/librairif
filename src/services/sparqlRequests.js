@@ -87,6 +87,34 @@ export async function researchQuery(bookName, author) {
   return await axiosQuery(query);
 }
 
+/**
+ * Gives the first 10 books or authors found 
+ * on dbpedia containing the string passed in parameter sorted alphabetically
+ * @param {String} text the name in parameter
+ * @returns List of names associated with a type of Book or Writer
+ */
+export async function autocompleteQuery(text){
+  let query = [
+    "SELECT DISTINCT ?name ?type ",
+    "WHERE { ",
+    "{{ ?uri a dbo:Book. ",
+    "?uri dbp:name ?name.  ",
+    "BIND('Book' AS ?type)} ",
+    "UNION { ",
+    "?uri dbp:name ?name. ",
+    "?uri a dbo:Writer. ",
+    "BIND('Writer' AS ?type)}} ",
+    `FILTER (isLiteral(?name)) `,
+    'FILTER(lang(?name) = "en") ',
+    `FILTER (regex(?name, '${text}')) `,
+    "} ",
+    "ORDER BY ASC(?name) ",
+    "LIMIT 10 ",
+  ].join("");
+  return await axiosQuery(query);
+}
+
+
 async function axiosQuery(query) {
   let url = "http://dbpedia.org/sparql";
   let queryURL = encodeURI(url + "?query=" + query + "&format=json");
