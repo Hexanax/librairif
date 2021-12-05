@@ -11,7 +11,7 @@ function BookResult(index, data, navigate) {
 
     const handleClick = () => {
         console.log("click");
-        navigate(`../../bookInfo/${data.bookURI}`, { replace: true });
+        navigate(`../../bookInfo/${data.bookURI}`);
     }
     return (
             <Grid onClick={() => handleClick()} item key={index}>

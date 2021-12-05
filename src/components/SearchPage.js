@@ -13,7 +13,7 @@ import {useNavigate} from "react-router-dom"
 export default function SearchPage() {
 
 
-
+    const navigate = useNavigate();
     const [searchResults, setSearchResults] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const [bookTitle, setBookTitle] = useState("");
@@ -26,11 +26,11 @@ export default function SearchPage() {
             book: data.get("search"),
         });
         setBookTitle(data.get("search"));
+        navigate(`/bookSearch/${data.get("search")}`);
     };
 
     return (
         <div>
-            {bookTitle === "" ?
                 <Box
                     component="form"
                     onSubmit={handleSubmit}
@@ -77,8 +77,6 @@ export default function SearchPage() {
                     >
                     </Box>
                 </Box>
-                : <Navigate to={`/bookSearch/${bookTitle}`}/>
-            }
         </div>
 
     );
