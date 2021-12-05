@@ -16,6 +16,23 @@ export async function getBookInfo(resourceURI){
         }`;
     return await axiosQuery(content);
 }
+export async function getEditorInfo(editorName){
+  let editorRsrc = `dbr:${editorName}`;
+  let query = [
+    "SELECT DISTINCT ?label ?abstract ?founded ?homepage ?headquarters ?founder",
+    "WHERE {",
+    ` ${editorRsrc} rdfs:label ?label;`,
+        'dbo:abstract ?abstract;',
+        'dbo:founder ?founder;',
+        'dbo:foundingYear ?founded;',
+        'foaf:homepage ?homepage;',
+        'dbp:headquarters ?headquarters.',
+        'FILTER(lang(?abstract) = "en").',
+        'FILTER(lang(?label) = "en").',
+    "}",
+  ].join("");
+  return await axiosQuery(query);
+}
 
 export async function getSearchResults() {
   //TODO CHANGE HARDCODED URI
@@ -70,13 +87,13 @@ export async function researchQuery(bookName, author) {
   let query = [
     "SELECT ?name ?authorName ?releaseDate MIN(?titleOrig) MIN(?imageURL) MIN(?abstract)",
     "WHERE {",
-    "?book a dbo:Book.",
-    "?book dbp:name ?name.",
-    "?book dbo:author ?author.",
-    "?book dbp:titleOrig ?titleOrig.",
-    "?book dbp:releaseDate ?releaseDate.",
-    "?book dbo:thumbnail ?imageURL.",
-    "?book dbo:abstract ?abstract.",
+    "?book a dbo:Book;",
+    " dbp:name ?name;",
+    " dbo:author ?author;",
+    " dbp:titleOrig ?titleOrig;",
+    " dbp:releaseDate ?releaseDate;",
+    " dbo:thumbnail ?imageURL;",
+    " dbo:abstract ?abstract.",
     "?author dbp:name ?authorName.",
     'FILTER(lang(?name) = "en")',
     'FILTER(lang(?abstract) = "en")',

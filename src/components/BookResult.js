@@ -21,7 +21,7 @@ function BookResult(index, data) {
               {data.title}
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              {data.author} - {data.releaseDate}
+              {data.author} - {data.releaseDate} 
             </Typography>
           </CardContent>
         </CardActionArea>
