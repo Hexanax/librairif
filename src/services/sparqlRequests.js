@@ -41,7 +41,7 @@ export async function queryAuthor() {
 }
 
 export async function researchQuery(bookName, author) {
-  let query = `SELECT ?name ?authorName ?releaseDate MIN(?titleOrig) as ?titleOrig MIN(?imageURL) as ?imageUrl
+  let query = `SELECT ?book ?name ?authorName ?releaseDate MIN(?titleOrig) as ?titleOrig MIN(?imageURL) as ?imageUrl
     WHERE {
     ?book a dbo:Book.
     ?book dbp:name ?name.
@@ -55,7 +55,7 @@ export async function researchQuery(bookName, author) {
     FILTER(lang(?abstract) = "en")
     FILTER (regex(?name, "${bookName}", "i"))
     FILTER (regex(?author, "${author}",  "i"))
-    } GROUP BY ?name ?authorName ?releaseDate
+    } GROUP BY ?name ?authorName ?releaseDate ?book
     LIMIT 100`;
   return await axiosQuery(query);
 }
