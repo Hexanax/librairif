@@ -1,13 +1,15 @@
 import * as React from "react";
 import Box from "@mui/material/Box";
 
-import { useEffect, useState } from "react";
+import {useEffect, useState} from "react";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import BookResult from "./BookResult";
 import { researchQuery, autocompleteQuery } from "../services/sparqlRequests";
 import Results from "./Results";
 import SearchIcon from "@mui/icons-material/Search";
+import {Navigate} from "react-router";
+import {useNavigate} from "react-router-dom"
 
 import Autocomplete from "@mui/material/Autocomplete";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -26,21 +28,24 @@ function sleep(delay = 0) {
 }
 
 export default function SearchPage() {
-  const [searchResults, setSearchResults] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
 
+  const bookTitle, setBookTitle = useState("");
+  let navigate = useNavigate();
+  
   /**
    * Searches the list of corresponding books that match with textfield value
    * @param {*} event
    */
-  const handleSubmit = async (event) => {
-    console.log(value);
-    event.preventDefault();
-    setIsLoading(true);
-    const response = await researchQuery(value, "");
-    setSearchResults(response);
-    setIsLoading(false);
-  };
+  const handleSubmit = (event) => {
+        event.preventDefault();
+        const data = new FormData(event.currentTarget);
+        // eslint-disable-next-line no-console
+        console.log({
+            book: data.get("search"),
+        });
+        setBookTitle(data.get("search"));
+        navigate(`/bookSearch/${data.get("search")}`);
+    };
 
   //Autocomplete parameters (source :https://mui.com/components/autocomplete/)
   const [open, setOpen] = React.useState(false);
@@ -207,7 +212,6 @@ export default function SearchPage() {
           bgcolor: "background.paper",
         }}
       >
-        <Results books={searchResults} />
       </Box>
     </Box>
   );

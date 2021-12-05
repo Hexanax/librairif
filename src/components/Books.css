@@ -1,0 +1,45 @@
+
+
+.bookContainer{
+    margin-right:20%;
+    margin-left:20%;
+    margin-top:5%;
+    margin-bottom: 5%;
+}
+
+.bookContainer h1{
+    font-size: xxx-large;
+}
+
+.bookContainer h2{
+    font-size:xx-large;
+}
+
+.author{
+    font-size: large;
+    color:grey;
+}
+
+.mainContent{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.imageWrapper{
+    margin-left:3em;
+}
+
+.imageWrapper img{
+    border-radius: 10px;
+    box-shadow: 2px 2px 2px 2px grey;
+
+}
+
+.infoWrapper{
+    display:grid;
+    width:40%;
+    grid-template-columns: 50% 50%;
+    grid-template-rows: 50% 50%;
+    margin-bottom: 50px;
+}
