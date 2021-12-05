@@ -1,9 +1,9 @@
-import axios from 'axios';
+import axios from "axios";
 
-export async function getBookInfo(resourceURI){
-    //TODO CHANGE HARDCODED URI
-    const book = `dbr:${resourceURI}`
-    const content = `SELECT ?name ?titleOrig ?releaseDate ?imageURL ?abstract ?authorURI ?authorName ?publisherURI
+export async function getBookInfo(resourceURI) {
+  //TODO CHANGE HARDCODED URI
+  const book = `dbr:${resourceURI}`;
+  const content = `SELECT ?name ?titleOrig ?releaseDate ?imageURL ?abstract ?authorURI ?authorName ?publisherURI
         WHERE {
         ${book} dbp:name ?name;
         dbp:titleOrig ?titleOrig;
@@ -16,90 +16,57 @@ export async function getBookInfo(resourceURI){
         FILTER(lang(?abstract) = "en")
         FILTER(lang(?releaseDate) = "en")
         }
-        GROUP BY ?publisherURI`
-    console.log(content);
-    return await axiosQuery(content);
+        GROUP BY ?publisherURI`;
+  console.log(content);
+  return await axiosQuery(content);
 }
-
-export async function getSearchResults() {
-  //TODO CHANGE HARDCODED URI
-  const book = `dbr:${"The_Little_Prince"}`;
-  const content = `SELECT ?name ?releaseDate ?imageURL ?authorName
-  WHERE {
-  ?book a dbo:Book.
-  ?book dbp:name ?name.
-  ?book dbp:titleOrig ?titleOrig.
-  ?book dbp:releaseDate ?releaseDate.
-  FILTER(lang(?releaseDate) = "en")
-  ?book dbo:thumbnail ?imageURL.
-  ?book dbo:abstract ?abstract.
-  FILTER(lang(?abstract) = "en")
-  ?book dbo:author ?author.
-  ?author dbp:name ?authorName
-  } LIMIT 100`;
-  const url_base = "http://dbpedia.org/sparql";
-  const url =
-    url_base + "?query=" + encodeURIComponent(content) + "&format=json";
-
-  try {
-    const response = await axios.get(url);
-    const data = response.data.results.bindings;
-    return data;
-  } catch (error) {
-    console.log(error);
-  }
-}
-
 
 export async function queryAuthor() {
-    let query = [
-        'SELECT ?name, GROUP_CONCAT(DISTINCT ?listGenres, ";"), GROUP_CONCAT(DISTINCT ?listBooks, ";") WHERE {',
-        '?writer a dbo:Writer.',
-        '?writer dbp:name ?name.',
-        '?writer dbp:occupation ?occupation.',
-        '?writer dbo:thumbnail ?image.',
-        '?writer ^dbp:author ?books.',
-        '?books rdfs:label ?listBooks.',
-        '?writer dbo:genre ?genres.',
-        '?genres rdfs:label ?listGenres.',
-        'FILTER(lang(?listBooks) = "en").',
-        'FILTER(lang(?listGenres) = "en").',
-        'FILTER (regex(?name, "Antoine de"))',
-        '}',
-    ].join('');
-    return await axiosQuery(query);
+  let query = [
+    'SELECT ?name, GROUP_CONCAT(DISTINCT ?listGenres, ";"), GROUP_CONCAT(DISTINCT ?listBooks, ";") WHERE {',
+    "?writer a dbo:Writer.",
+    "?writer dbp:name ?name.",
+    "?writer dbp:occupation ?occupation.",
+    "?writer dbo:thumbnail ?image.",
+    "?writer ^dbp:author ?books.",
+    "?books rdfs:label ?listBooks.",
+    "?writer dbo:genre ?genres.",
+    "?genres rdfs:label ?listGenres.",
+    'FILTER(lang(?listBooks) = "en").',
+    'FILTER(lang(?listGenres) = "en").',
+    'FILTER (regex(?name, "Antoine de"))',
+    "}",
+  ].join("");
+  return await axiosQuery(query);
 }
 
 export async function researchQuery(bookName, author) {
-  let query = [
-    `SELECT ?book ?name ?authorName ?releaseDate MIN(?titleOrig) as ?titleOrig MIN(?imageURL) as ?imageUrl MIN(?abstract) as ?abstract
+  let query = `SELECT ?book ?name ?authorName ?releaseDate MIN(?titleOrig) as ?titleOrig MIN(?imageURL) as ?imageUrl
     WHERE {
     ?book a dbo:Book.
     ?book dbp:name ?name.
     ?book dbo:author ?author.
     ?book dbp:titleOrig ?titleOrig.
     ?book dbp:releaseDate ?releaseDate.
-    ?book dbo:thumbnail ?imageURL.
+    OPTIONAL {?book dbo:thumbnail ?imageURL}
     ?book dbo:abstract ?abstract.
     ?author dbp:name ?authorName.
     FILTER(lang(?name) = "en")
     FILTER(lang(?abstract) = "en")
-    FILTER (regex(?name, "${bookName}"))
-    FILTER (regex(?author, "${author}"))
-    } GROUP BY ?name ?authorName ?releaseDate ?book`
-  ].join("");
-
-  console.log(query);
+    FILTER (regex(?name, "${bookName}", "i"))
+    FILTER (regex(?author, "${author}",  "i"))
+    } GROUP BY ?name ?authorName ?releaseDate ?book
+    LIMIT 100`;
   return await axiosQuery(query);
 }
 
 /**
- * Gives the first 10 books or authors found 
+ * Gives the first 10 books or authors found
  * on dbpedia containing the string passed in parameter sorted alphabetically
  * @param {String} text the name in parameter
  * @returns List of names associated with a type of Book or Writer
  */
-export async function autocompleteQuery(text){
+export async function autocompleteQuery(text) {
   let query = [
     "SELECT DISTINCT ?name ?type ",
     "WHERE { ",
@@ -119,7 +86,6 @@ export async function autocompleteQuery(text){
   ].join("");
   return await axiosQuery(query);
 }
-
 
 async function axiosQuery(query) {
   let url = "http://dbpedia.org/sparql";
