@@ -2,8 +2,8 @@ import React, {useEffect, useState} from "react";
 import {CardActionArea, Grid, Card, CardContent, CardMedia, Typography} from '@mui/material';
 import {researchQuery} from "../services/sparqlRequests";
 import BookResult from "./BookResult";
-import {useParams} from 'react-router';
-import {useNavigate} from "react-router-dom"
+import {useNavigate} from "react-router-dom";
+import {useParams} from 'react-router-dom';
 
 
 export default function Results() {

@@ -8,7 +8,6 @@ import BookResult from "./BookResult";
 import { researchQuery, autocompleteQuery } from "../services/sparqlRequests";
 import Results from "./Results";
 import SearchIcon from "@mui/icons-material/Search";
-import {Navigate} from "react-router";
 import {useNavigate} from "react-router-dom"
 
 import Autocomplete from "@mui/material/Autocomplete";
@@ -29,9 +28,11 @@ function sleep(delay = 0) {
 
 export default function SearchPage() {
 
-  const bookTitle, setBookTitle = useState("");
-  let navigate = useNavigate();
-  
+    let navigate = useNavigate();
+    const [bookTitle, setBookTitle] = useState("");
+    const [searchResults, setSearchResults] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
+
   /**
    * Searches the list of corresponding books that match with textfield value
    * @param {*} event
@@ -160,6 +161,8 @@ export default function SearchPage() {
         loading={loading}
         renderInput={(params) => (
           <TextField
+              id="search"
+              name="search"
             {...params}
             InputProps={{
               ...params.InputProps,
