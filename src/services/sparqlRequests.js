@@ -2,18 +2,22 @@ import axios from 'axios';
 
 export async function getBookInfo(resourceURI){
     //TODO CHANGE HARDCODED URI
-    const book = `dbr:${"The_Little_Prince"}`
-    const content = `SELECT ?name ?titleOrig ?releaseDate ?imageURL ?abstract ?author
+    const book = `dbr:${resourceURI}`
+    const content = `SELECT ?name ?titleOrig ?releaseDate ?imageURL ?abstract ?authorURI ?authorName ?publisherURI
         WHERE {
         ${book} dbp:name ?name;
         dbp:titleOrig ?titleOrig;
         dbp:releaseDate ?releaseDate;
         dbo:thumbnail ?imageURL;
         dbo:abstract ?abstract;
-        dbp:author ?author.
+        dbp:publisher ?publisherURI;
+        dbp:author ?authorURI.
+        ?authorURI dbp:name ?authorName.
         FILTER(lang(?abstract) = "en")
         FILTER(lang(?releaseDate) = "en")
-        }`;
+        }
+        GROUP BY ?publisherURI`
+    console.log(content);
     return await axiosQuery(content);
 }
 
