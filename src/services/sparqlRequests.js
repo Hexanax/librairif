@@ -68,22 +68,24 @@ export async function queryAuthor() {
 
 export async function researchQuery(bookName, author) {
   let query = [
-    "SELECT ?name ?authorName ?releaseDate MIN(?titleOrig) MIN(?imageURL) MIN(?abstract)",
-    "WHERE {",
-    "?book a dbo:Book.",
-    "?book dbp:name ?name.",
-    "?book dbo:author ?author.",
-    "?book dbp:titleOrig ?titleOrig.",
-    "?book dbp:releaseDate ?releaseDate.",
-    "?book dbo:thumbnail ?imageURL.",
-    "?book dbo:abstract ?abstract.",
-    "?author dbp:name ?authorName.",
-    'FILTER(lang(?name) = "en")',
-    'FILTER(lang(?abstract) = "en")',
-    `FILTER (regex(?name, "${bookName}"))`,
-    `FILTER (regex(?author, "${author}"))`,
-    "} GROUP BY ?name ?authorName ?releaseDate",
+    `SELECT ?book ?name ?authorName ?releaseDate MIN(?titleOrig) as ?titleOrig MIN(?imageURL) as ?imageUrl MIN(?abstract) as ?abstract
+    WHERE {
+    ?book a dbo:Book.
+    ?book dbp:name ?name.
+    ?book dbo:author ?author.
+    ?book dbp:titleOrig ?titleOrig.
+    ?book dbp:releaseDate ?releaseDate.
+    ?book dbo:thumbnail ?imageURL.
+    ?book dbo:abstract ?abstract.
+    ?author dbp:name ?authorName.
+    FILTER(lang(?name) = "en")
+    FILTER(lang(?abstract) = "en")
+    FILTER (regex(?name, "${bookName}"))
+    FILTER (regex(?author, "${author}"))
+    } GROUP BY ?name ?authorName ?releaseDate ?book`
   ].join("");
+
+  console.log(query);
   return await axiosQuery(query);
 }
 

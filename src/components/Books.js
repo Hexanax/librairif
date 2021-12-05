@@ -1,8 +1,9 @@
 import {getBookInfo} from '../services/sparqlRequests'
 import {useEffect, useState} from "react";
+import {useParams} from 'react-router-dom'
+const Books = () => {
 
-const Books = ({resourceURI}) => {
-
+    let { bookURI } = useParams();
     const [bookInfo, setBookInfo] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
 
@@ -10,7 +11,7 @@ const Books = ({resourceURI}) => {
 
         const loadBookInfo = async () => {
             setIsLoading(true);
-            const response = await getBookInfo(resourceURI);
+            const response = await getBookInfo(bookURI);
             setBookInfo(response)
             setIsLoading(false);
         }
@@ -25,12 +26,13 @@ const Books = ({resourceURI}) => {
     const render = () => {
         return (
             <div>
-                {isLoading &&
+                {!bookInfo &&
                 <div>
-
+                    Loading results
                 </div>}
-                {!isLoading &&
+                {bookInfo &&
                 <div>
+                    {JSON.stringify(bookInfo)}
                 </div>}
             </div>
         )

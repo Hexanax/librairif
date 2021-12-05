@@ -8,14 +8,6 @@ import Books from "./Books";
 import SearchPage from "./SearchPage";
 
 export default function Browser() {
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    // eslint-disable-next-line no-console
-    console.log({
-      book: data.get("searchBook"),
-    });
-  };
 
   return (
     <Grid
@@ -33,7 +25,6 @@ export default function Browser() {
             display: "flex",
             flexDirection: "row",
             alignItems: "center",
-            ml: 4,
             mr: 4,
             ml: 8,
           }}
