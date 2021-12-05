@@ -24,7 +24,7 @@ export default function Results({ books }) {
         const data = {
           title: obj.name.value,
           author: obj.authorName.value,
-          img: obj["callret-4"].value,
+          img: obj["callret-4"]?.value,
           releaseDate: obj.releaseDate.value,
         };
         return BookResult(index, data);
