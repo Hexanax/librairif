@@ -21,6 +21,165 @@ export async function getBookInfo(resourceURI) {
   return await axiosQuery(content);
 }
 
+/**
+ * Allows to get the previous and the following book of the current one
+ * @param {String} ressourceURI Uri of the current book
+ * @returns ?book => the uri of the book; ?name => the name in english; ?position => before or after
+ */
+export async function getBookNeighbor(ressourceURI){
+  const currentBook = `dbr:${ressourceURI}`;
+  let query = [
+    "Select ?book ?name ?position WHERE { ",
+    "{{ ",
+    `${currentBook} dbp:precededBy ?book. `,
+    "?book a dbo:Book. ",
+    "?book rdfs:label ?name. ",
+    "BIND('before' AS ?position) ",
+    "} UNION { ",
+    `${currentBook} dbp:followedBy ?book. `,
+    "?book a dbo:Book. ",
+    "?book rdfs:label ?name. ",
+    "BIND('after' AS ?position) ",
+    "}} ORDER BY DESC(?position)",
+    'FILTER(lang(?name) = "en") }',
+  ].join("");
+  return await axiosQuery(query);
+}
+
+/**
+ * Allows to get the list of games based on the book
+ * @param {String} name the name of the current book 
+ * @param {String} author the author of the current book
+ * @returns 
+ */
+export async function getAssociatedGames(name, author){
+  let query = [
+    "select DISTINCT(STR(?label)) as ?game ?uri ?date ?developer where{ ",
+    "?uri rdf:type dbo:VideoGame; ",
+    "dbo:abstract ?abstract; ",
+    "dbo:releaseDate ?date; ",
+    "dbo:developer ?developer; ",
+    "rdfs:label ?label. ",
+    `Filter(( lang(?label)="en" and lang(?abstract)="en" ) and (regex(?abstract,"${name}","i")) and (regex(?abstract,"${author}","i")))} `,
+    "GROUP BY ?game ?uri ?date ORDER BY ASC(?date) ASC(?game)",
+  ].join("");
+  return await axiosQuery(query);
+}
+
+/**
+ * Allows to get the list of movies based on the book
+ * @param {String} name the name of the current book 
+ * @param {String} author the author of the current book
+ * @returns 
+ */
+ export async function getAssociatedMovies(name, author){
+  let query = [
+    "select DISTINCT(STR(?label)) as ?movie ?uri ?runtime ?producer where{ ",
+    "?uri rdf:type dbo:Film; ",
+    "dbo:abstract ?abstract; ",
+    "dbo:producer ?producer; ",
+    "dbo:runtime ?runtime; ",
+    "rdfs:label ?label. ",
+    `Filter(( lang(?label)="en" and lang(?abstract)="en" ) and (regex(?abstract,"${name}","i")) and (regex(?abstract,"${author}","i")))} `,
+    "GROUP BY ?movie ?uri ?runtime ORDER BY ASC(?movie)",
+  ].join("");
+  return await axiosQuery(query);
+}
+
+/**
+ * Allows to get the list of musicals based on the book
+ * @param {String} name the name of the current book 
+ * @param {String} author the author of the current book
+ * @returns 
+ */
+ export async function getAssociatedMusicals(name, author){
+  let query = [
+    "select DISTINCT(STR(?label)) as ?musical ?uri ?author ?lyric ?music where{ ",
+    "?uri rdf:type dbo:Musical; ",
+    "dbo:abstract ?abstract; ",
+    "dbo:author ?author; ",
+    "dbo:lyrics ?lyric; ",
+    "dbo:musicBy ?music; ",
+    "rdfs:label ?label. ",
+    `Filter(( lang(?label)="en" and lang(?abstract)="en" ) and (regex(?abstract,"${name}","i")) and (regex(?abstract,"${author}","i")))} `,
+    "GROUP BY ?musical ?uri ORDER BY ASC(?musical)",
+  ].join("");
+  return await axiosQuery(query);
+}
+
+/**
+ * Allows to get the list of series based on the book
+ * @param {String} name the name of the current book 
+ * @param {String} author the author of the current book
+ * @returns 
+ */
+ export async function getAssociatedSeries(name, author){
+  let query = [
+    "select DISTINCT(STR(?label)) as ?serie ?uri ?composer ?season where{ ",
+    "?uri rdf:type dbo:TelevisionShow; ",
+    "dbo:abstract ?abstract; ",
+    "dbo:composer ?composer; ",
+    "dbo:numberOfSeasons ?season; ",
+    "rdfs:label ?label. ",
+    `Filter(( lang(?label)="en" and lang(?abstract)="en" ) and (regex(?abstract,"${name}","i")) and (regex(?abstract,"${author}","i")))} `,
+    "ORDER BY ASC(?serie)",
+  ].join("");
+  return await axiosQuery(query);
+}
+
+/**
+ * Allows to get the list of arts based on the book
+ * @param {String} name the name of the current book 
+ * @param {String} author the author of the current book
+ * @returns 
+ */
+ export async function getAssociatedArts(name, author){
+  let query = [
+    "select DISTINCT(STR(?label)) as ?art ?uri ?image ?artist where{ ",
+    "?uri rdf:type dbo:Artwork; ",
+    "dbo:abstract ?abstract; ",
+    "dbo:artist ?artist; ",
+    "dbo:thumbnail ?image; ",
+    "rdfs:label ?label. ",
+    `Filter(( lang(?label)="en" and lang(?abstract)="en" ) and (regex(?abstract,"${name}","i")) and (regex(?abstract,"${author}","i")))} `,
+    "GROUP BY ?art ?uri ?image ORDER BY ASC(?art)",
+  ].join("");
+  return await axiosQuery(query);
+}
+
+/**
+ * Allows to get the list of musics based on the book
+ * @param {String} name the name of the current book 
+ * @param {String} author the author of the current book
+ * @returns 
+ */
+ export async function getAssociatedMusics(name, author){
+  let query = [
+    "select DISTINCT(STR(?label)) as ?music ?uri ?type ?artist where{ ",
+    ` {{
+      ?uri a dbo:Song;
+      dbo:abstract ?abstract;
+      dbo:artist ?artist;
+      rdfs:label ?label.
+      BIND("song" as ?type)
+      } UNION {
+      ?uri a dbo:Single;
+      dbo:abstract ?abstract;
+      rdfs:label ?label.
+      dbo:artist ?artist;
+      BIND("single" as ?type)
+      } UNION {
+      ?uri a dbo:Sound;
+      dbo:abstract ?abstract;
+      rdfs:label ?label.
+      BIND("sound" as ?type)
+      }}`,
+    `Filter(( lang(?label)="en" and lang(?abstract)="en" ) and (regex(?abstract,"${name}","i")) and (regex(?abstract,"${author}","i")))} `,
+    "GROUP BY ?music ?uri ?type ORDER BY ASC(?music)",
+  ].join("");
+  return await axiosQuery(query);
+}
+
 export async function queryAuthor() {
   let query = [
     'SELECT ?name, GROUP_CONCAT(DISTINCT ?listGenres, ";"), GROUP_CONCAT(DISTINCT ?listBooks, ";") WHERE {',
