@@ -34,7 +34,7 @@ export default function Results({ books }) {
               title: obj.name.value,
               author: obj.authorName.value,
               img: obj.imageUrl?.value,
-              releaseDate: obj.releaseDate.value,
+              releaseDate: obj.releaseDate?.value,
               bookURI: obj.book.value.split("http://dbpedia.org/resource/")[1],
             };
             return BookResult(index, data, navigate);
