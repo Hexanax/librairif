@@ -22,6 +22,25 @@ export async function getBookInfo(resourceURI) {
 }
 
 /**
+ * Allows to get the list of book associated with the current on if 
+ * it is in a series of book Uri of the current book
+ * @param {*} ressourceURI 
+ */
+ export async function getListInSeries(ressourceURI){
+  const currentBook = `dbr:${ressourceURI}`;
+  let query = [
+    "Select ?bookUri ?serie ?name ?imageURL WHERE { ",
+    `${currentBook} dbo:series ?serie.`,
+    "?bookUri a dbo:Book; ",
+    "dbp:name ?name; ",
+    "dbo:series ?serie. ",
+    "OPTIONAL{?bookUri dbo:thumbnail ?imageURL} ",
+    "}",
+  ].join("");
+  return await axiosQuery(query);
+}
+
+/**
  * Allows to get the previous and the following book of the current one
  * @param {String} ressourceURI Uri of the current book
  * @returns ?book => the uri of the book; ?name => the name in english; ?position => before or after
@@ -40,8 +59,8 @@ export async function getBookNeighbor(ressourceURI){
     "?book a dbo:Book. ",
     "?book rdfs:label ?name. ",
     "BIND('after' AS ?position) ",
-    "}} ORDER BY DESC(?position)",
-    'FILTER(lang(?name) = "en") }',
+    "}} ",
+    'FILTER(lang(?name) = "en") } ORDER BY DESC(?position)',
   ].join("");
   return await axiosQuery(query);
 }
@@ -165,8 +184,8 @@ export async function getAssociatedGames(name, author){
       } UNION {
       ?uri a dbo:Single;
       dbo:abstract ?abstract;
-      rdfs:label ?label.
-      dbo:artist ?artist;
+      rdfs:label ?label;
+      dbo:artist ?artist.
       BIND("single" as ?type)
       } UNION {
       ?uri a dbo:Sound;
@@ -195,6 +214,20 @@ export async function queryAuthor() {
     'FILTER(lang(?listGenres) = "en").',
     'FILTER (regex(?name, "Antoine de"))',
     "}",
+  ].join("");
+  return await axiosQuery(query);
+}
+
+export async function getAuthorTimeLife(ressourceURI){
+  const currentAuthor = `dbr:${ressourceURI}`;
+  let query = [
+    'SELECT ?birthDate ?deathDate GROUP_CONCAT(?notableWorkName, ";") GROUP_CONCAT(?releaseDate, ";") WHERE { ',
+    `${currentAuthor} a dbo:Writer; `,
+    "dbo:birthDate ?birthDate; ",
+    "dbo:notableWork ?notableWork. ",
+    "?notableWork dbp:name ?notableWorkName. ",
+    "?notableWork dbp:releaseDate ?releaseDate. ",
+    `OPTIONAL{${currentAuthor} dbo:deathDate ?deathDate }}`,
   ].join("");
   return await axiosQuery(query);
 }

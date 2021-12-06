@@ -1,4 +1,6 @@
-import {getBookInfo} from '../services/sparqlRequests'
+import {getBookInfo, getAssociatedGames, getAssociatedMovies, getAssociatedMusicals,
+    getAssociatedSeries, getAssociatedArts, getAssociatedMusics , getListInSeries,
+    getBookNeighbor} from '../services/sparqlRequests'
 import {useEffect, useState} from "react";
 import {useParams} from 'react-router-dom'
 import './Books.css'
@@ -11,6 +13,16 @@ const Books = () => {
     const [bookInfo, setBookInfo] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
 
+    const [associatedGames, setAssociatedGames] = useState(null);
+    const [associatedMovies, setAssociatedMovies] = useState(null);
+    const [associatedMusicals, setAssociatedMusicals] = useState(null);
+    const [associatedSeries, setAssociatedSeries] = useState(null);
+    const [associatedArts, setAssociatedArts] = useState(null);
+    const [associatedMusics, setAssociatedMusics] = useState(null);
+
+    const [seriesOfBook, setSeriesOfBook] = useState(null);
+    const [neighbors, setNeighbors] = useState(null);
+
     useEffect(() => {
 
         const loadBookInfo = async () => {
@@ -19,13 +31,70 @@ const Books = () => {
             setBookInfo(response[0])
             setIsLoading(false);
         }
-        loadBookInfo();
+
+        (async () => {
+            await loadBookInfo();
+          })();
     }, []);
 
     useEffect(() => {
-        console.log(bookInfo);
-        setIsLoading(false)
+        const loadAssociatedWork = async () => {
+            setIsLoading(true);
+            if(bookInfo !== null) {
+                const games = await getAssociatedGames(bookInfo.name.value, bookInfo.authorName.value);
+                setAssociatedGames(games);
+
+                const movies = await getAssociatedMovies(bookInfo.name.value, bookInfo.authorName.value);
+                setAssociatedMovies(movies);
+
+                const musicals = await getAssociatedMusicals(bookInfo.name.value, bookInfo.authorName.value);
+                setAssociatedMusicals(musicals);
+
+                const series = await getAssociatedSeries(bookInfo.name.value, bookInfo.authorName.value);
+                setAssociatedSeries(series);
+
+                const arts = await getAssociatedArts(bookInfo.name.value, bookInfo.authorName.value);
+                setAssociatedArts(arts);
+
+                const musics = await getAssociatedMusics(bookInfo.name.value, bookInfo.authorName.value);
+                setAssociatedMusics(musics);
+            }
+            setIsLoading(false);
+        }
+        const loadAssociatedSeriesOfBook = async () => {
+            setIsLoading(true);
+            const response = await getListInSeries(bookURI);
+            setSeriesOfBook(response);
+            setIsLoading(false);
+        }
+        const loadBookNeighbors = async () => {
+            setIsLoading(true);
+            const response = await getBookNeighbor(bookURI);
+            setNeighbors(response);
+            setIsLoading(false);
+        }
+
+        (async () => {
+            await loadAssociatedWork();
+            await loadAssociatedSeriesOfBook();
+            await loadBookNeighbors();
+          })();
     }, [bookInfo])
+
+    useEffect(() => {
+        console.log(bookInfo);
+        console.log(associatedGames);
+        console.log(associatedMovies);
+        console.log(associatedMusicals);
+        console.log(associatedSeries);
+        console.log(associatedArts);
+        console.log(associatedMusics);
+        console.log(seriesOfBook);
+        console.log(neighbors);
+        setIsLoading(false)
+    }, [bookInfo, associatedGames, associatedMovies, 
+        associatedMusicals, associatedSeries, associatedArts,
+        associatedMusics, seriesOfBook, neighbors]) 
 
     const render = () => {
         return (
