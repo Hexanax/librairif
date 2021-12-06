@@ -41,18 +41,15 @@ export async function queryAuthor() {
 }
 
 export async function researchQuery(bookName, author) {
-  let query = `SELECT ?book ?name ?authorName ?releaseDate MIN(?titleOrig) as ?titleOrig MIN(?imageURL) as ?imageUrl
+  let query = `SELECT ?book ?name ?authorName ?releaseDate MIN(?imageURL) as ?imageUrl
     WHERE {
     ?book a dbo:Book.
     ?book dbp:name ?name.
     ?book dbo:author ?author.
-    ?book dbp:titleOrig ?titleOrig.
-    ?book dbp:releaseDate ?releaseDate.
-    OPTIONAL {?book dbo:thumbnail ?imageURL}
-    ?book dbo:abstract ?abstract.
+    OPTIONAL {?book dbo:thumbnail ?imageURL;
+    dbp:releaseDate ?releaseDate.}
     ?author dbp:name ?authorName.
     FILTER(lang(?name) = "en")
-    FILTER(lang(?abstract) = "en")
     FILTER (regex(?name, "${bookName}", "i"))
     FILTER (regex(?author, "${author}",  "i"))
     } GROUP BY ?name ?authorName ?releaseDate ?book
@@ -79,7 +76,7 @@ export async function autocompleteQuery(text) {
     "BIND('Writer' AS ?type)}} ",
     `FILTER (isLiteral(?name)) `,
     'FILTER(lang(?name) = "en") ',
-    `FILTER (regex(?name, '${text}')) `,
+    `FILTER (regex(?name, '${text}',"i")) `,
     "} ",
     "ORDER BY ASC(?name) ",
     "LIMIT 10 ",
