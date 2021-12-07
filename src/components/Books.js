@@ -11,6 +11,7 @@ import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import * as React from "react";
 import Game from "./Game";
+import Movie from "./Movie";
 
 const Books = () => {
 
@@ -202,6 +203,10 @@ const Books = () => {
                             <div className={"relatedWrapper"}>
                                 <h3>Related Games</h3>
                                 {associatedGames !== null && associatedGames.map(game => <Game game={game}/>)}
+                            </div>
+                            <div className={"relatedWrapper"}>
+                                <h3>Related Movies</h3>
+                                {associatedMovies !== null && associatedMovies.map(movie => <Movie movie={movie}/>)}
                             </div>
                         </div>
                     </div>
