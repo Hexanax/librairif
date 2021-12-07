@@ -8,7 +8,7 @@ import {useNavigate} from 'react-router-dom'
 import './Books.css'
 import Typography from "@mui/material/Typography"
 import Grid from "@mui/material/Grid"
-import { getBookInfo } from "../services/sparqlRequests";
+import { fetchBookInfo } from "../services/sparqlRequests";
 
 
 function Author(data){  
@@ -36,7 +36,7 @@ function Author(data){
             
             for (let element of response[0].books.value.split(";")){
                 console.log("this is the book" + element.split("/").pop());
-                let responseBook = getBookInfo(element.split("/").pop());
+                let responseBook = fetchBookInfo(element.split("/").pop());
                 setBooks(Books => [...Books, responseBook]);
     }
             console.log("books " + Books);
