@@ -125,7 +125,7 @@ export default function SearchPage() {
         }
       })();
     }
-  }, [open]);
+  }, [open, value]);
 
   return (
     <Box
@@ -195,12 +195,12 @@ export default function SearchPage() {
             InputProps={{
               ...params.InputProps,
               endAdornment: (
-                <React.Fragment>
+                <>
                   {loading ? (
                     <CircularProgress color="inherit" size={20} />
                   ) : null}
                   {params.InputProps.endAdornment}
-                </React.Fragment>
+                </>
               ),
             }}
           />

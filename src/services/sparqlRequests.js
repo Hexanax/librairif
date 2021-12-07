@@ -1,6 +1,6 @@
 import axios from "axios";
 
-export async function getBookInfo(resourceURI) {
+export async function fetchBookInfo(resourceURI) {
     //TODO CHANGE HARDCODED URI
     const book = `dbr:${resourceURI}`;
     const content = `SELECT ?name ?titleOrig ?releaseDate ?imageURL ?abstract ?authorURI ?authorName ?publisherURI
@@ -24,7 +24,7 @@ export async function getBookInfo(resourceURI) {
  * it is in a series of book Uri of the current book
  * @param {*} ressourceURI 
  */
- export async function getListInSeries(ressourceURI){
+ export async function fetchListInSeries(ressourceURI){
   const currentBook = `dbr:${ressourceURI}`;
   let query = [
     "Select ?bookUri ?serie ?name ?imageURL WHERE { ",
@@ -43,7 +43,7 @@ export async function getBookInfo(resourceURI) {
  * @param {String} ressourceURI Uri of the current book
  * @returns ?book => the uri of the book; ?name => the name in english; ?position => before or after
  */
-export async function getBookNeighbor(ressourceURI){
+export async function fetchBookNeighbor(ressourceURI){
   const currentBook = `dbr:${ressourceURI}`;
   let query = [
     "Select ?book ?name ?position WHERE { ",
@@ -69,7 +69,7 @@ export async function getBookNeighbor(ressourceURI){
  * @param {String} author the author of the current book
  * @returns 
  */
-export async function getAssociatedGames(name, author){
+export async function fetchAssociatedGames(name, author){
   let query = [
     "select DISTINCT(STR(?label)) as ?game ?uri ?date ?developer where{ ",
     "?uri rdf:type dbo:VideoGame; ",
@@ -89,7 +89,7 @@ export async function getAssociatedGames(name, author){
  * @param {String} author the author of the current book
  * @returns 
  */
- export async function getAssociatedMovies(name, author){
+ export async function fetchAssociatedMovies(name, author){
   let query = [
     "select DISTINCT(STR(?label)) as ?movie ?uri ?runtime ?producer where{ ",
     "?uri rdf:type dbo:Film; ",
@@ -109,7 +109,7 @@ export async function getAssociatedGames(name, author){
  * @param {String} author the author of the current book
  * @returns 
  */
- export async function getAssociatedMusicals(name, author){
+ export async function fetchAssociatedMusicals(name, author){
   let query = [
     "select DISTINCT(STR(?label)) as ?musical ?uri ?author ?lyric ?music where{ ",
     "?uri rdf:type dbo:Musical; ",
@@ -130,7 +130,7 @@ export async function getAssociatedGames(name, author){
  * @param {String} author the author of the current book
  * @returns 
  */
- export async function getAssociatedSeries(name, author){
+ export async function fetchAssociatedSeries(name, author){
   let query = [
     "select DISTINCT(STR(?label)) as ?serie ?uri ?composer ?season where{ ",
     "?uri rdf:type dbo:TelevisionShow; ",
@@ -150,7 +150,7 @@ export async function getAssociatedGames(name, author){
  * @param {String} author the author of the current book
  * @returns 
  */
- export async function getAssociatedArts(name, author){
+ export async function fetchAssociatedArts(name, author){
   let query = [
     "select DISTINCT(STR(?label)) as ?art ?uri ?image ?artist where{ ",
     "?uri rdf:type dbo:Artwork; ",
@@ -170,7 +170,7 @@ export async function getAssociatedGames(name, author){
  * @param {String} author the author of the current book
  * @returns 
  */
- export async function getAssociatedMusics(name, author){
+ export async function fetchAssociatedMusics(name, author){
   let query = [
     "select DISTINCT(STR(?label)) as ?music ?uri ?type ?artist where{ ",
     ` {{
