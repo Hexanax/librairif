@@ -95,10 +95,12 @@ export default function SearchPage() {
     setOptions([...response]);
   };
 
-  const handleSelectorChange = (event, searchType) => {
-    setSearchType(searchType);
-    setSearchResults([]);
-    setInputValue("");
+  const handleSelectorChange = (event, newSearchType) => {
+    if (newSearchType) {
+      setSearchType(newSearchType);
+      setSearchResults([]);
+      setInputValue("");
+    }
   };
 
   const handleChange = async (event, newValue) => {

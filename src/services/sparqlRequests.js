@@ -278,7 +278,8 @@ export async function researchQuery(bookName, author) {
     FILTER(lang(?abstract) = "en")
     FILTER (regex(?name, "${bookName}", "i"))
     FILTER (regex(?author, "${author}",  "i"))
-    } GROUP BY ?authorName ?book`
+    } GROUP BY ?authorName ?book
+    LIMIT 200`;
   return await axiosQuery(query);
 }
 
