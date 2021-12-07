@@ -16,7 +16,7 @@ export async function fetchBookInfo(resourceURI) {
             OPTIONAL{${book} dbo:literaryGenre ?genre.}
             OPTIONAL{${book} dbp:publisher ?publisherURI.}
             OPTIONAL{${book} dbp:author ?authorURI.}
-            OPTIONAL{?authorURI dbp:name ?authorName.}
+            ?authorURI dbp:name ?authorName.
             FILTER(lang(?abstract) = "en")
         }`;
     console.log(content);
@@ -351,7 +351,7 @@ async function axiosQuery(query) {
     return new Promise((resolve, reject) => {
         axios
             .get(queryURL)
-            .then((response) => resolve(response.data.results.bindings))
+            .then((response) => {resolve(response.data.results.bindings); console.log(response.data.results)})
             .catch((err) => {
                 console.error(err);
             });
