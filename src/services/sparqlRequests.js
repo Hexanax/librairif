@@ -42,10 +42,10 @@ export async function fetchListInSeries(ressourceURI) {
     return await axiosQuery(query);
 }
 
-export async function getEditorInfo(editorName){
-  let editorRsrc = `dbr:${editorName}`;
-  let query = [
-    `SELECT ?label ?abstract
+export async function getEditorInfo(editorName) {
+    let editorRsrc = `dbr:${editorName}`;
+    let query = [
+        `SELECT ?label ?abstract
     (GROUP_CONCAT(DISTINCT ?founded;   SEPARATOR=", ") AS ?foundingYears)
     (GROUP_CONCAT(DISTINCT ?founder;   SEPARATOR=", ") AS ?founders)
     (GROUP_CONCAT(DISTINCT ?homepage;    SEPARATOR=", ") AS ?homepages)
@@ -59,9 +59,9 @@ export async function getEditorInfo(editorName){
       FILTER(lang(?abstract) = "en").
       FILTER(lang(?label) = "en").
     }`
-  ].join("");
-  console.log(query);
-  return await axiosQuery(query);
+    ].join("");
+    console.log(query);
+    return await axiosQuery(query);
 }
 
 /**
@@ -97,7 +97,7 @@ export async function fetchBookNeighbor(ressourceURI) {
  */
 export async function fetchAssociatedGames(name, author) {
     let query = [
-    `SELECT DISTINCT(STR(?label)) as ?game ?uri ?date ?developer
+        `SELECT DISTINCT(STR(?label)) as ?game ?uri ?date ?developer
     WHERE{
         ?uri rdf:type dbo:VideoGame; 
         dbo:abstract ?abstract;
@@ -118,7 +118,7 @@ export async function fetchAssociatedGames(name, author) {
  */
 export async function fetchAssociatedMovies(name, author) {
     let query = [
-    `SELECT DISTINCT(STR(?label)) as ?movie ?uri ?runtime
+        `SELECT DISTINCT(STR(?label)) as ?movie ?uri ?runtime
     (GROUP_CONCAT(DISTINCT ?producer; SEPARATOR=", ") AS ?producers)
     WHERE{
       ?uri rdf:type dbo:Film;
@@ -234,10 +234,9 @@ export async function fetchAssociatedMusics(name, author) {
     return await axiosQuery(query);
 }
 
-<<<<<<< HEAD
 export async function queryAuthor(authorURI) {
-  let author = `dbr:${authorURI}`;
-  let query = `SELECT ?name ?description ?birthDate ?deathDate ?occupation ?educ ?image 
+    let author = `dbr:${authorURI}`;
+    let query = `SELECT ?name ?description ?birthDate ?deathDate ?occupation ?educ ?image 
   GROUP_CONCAT(DISTINCT ?listAwards, ";") as ?listAwards 
   GROUP_CONCAT(DISTINCT ?listGenres, ";") as ?listGenres 
   GROUP_CONCAT(DISTINCT ?books, ";") as ?books
@@ -257,27 +256,10 @@ export async function queryAuthor(authorURI) {
   FILTER(lang(?listAwards) = "en")
   FILTER(lang(?listGenres) = "en")
   }`;
-  console.log("query" + query);
-  return await axiosQuery(query);
-=======
-export async function queryAuthor() {
-    let query = [
-        `SELECT ?name, GROUP_CONCAT(DISTINCT ?listGenres, ";"), GROUP_CONCAT(DISTINCT ?listBooks, ";") WHERE {
-        ?writer a dbo:Writer.
-        ?writer dbp:name ?name.
-        ?writer dbp:occupation ?occupation.
-        ?writer dbo:thumbnail ?image.
-        ?writer ^dbp:author ?books.
-        ?books rdfs:label ?listBooks.
-        ?writer dbo:genre ?genres.
-        ?genres rdfs:label ?listGenres.
-        FILTER(lang(?listBooks) = "en").
-        FILTER(lang(?listGenres) = "en").
-        FILTER (regex(?name, "Antoine de"))
-        }`
-    ].join("");
+    console.log("query" + query);
     return await axiosQuery(query);
 }
+
 
 export async function getAuthorTimeLife(ressourceURI) {
     const currentAuthor = `dbr:${ressourceURI}`;
@@ -291,12 +273,11 @@ export async function getAuthorTimeLife(ressourceURI) {
         OPTIONAL{${currentAuthor} dbo:deathDate ?deathDate }}`
     ].join("");
     return await axiosQuery(query);
->>>>>>> 4e7e8df8f833a49d5753a7e56604f590dd8b6d0b
 }
 
 export async function researchQuery(bookName, author) {
 
-  let query = `SELECT ?authorName ?book
+    let query = `SELECT ?authorName ?book
   (MIN(?name) AS ?name)
   (MIN(?releaseDate) AS ?releaseDate)
   (MAX(?imageURL) AS ?imageUrl)
@@ -319,7 +300,7 @@ export async function researchQuery(bookName, author) {
 
     } GROUP BY ?authorName ?book`
 
-  return await axiosQuery(query);
+    return await axiosQuery(query);
 }
 
 /**
@@ -350,22 +331,17 @@ export async function autocompleteQuery(text) {
 }
 
 export async function getSearch(name) {
-  return new Promise((resolve, reject) => {
-<<<<<<< HEAD
-    axios
-      .get(queryURL)
-      .then((response) => {resolve(response.data.results.bindings); console.log(response.data.results)})
-      .catch((err) => {
-        console.error(err);
-=======
-    researchQuery(name, "").then(results1 => {
-      researchQuery("", name).then(results2 => {
-        let finalResults = results1.concat(results2);
-        return resolve(finalResults.sort((a, b) => {return a.name.value.toUpperCase().localeCompare(b.name.value.toUpperCase())}));
->>>>>>> 4e7e8df8f833a49d5753a7e56604f590dd8b6d0b
-      });
+    return new Promise((resolve, reject) => {
+
+        researchQuery(name, "").then(results1 => {
+            researchQuery("", name).then(results2 => {
+                let finalResults = results1.concat(results2);
+                return resolve(finalResults.sort((a, b) => {
+                    return a.name.value.toUpperCase().localeCompare(b.name.value.toUpperCase())
+                }));
+            });
+        });
     });
-  });
 }
 
 async function axiosQuery(query) {
@@ -380,4 +356,5 @@ async function axiosQuery(query) {
                 console.error(err);
             });
     });
+
 }
