@@ -114,7 +114,7 @@ const Books = () => {
                         </h1>
                         <div className={"authorWrapper"}>
                             <span className={"author"}>{bookInfo.authorName ? bookInfo.authorName.value :
-                                <span>unknown author</span>}</span>
+                                bookInfo.authorURI?.value }</span>
                         </div>
                         <div className={"mainContent"}>
                             <div className={"abstractWrapper"}>
