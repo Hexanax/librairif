@@ -46,7 +46,9 @@ function Author(data) {
             // initialise arrays
             setListAwards(splitString(response[0].listAwards.value));
             setListBooks(splitString(response[0].books.value));
-            setListGenres(splitString(response[0].listGenres.value));
+            if (response[0].listGenres !== null) {
+                setListGenres(response[0].listGenres?.value.split(','));
+            }
            
         
 
@@ -176,7 +178,7 @@ function Author(data) {
                                     <div>
                                         <ul>
                                             {listGenres !== null &&
-                                                listGenres.map((genre) =>
+                                                listGenres?.map((genre) =>
                                                     <li key={genre}>
                                                         {genre}
                                                     </li>

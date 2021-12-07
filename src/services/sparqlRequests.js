@@ -240,9 +240,8 @@ export async function queryAuthor(authorURI) {
     authorURI = authorURI.replace(/[( ]/g, '\\(')
     authorURI = authorURI.replace(/[) ]/g, '\\)')
     let author = `dbr:${authorURI}`;
-    let query = `SELECT ?name ?description ?birthDate ?deathDate ?occupation ?educ ?image 
+    let query = `SELECT ?name ?description ?birthDate ?deathDate ?occupation ?educ ?image ?listGenres
   GROUP_CONCAT(DISTINCT ?listAwards, ";") as ?listAwards 
-  GROUP_CONCAT(DISTINCT ?listGenres, ";") as ?listGenres 
   GROUP_CONCAT(DISTINCT ?books, ";") as ?books
   WHERE {
   ${author} dbp:name ?name.
@@ -254,7 +253,7 @@ export async function queryAuthor(authorURI) {
   OPTIONAL{${author} dbo:education ?education. ?education rdfs:label ?educ}
   OPTIONAL{${author} dbp:awards ?awards. ?awards rdfs:label ?listAwards}
   OPTIONAL{${author} ^dbp:author ?books}
-  OPTIONAL{${author} dbo:genre ?genres. ?genres rdfs:label ?listGenres}
+  OPTIONAL{${author} dbp:genre ?listGenres}
   FILTER(lang(?description) = "en")
   FILTER(lang(?educ) = "en")
   FILTER(lang(?listAwards) = "en")
