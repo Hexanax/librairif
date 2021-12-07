@@ -47,7 +47,7 @@ function Author(data) {
             setListAwards(splitString(response[0].listAwards.value));
             setListBooks(splitString(response[0].books.value));
             setListGenres(splitString(response[0].listGenres.value));
-            console.log("book " + response[0].books.value.split(";")[2].split("/").pop());
+           
         
 
             for (let element of response[0].books.value.split(";")) {
@@ -96,13 +96,13 @@ function Author(data) {
                         <div className={"titleWrapper"}>
 
                             <Typography component="h1" variant="h1">
-                                {authorInfo.name.value}
+                                {authorInfo.name?.value}
                             </Typography>
 
                             <h3> {authorInfo.birthDate.value} </h3> -
-                            {authorInfo.deathDate === null &&
-                                <div> Present </div>}
-                            {authorInfo.deathDate !== null && <h3>{authorInfo.deathDate.value}</h3>}
+                            {authorInfo.deathDate == null &&
+                                <h3> Present </h3>}
+                            {authorInfo.deathDate !== null && <h3>{authorInfo.deathDate?.value}</h3>}
 
 
                             <div className={"mainContent"}>
@@ -110,10 +110,10 @@ function Author(data) {
                                     <Typography component="h2" variant="h2">
                                         Description
                                     </Typography>
-                                    {authorInfo.description.value}
+                                    {authorInfo.description?.value}
                                 </div>
                                 <div className={"imageWrapper"}>
-                                    <img src={authorInfo.image.value} />
+                                    <img src={authorInfo.image?.value} />
                                 </div>
                             </div>
                             <div>
@@ -144,7 +144,7 @@ function Author(data) {
                                     <div>
                                         {authorInfo.occupation.value !== null &&
                                             <div>
-                                                {authorInfo.occupation.value}
+                                                {authorInfo.occupation?.value}
                                             </div>
                                         }
                                     </div>
@@ -157,9 +157,6 @@ function Author(data) {
                                                 <Typography component="h6" variant="h6">
                                                     Education
                                                 </Typography>
-
-
-
                                             </div>
                                         }
                                     </div>
@@ -186,8 +183,6 @@ function Author(data) {
                                                 )}
                                         </ul>
                                     </div>
-
-
 
                                 </div>
                                     <div>

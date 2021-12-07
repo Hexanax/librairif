@@ -237,6 +237,8 @@ export async function fetchAssociatedMusics(name, author) {
 }
 
 export async function queryAuthor(authorURI) {
+    authorURI = authorURI.replace(/[( ]/g, '\\(')
+    authorURI = authorURI.replace(/[) ]/g, '\\)')
     let author = `dbr:${authorURI}`;
     let query = `SELECT ?name ?description ?birthDate ?deathDate ?occupation ?educ ?image 
   GROUP_CONCAT(DISTINCT ?listAwards, ";") as ?listAwards 
