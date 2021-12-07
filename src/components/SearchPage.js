@@ -4,7 +4,7 @@ import Box from "@mui/material/Box";
 import {useEffect, useState} from "react";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
-import {researchQuery, autocompleteQuery} from "../services/sparqlRequests";
+import {researchQuery, autocompleteQuery, getSearch} from "../services/sparqlRequests";
 import SearchIcon from "@mui/icons-material/Search";
 import {useNavigate} from "react-router-dom"
 
@@ -54,7 +54,7 @@ export default function SearchPage() {
     const data = new FormData(event.currentTarget);
     const searchInput = data.get("search");
     setIsLoading(true);
-    const response = await researchQuery("", searchInput);
+    const response = await getSearch(searchInput);
     console.log(response);
     setSearchResults(response);
     setIsLoading(false);
@@ -88,12 +88,12 @@ export default function SearchPage() {
     if(newValue.name === undefined){
       setValue(newValue);
       setInputValue(newValue);
-      const response = await researchQuery(newValue, "");
+      const response = await getSearch(newValue);
       setSearchResults(response);
     } else {
       setValue(newValue.name.value);
       setInputValue(newValue.name.value);
-      const response = await researchQuery(newValue.name.value, "");
+      const response = await getSearch(newValue.name.value);
       setSearchResults(response);
     }
     setIsLoading(false);
@@ -191,6 +191,7 @@ export default function SearchPage() {
           <TextField
             id="search"
             name="search"
+            label="Search your book by name or author"
             {...params}
             InputProps={{
               ...params.InputProps,

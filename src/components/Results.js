@@ -33,8 +33,8 @@ export default function Results({ books }) {
             const data = {
               title: obj.name.value,
               author: obj.authorName.value,
-              img: obj.imageUrl?.value,
-              releaseDate: obj.releaseDate?.value,
+              img: obj.imageUrls?.value.split(",")[0],
+              releaseDate: obj.releaseDates?.value.split(",")[0],
               bookURI: obj.book.value.split("http://dbpedia.org/resource/")[1],
             };
             return BookResult(index, data, navigate);

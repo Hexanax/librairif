@@ -40,6 +40,28 @@ export async function fetchListInSeries(ressourceURI) {
     return await axiosQuery(query);
 }
 
+export async function getEditorInfo(editorName){
+  let editorRsrc = `dbr:${editorName}`;
+  let query = [
+    `SELECT ?label ?abstract
+    (GROUP_CONCAT(DISTINCT ?founded;   SEPARATOR=", ") AS ?foundingYears)
+    (GROUP_CONCAT(DISTINCT ?founder;   SEPARATOR=", ") AS ?founders)
+    (GROUP_CONCAT(DISTINCT ?homepage;    SEPARATOR=", ") AS ?homepages)
+    (GROUP_CONCAT(DISTINCT ?headquarters; SEPARATOR=", ") AS ?headquartersLocations) WHERE {
+      ${editorRsrc} rdfs:label ?label;
+      dbo:abstract ?abstract.
+      OPTIONAL{${editorRsrc} dbo:founder ?founder}
+      OPTIONAL{${editorRsrc} dbo:foundingYear ?founded}
+      OPTIONAL{${editorRsrc} foaf:homepage ?homepage}
+      OPTIONAL{${editorRsrc} dbp:headquarters ?headquarters}
+      FILTER(lang(?abstract) = "en").
+      FILTER(lang(?label) = "en").
+    }`
+  ].join("");
+  console.log(query);
+  return await axiosQuery(query);
+}
+
 /**
  * Allows to get the previous and the following book of the current one
  * @param {String} ressourceURI Uri of the current book
@@ -244,24 +266,31 @@ export async function getAuthorTimeLife(ressourceURI) {
 }
 
 export async function researchQuery(bookName, author) {
-    let query = `SELECT ?name ?authorName ?book
+
+  let query = `SELECT ?authorName ?book
+  (MIN(?name) AS ?name)
   (MIN(?releaseDate) AS ?releaseDate)
   (MAX(?imageURL) AS ?imageUrl)
   (MAX(?abstract) AS ?abstract) 
+
     WHERE {
     ?book a dbo:Book.
     ?book dbp:name ?name.
     ?book dbo:author ?author;
     dbo:abstract ?abstract.
+
     OPTIONAL {?book dbo:thumbnail ?imageURL.}
     OPTIONAL {?book dbp:releaseDate ?releaseDate.}
+
     ?author dbp:name ?authorName.
     FILTER(lang(?name) = "en")
     FILTER(lang(?abstract) = "en")
     FILTER (regex(?name, "${bookName}", "i"))
     FILTER (regex(?author, "${author}",  "i"))
-    } GROUP BY ?name ?authorName ?book`
-    return await axiosQuery(query);
+
+    } GROUP BY ?authorName ?book`
+
+  return await axiosQuery(query);
 }
 
 /**
@@ -289,6 +318,17 @@ export async function autocompleteQuery(text) {
         LIMIT 10`
     ].join("");
     return await axiosQuery(query);
+}
+
+export async function getSearch(name) {
+  return new Promise((resolve, reject) => {
+    researchQuery(name, "").then(results1 => {
+      researchQuery("", name).then(results2 => {
+        let finalResults = results1.concat(results2);
+        return resolve(finalResults.sort((a, b) => {return a.name.value.toUpperCase().localeCompare(b.name.value.toUpperCase())}));
+      });
+    });
+  });
 }
 
 async function axiosQuery(query) {
