@@ -41,7 +41,8 @@ export default function SearchPage() {
     const data = new FormData(event.currentTarget);
     const searchInput = data.get("search");
     setIsLoading(true);
-    const response = await researchQuery(searchInput, "");
+    const response = await researchQuery("", searchInput);
+    console.log(response);
     setSearchResults(response);
     setIsLoading(false);
     console.log({
