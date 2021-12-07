@@ -38,15 +38,25 @@
 
 .infoWrapper{
     display:grid;
-    width:40%;
+    width:100%;
+    height:100%;
     grid-gap:20px;
-    grid-template-columns: 50% 50%;
-    grid-template-rows: 50% 50%;
+    grid-template-columns: 30% 50%;
     margin-bottom: 50px;
-    height: fit-content;
+
 }
 
 .publishersWrapper{
+    width:fit-content;
+    height: fit-content;
+}
+
+.releaseDateWrapper{
+    width:fit-content;
+    height: fit-content;
+}
+
+.titleOrig{
     width:fit-content;
     height: fit-content;
 }
