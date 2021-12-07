@@ -35,7 +35,7 @@ export const lightTheme = {
       fontWeight: 300,
     },
     h6: {
-      fontFamily: "Oswald",
+      fontFamily: "EB Garamond",
       fontWeight: 500,
     },
     button: {

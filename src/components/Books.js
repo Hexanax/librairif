@@ -187,6 +187,15 @@ const Books = () => {
                                             <span> {bookInfo.titleOrig.value}</span>
                                         </div>
                                     </> : null}
+                                {bookInfo.genres ?
+                                    <>
+                                        <div className={"literaryGenres"}>
+                                            <span>Literary genres</span>
+                                        </div>
+                                        <div className={"literaryGenres"}>
+                                            <span> {bookInfo.genres.value}</span>
+                                        </div>
+                                    </> : null}
                             </div>
                         </div>
                         <div>
