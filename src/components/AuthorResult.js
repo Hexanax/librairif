@@ -9,7 +9,7 @@ import { CardActionArea, Grid } from "@mui/material";
 function AuthorResult(index, data, navigate) {
   const handleClick = () => {
     console.log("click");
-    navigate(`../../bookInfo/${data.bookURI}`);
+    navigate(`../../bookInfo/${data.authorURI}`);
   };
   // uri, nom date naissance, date mort, thumbnail
   let authorCover;
@@ -69,11 +69,10 @@ function AuthorResult(index, data, navigate) {
               component="div"
               sx={{ textOverflow: "ellipsis" }}
             >
-              {data.title}
+              {data.name}
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              {data.birthDate} {data.birthDate && data.deathDate ? " - " : ""}{" "}
-              {data.deathDate}
+              {data.birthDate ? data.birthDate : ""} {data.deathDate ? " - " + data.deathDate : ""}
             </Typography>
           </CardContent>
         </CardActionArea>

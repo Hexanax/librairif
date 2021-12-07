@@ -289,7 +289,7 @@ export async function getAuthors(name) {
     OPTIONAL {?writer dbp:birthDate ?birthDate.}
     OPTIONAL {?writer dbp:deathDate ?deathDate.}
     OPTIONAL  {?writer dbo:thumbnail ?image.}
-    FILTER (regex(?name, "${name}"))
+    FILTER (regex(?name, "${name}", "i"))
     } GROUP BY ?writer`;
     return await axiosQuery(query);
 }
