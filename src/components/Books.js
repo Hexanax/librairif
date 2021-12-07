@@ -45,22 +45,22 @@ const Books = () => {
         const loadAssociatedWork = async () => {
             setIsLoading(true);
             if (bookInfo !== null) {
-                const games = await getAssociatedGames(bookInfo.name.value, bookInfo.authorName.value);
+                const games = await getAssociatedGames(bookInfo.name.value, bookInfo.authorName?.value);
                 setAssociatedGames(games);
 
-                const movies = await getAssociatedMovies(bookInfo.name.value, bookInfo.authorName.value);
+                const movies = await getAssociatedMovies(bookInfo.name.value, bookInfo.authorName?.value);
                 setAssociatedMovies(movies);
 
-                const musicals = await getAssociatedMusicals(bookInfo.name.value, bookInfo.authorName.value);
+                const musicals = await getAssociatedMusicals(bookInfo.name.value, bookInfo.authorName?.value);
                 setAssociatedMusicals(musicals);
 
-                const series = await getAssociatedSeries(bookInfo.name.value, bookInfo.authorName.value);
+                const series = await getAssociatedSeries(bookInfo.name.value, bookInfo.authorName?.value);
                 setAssociatedSeries(series);
 
-                const arts = await getAssociatedArts(bookInfo.name.value, bookInfo.authorName.value);
+                const arts = await getAssociatedArts(bookInfo.name.value, bookInfo.authorName?.value);
                 setAssociatedArts(arts);
 
-                const musics = await getAssociatedMusics(bookInfo.name.value, bookInfo.authorName.value);
+                const musics = await getAssociatedMusics(bookInfo.name.value, bookInfo.authorName?.value);
                 setAssociatedMusics(musics);
             }
             setIsLoading(false);
@@ -158,10 +158,10 @@ const Books = () => {
                                     </Box>}
                             </div>
                         </div>
-                        <div>
+                        <div style={{'margin-bottom':'10px'}}>
                             <h2>Info</h2>
                             <div className={"infoWrapper"}>
-                                {bookInfo.publishers ?
+                                {bookInfo.publishers.value!=="" ?
                                     <>
                                         <div className={"publishersWrapper"}>
                                             Publishers
@@ -171,7 +171,7 @@ const Books = () => {
                                         </div>
                                     </>
                                     : null}
-                                {bookInfo.releaseDate ?
+                                {bookInfo.releaseDates.value!=="" ?
                                     <>
                                         <div className={"releaseDateWrapper"}>
                                             <span>Release Date</span>
@@ -185,16 +185,18 @@ const Books = () => {
                                         <div className={"titleOrig"}>
                                             <span>Original Title</span>
                                         </div>
-                                        <div>
+                                        <div className={"titleOrig"}>
                                             <span> {bookInfo.titleOrig.value}</span>
                                         </div>
-                                    </>
-                                    : null}
+                                    </> : null}
                             </div>
                         </div>
                         <div>
-                            <h2> Related Books</h2>
+                            <h2> Related Content</h2>
                             <div className={"relatedWrapper"}>
+                                <h3 Related Books>
+
+                                </h3>
                             </div>
                         </div>
                     </div>
