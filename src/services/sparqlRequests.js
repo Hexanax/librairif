@@ -307,28 +307,25 @@ export async function getAuthorTimeLife(resourceURI) {
  * @param {*} author 
  * @returns result array
  */
-export async function researchQuery(bookName, author) {
-    bookName=encodeResource(bookName);
-    author=encodeResource(author)
+export async function researchQuery(name) {
+    name=encodeResource(name);
     let query = `SELECT ?authorName ?book
-  (MIN(?name) AS ?name)
-  (MIN(?releaseDate) AS ?releaseDate)
-  (MAX(?imageURL) AS ?imageUrl)
-  (MAX(?abstract) AS ?abstract) 
-    WHERE {
-    ?book a dbo:Book.
-    ?book dbp:name ?name.
-    ?book dbo:author ?author;
-    dbo:abstract ?abstract.
-    OPTIONAL {?book dbo:thumbnail ?imageURL.}
-    OPTIONAL {?book dbp:releaseDate ?releaseDate.}
-    ?author dbp:name ?authorName.
-    FILTER(lang(?name) = "en")
-    FILTER(lang(?abstract) = "en")
-    FILTER (regex(?name, "${bookName}", "i"))
-    FILTER (regex(?author, "${author}",  "i"))
-    } GROUP BY ?authorName ?book`
-
+    (MAX(?name) AS ?name)
+    (MAX(?releaseDate) AS ?releaseDate)
+    (MAX(?imageURL) AS ?imageUrl)
+    (MAX(?abstract) AS ?abstract) 
+        WHERE {
+        ?book a dbo:Book.
+        ?book dbp:name ?name.
+        ?book dbo:author ?author;
+        dbo:abstract ?abstract.
+        OPTIONAL {?book dbo:thumbnail ?imageURL.}
+        OPTIONAL {?book dbp:releaseDate ?releaseDate.}
+        ?author dbp:name ?authorName.
+        FILTER(lang(?name) = "en")
+        FILTER(lang(?abstract) = "en")
+        FILTER (regex(?name, "${name}", "i") || regex(?author, "${name}",  "i"))
+        } GROUP BY ?authorName ?book LIMIT 300`
     return await axiosQuery(query);
 }
 
@@ -341,7 +338,7 @@ export async function getAuthors(name) {
     OPTIONAL {?writer dbp:deathDate ?deathDate.}
     OPTIONAL  {?writer dbo:thumbnail ?image.}
     FILTER (regex(?name, "${name}", "i"))
-    } GROUP BY ?writer`;
+    } GROUP BY ?writer LIMIT 300`;
     return await axiosQuery(query);
 }
 
@@ -375,14 +372,10 @@ export async function autocompleteQuery(text) {
 
 export async function getSearch(name) {
     return new Promise((resolve, reject) => {
-
-        researchQuery(name, "").then(results1 => {
-            researchQuery("", name).then(results2 => {
-                let finalResults = results1.concat(results2);
-                return resolve(finalResults.sort((a, b) => {
-                    return a.name.value.toUpperCase().localeCompare(b.name.value.toUpperCase())
-                }));
-            });
+        researchQuery(name).then(results => {
+            return resolve(results.sort((a, b) => {
+                return a.name.value.toUpperCase().localeCompare(b.name.value.toUpperCase());
+            }));
         });
     });
 }
