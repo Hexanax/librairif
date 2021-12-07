@@ -1,52 +1,60 @@
 
-
-.bookContainer{
-    margin-right:20%;
-    margin-left:20%;
-    margin-top:5%;
-    margin-bottom: 5%;
+.bookContainer {
+    margin: 5% 20%;
 }
 
-.bookContainer h1{
+.bookContainer h1 {
     font-size: xxx-large;
 }
 
-.bookContainer h2{
-    font-size:xx-large;
+.bookContainer h2 {
+    font-size: xx-large;
 }
 
-.author{
+.author {
     font-size: large;
-    color:grey;
+    color: grey;
 }
 
-.mainContent{
+.mainContent {
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
-.imageWrapper{
-    margin-left:3em;
+.imageWrapper {
+    margin-left: 3em;
 }
 
-.imageWrapper img{
+.imageWrapper img {
     border-radius: 10px;
     box-shadow: 2px 2px 2px 2px grey;
 
 }
 
-.infoWrapper{
-    display:grid;
-    width:40%;
-    grid-gap:20px;
+.infoWrapper {
+    display: grid;
+    width: 40%;
+    grid-gap: 20px;
     grid-template-columns: 50% 50%;
     grid-template-rows: 50% 50%;
     margin-bottom: 50px;
     height: fit-content;
 }
 
-.publishersWrapper{
-    width:fit-content;
+.publishersWrapper {
+    width: fit-content;
     height: fit-content;
+}
+
+.game-container {
+
+}
+
+.game {
+    box-shadow: 0 0 10px -2px rgb(0, 0, 0, 0.1);
+    border-radius: 10px;
+    padding: 10px;
+    margin: 10px;
+    width: fit-content;
 }
