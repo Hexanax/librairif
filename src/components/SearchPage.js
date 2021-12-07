@@ -70,11 +70,18 @@ export default function SearchPage() {
 
   const handleChange = async (event, newValue) => {
     event.preventDefault();
-    setValue(newValue.name.value);
-    setInputValue(newValue.name.value);
     setIsLoading(true);
-    const response = await researchQuery(newValue.name.value, "");
-    setSearchResults(response);
+    if(newValue.name === undefined){
+      setValue(newValue);
+      setInputValue(newValue);
+      const response = await researchQuery(newValue, "");
+      setSearchResults(response);
+    } else {
+      setValue(newValue.name.value);
+      setInputValue(newValue.name.value);
+      const response = await researchQuery(newValue.name.value, "");
+      setSearchResults(response);
+    }
     setIsLoading(false);
   };
 
@@ -82,6 +89,12 @@ export default function SearchPage() {
     if (event.key === "ArrowRight" && highlightedOption != null) {
       setInputValue(highlightedOption.name.value);
       setValue(highlightedOption.name.value);
+    }
+    
+    if (event.key === 'Enter') {
+      if(highlightedOption===null){
+        event.defaultMuiPrevented = true;
+      }
     }
   };
 
