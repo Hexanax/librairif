@@ -57,14 +57,15 @@ export default function SearchPage() {
     const data = new FormData(event.currentTarget);
     const searchInput = data.get("search");
     setIsLoading(true);
-    const response = [];
     if (searchType == "Book") {
-      response = await getSearch(searchInput);
+      const bookResponse = await getSearch(searchInput);
+      console.log(bookResponse);
+      setSearchResults(bookResponse);
     } else if (searchType == "Author") {
-      response = await getAuthors(searchInput);
+      const authorResponse = await getAuthors(searchInput);
+      console.log(authorResponse);
+      setSearchResults(authorResponse);
     }
-    console.log(response);
-    setSearchResults(response);
     setIsLoading(false);
     console.log({
       searchInput: searchInput,
