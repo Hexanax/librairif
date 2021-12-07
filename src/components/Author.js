@@ -42,23 +42,20 @@ function Author(data) {
             setAuthorInfo(response[0]);
             console.log("authorInfo  " + response[0]);
             setIsLoading(false);
-            // initialise arrays
 
+            // initialise arrays
             setListAwards(splitString(response[0].listAwards.value));
             setListBooks(splitString(response[0].books.value));
             setListGenres(splitString(response[0].listGenres.value));
             console.log("book " + response[0].books.value.split(";")[2].split("/").pop());
-            //const responseBook = await fetchBookInfo(response[0].books.value.split(";")[2].split("/").pop());
-            //console.log(responseBook);
-            //setBooks(responseBook);
+        
 
             for (let element of response[0].books.value.split(";")) {
                 console.log("this is the book" + element.split("/").pop());
                 let responseBook = await fetchBookInfo(element.split("/").pop());
                 setBooks(Books => [...Books, responseBook]);
             }
-            console.log("books " + Books);
-
+            
         }
         loadAuthorInfo();
 
