@@ -155,19 +155,6 @@ export default function SearchPage() {
           flexDirection: "row ",
         }}
       >
-        <ToggleButtonGroup
-          color="primary"
-          value={searchType}
-          exclusive
-          onChange={handleSelectorChange}
-          sx={{
-            pr: 2,
-            height: 1,
-          }}
-        >
-          <ToggleButton value="Books">Books</ToggleButton>
-          <ToggleButton value="Author">Author</ToggleButton>
-        </ToggleButtonGroup>
         <Autocomplete
           freeSolo
           margin="normal"
@@ -257,6 +244,18 @@ export default function SearchPage() {
             );
           }}
         />
+        <ToggleButtonGroup
+          color="primary"
+          value={searchType}
+          exclusive
+          onChange={handleSelectorChange}
+          sx={{
+            pl: 2,
+          }}
+        >
+          <ToggleButton value="Books">Books</ToggleButton>
+          <ToggleButton value="Author">Author</ToggleButton>
+        </ToggleButtonGroup>
       </Box>
       <Button
         type="submit"
