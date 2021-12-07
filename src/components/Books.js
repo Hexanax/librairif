@@ -9,6 +9,8 @@ import './Books.css'
 import {useNavigate, Link} from 'react-router-dom'
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
+import IconButton from "@mui/material/IconButton"
+import ArrowBackRounded from "@bit/mui-org.material-ui-icons.arrow-back-rounded";
 import * as React from "react";
 import Game from "./Game";
 import Movie from "./Movie";
@@ -108,7 +110,9 @@ const Books = () => {
                 {bookInfo !== null &&
                 <div className={"bookContainer"}>
                     <div className={"historyBack"}>
-                        <button onClick={() => navigate(-1)}>go back</button>
+                        <IconButton onClick={() => navigate(-1)} aria-label="delete" size="large">
+                            <ArrowBackRounded fontSize="inherit" />
+                        </IconButton>
                     </div>
                     <div className={"titleWrapper"}>
                         <h1 className={"bookTitle"}>

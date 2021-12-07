@@ -8,7 +8,8 @@ import { useNavigate } from 'react-router-dom'
 import './Books.css'
 import Typography from "@mui/material/Typography"
 import Grid from "@mui/material/Grid"
-import Box from "@mui/material/Box"
+import IconButton from "@mui/material/IconButton"
+import ArrowBackRounded from "@bit/mui-org.material-ui-icons.arrow-back-rounded";
 import Lottie from "react-lottie";
 import BookResult from "./BookResult"
 import { fetchBookInfo } from "../services/sparqlRequests";
@@ -40,7 +41,6 @@ function Author(data) {
             setIsLoading(true);
             const response = await queryAuthor(authorURI);
             setAuthorInfo(response[0]);
-            console.log("authorInfo  " + response[0]);
             setIsLoading(false);
 
             // initialise arrays
@@ -93,7 +93,9 @@ function Author(data) {
 
                     <div className={"bookContainer"}>
                         <div className={"historyBack"}>
-                            <button onClick={() => navigate(-1)}>go back</button>
+                            <IconButton onClick={() => navigate(-1)} aria-label="delete" size="large">
+                                <ArrowBackRounded fontSize="inherit" />
+                            </IconButton>
                         </div>
                         <div className={"titleWrapper"}>
 
@@ -101,11 +103,8 @@ function Author(data) {
                                 {authorInfo.name?.value}
                             </Typography>
 
-                            <h3> {authorInfo.birthDate.value} </h3> -
-                            {authorInfo.deathDate == null &&
-                                <h3> Present </h3>}
-                            {authorInfo.deathDate !== null && <h3>{authorInfo.deathDate?.value}</h3>}
-
+                            {authorInfo.birthDate ? <h3> {authorInfo.birthDate.value} </h3> : <h3>Pas d'informations</h3>}
+                            {authorInfo.deathDate ? <h3> {authorInfo.deathDate.value} </h3> : <h3>Présent</h3>}
 
                             <div className={"mainContent"}>
                                 <div className={"abstractWrapper"}>
@@ -206,7 +205,7 @@ function Author(data) {
                                                 author: obj.authorName?.value,
                                                 img: obj.imageURL?.value,
                                                 releaseDate: obj.releasesDates?.value,
-                                                bookURI: listBooks[index]
+                                                bookURI: listBooks[index].split("http://dbpedia.org/resource/")[1]
                                             };
                                             return BookResult(index, data, navigate);
                                         })}
