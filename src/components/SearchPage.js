@@ -1,12 +1,17 @@
 import * as React from "react";
 import Box from "@mui/material/Box";
 
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
-import {researchQuery, autocompleteQuery, getSearch} from "../services/sparqlRequests";
+import {
+  researchQuery,
+  autocompleteQuery,
+  getSearch,
+  getAuthors,
+} from "../services/sparqlRequests";
 import SearchIcon from "@mui/icons-material/Search";
-import {useNavigate} from "react-router-dom"
+import { useNavigate } from "react-router-dom";
 
 import Autocomplete from "@mui/material/Autocomplete";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -57,7 +62,12 @@ export default function SearchPage() {
     const data = new FormData(event.currentTarget);
     const searchInput = data.get("search");
     setIsLoading(true);
-    const response = await getSearch(searchInput);
+    const response = [];
+    if (searchType == "Book") {
+      response = await getSearch(searchInput);
+    } else if (searchType == "Author") {
+      response = await getAuthors(searchInput);
+    }
     console.log(response);
     setSearchResults(response);
     setIsLoading(false);
@@ -72,7 +82,7 @@ export default function SearchPage() {
   const [value, setValue] = useState("");
   const [inputValue, setInputValue] = useState("");
   const [highlightedOption, setHighlightedOption] = useState(0);
-  const [searchType, setSearchType] = React.useState("Books");
+  const [searchType, setSearchType] = React.useState("Book");
 
   const loading = open && options.length === 0;
 
@@ -253,7 +263,7 @@ export default function SearchPage() {
             pl: 2,
           }}
         >
-          <ToggleButton value="Books">Books</ToggleButton>
+          <ToggleButton value="Book">Books</ToggleButton>
           <ToggleButton value="Author">Author</ToggleButton>
         </ToggleButtonGroup>
       </Box>
@@ -276,7 +286,7 @@ export default function SearchPage() {
         {isLoading ? (
           <Lottie options={defaultOptions} height={400} width={400} />
         ) : (
-          <Results books={searchResults} />
+          <Results type={searchType} data={searchResults} />
         )}
       </Box>
     </Box>
