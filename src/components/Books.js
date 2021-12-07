@@ -1,10 +1,15 @@
-import {getBookInfo, getAssociatedGames, getAssociatedMovies, getAssociatedMusicals,
-    getAssociatedSeries, getAssociatedArts, getAssociatedMusics , getListInSeries,
-    getBookNeighbor} from '../services/sparqlRequests'
+import {
+    getBookInfo, getAssociatedGames, getAssociatedMovies, getAssociatedMusicals,
+    getAssociatedSeries, getAssociatedArts, getAssociatedMusics, getListInSeries,
+    getBookNeighbor
+} from '../services/sparqlRequests'
 import {useEffect, useState} from "react";
 import {useParams} from 'react-router-dom'
 import './Books.css'
 import {useNavigate} from 'react-router-dom'
+import Typography from "@mui/material/Typography";
+import Box from "@mui/material/Box";
+import * as React from "react";
 
 const Books = () => {
 
@@ -28,19 +33,18 @@ const Books = () => {
         const loadBookInfo = async () => {
             setIsLoading(true);
             const response = await getBookInfo(bookURI);
+            console.log(response);
             setBookInfo(response[0])
             setIsLoading(false);
         }
 
-        (async () => {
-            await loadBookInfo();
-          })();
+        loadBookInfo();
     }, []);
 
     useEffect(() => {
         const loadAssociatedWork = async () => {
             setIsLoading(true);
-            if(bookInfo !== null) {
+            if (bookInfo !== null) {
                 const games = await getAssociatedGames(bookInfo.name.value, bookInfo.authorName.value);
                 setAssociatedGames(games);
 
@@ -78,7 +82,7 @@ const Books = () => {
             await loadAssociatedWork();
             await loadAssociatedSeriesOfBook();
             await loadBookNeighbors();
-          })();
+        })();
     }, [bookInfo])
 
     useEffect(() => {
@@ -92,9 +96,9 @@ const Books = () => {
         console.log(seriesOfBook);
         console.log(neighbors);
         setIsLoading(false)
-    }, [bookInfo, associatedGames, associatedMovies, 
+    }, [bookInfo, associatedGames, associatedMovies,
         associatedMusicals, associatedSeries, associatedArts,
-        associatedMusics, seriesOfBook, neighbors]) 
+        associatedMusics, seriesOfBook, neighbors])
 
     const render = () => {
         return (
@@ -104,7 +108,6 @@ const Books = () => {
                     Loading results
                 </div>}
                 {bookInfo !== null &&
-
                 <div className={"bookContainer"}>
                     <div className={"historyBack"}>
                         <button onClick={() => navigate(-1)}>go back</button>
@@ -114,7 +117,8 @@ const Books = () => {
                             {bookInfo.name.value}
                         </h1>
                         <div className={"authorWrapper"}>
-                            <span className={"author"}>{bookInfo.authorURI.value}</span>
+                            <span className={"author"}>{bookInfo.authorName ? bookInfo.authorName.value :
+                                <span>unknown author</span>}</span>
                         </div>
                         <div className={"mainContent"}>
                             <div className={"abstractWrapper"}>
@@ -122,30 +126,70 @@ const Books = () => {
                                 {bookInfo.abstract.value}
                             </div>
                             <div className={"imageWrapper"}>
-                                <img src={bookInfo.imageURL.value}/>
+                                {bookInfo.imageURL ?
+                                    <img src={bookInfo.imageURL.value}/> :
+                                    <Box
+                                        sx={{
+                                            pt: 8,
+                                            pr: 2,
+                                            pl: 1,
+                                            borderRadius: 2,
+                                            backgroundColor: "#2F2F2F",
+                                            height: 2 / 3,
+                                            width: "100%",
+                                            filter: "drop-shadow(0px 0px 10px rgba(0, 0, 0, 0.25))",
+                                            display: "flex",
+                                            flexDirection: "column",
+                                            alignItems: "center",
+                                            textAlign: "center",
+                                        }}
+                                    >
+                                        <Typography
+                                            gutterBottom
+                                            variant="h5"
+                                            component="div"
+                                            color="primary.contrastText"
+                                        >
+                                            {bookInfo.name.value}
+                                        </Typography>
+                                        <Typography variant="body2" color="#DBDBDB">
+                                            {bookInfo.authorName?.value}
+                                        </Typography>
+                                    </Box>}
                             </div>
                         </div>
                         <div>
                             <h2>Info</h2>
                             <div className={"infoWrapper"}>
-                                <div className={"publishersWraooer"}>
-                                    Publishers
-                                </div>
-                                <div>
-                                    {bookInfo.publisherURI.value}
-                                </div>
-                                <div className={"releaseDateWrapper"}>
-                                    <span>Release Date</span>
-                                </div>
-                                <div>
-                                    {bookInfo.releaseDate.value}
-                                </div>
-                                <div className={"titleOrig"}>
-                                    <span>Original Title</span>
-                                </div>
-                                <div>
-                                    <span>{bookInfo.titleOrig.value}</span>
-                                </div>
+                                {bookInfo.publisherURI ?
+                                    <>
+                                        <div className={"publishersWrapper"}>
+                                            Publishers
+                                        </div>
+                                        <div>
+                                            {bookInfo.publisherURI.value}
+                                        </div>
+                                    </>
+                                    : null}
+                                {bookInfo.releaseDate ?
+                                    <>
+                                        <div className={"releaseDateWrapper"}>
+                                            <span>Release Date</span>
+                                        </div>
+                                        <div>
+                                            {bookInfo.releaseDate.value}
+                                        </div>
+                                    </> : null}
+                                {bookInfo.titleOrig ?
+                                    <>
+                                        <div className={"titleOrig"}>
+                                            <span>Original Title</span>
+                                        </div>
+                                        <div>
+                                            <span> {bookInfo.titleOrig.value}</span>
+                                        </div>
+                                    </>
+                                    : null}
                             </div>
                         </div>
                         <div>
