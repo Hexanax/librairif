@@ -6,7 +6,7 @@ import {
 import {useEffect, useState} from "react";
 import {useParams} from 'react-router-dom'
 import './Books.css'
-import {useNavigate} from 'react-router-dom'
+import {useNavigate, Link} from 'react-router-dom'
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import * as React from "react";
@@ -114,8 +114,9 @@ const Books = () => {
                             {bookInfo.name.value}
                         </h1>
                         <div className={"authorWrapper"}>
-                            <span className={"author"}>{bookInfo.authorName ? bookInfo.authorName.value :
-                                bookInfo.authorURI?.value }</span>
+                            <span className={"author"}>{bookInfo.authorName ?
+                                <Link to={`../../authorInfo/${bookInfo.authorURI.value.split("http://dbpedia.org/resource/")[1]}`}> {bookInfo.authorName.value}</Link>
+                                : bookInfo.authorURI?.value }</span>
                         </div>
                         <div className={"mainContent"}>
                             <div className={"abstractWrapper"}>
@@ -189,7 +190,7 @@ const Books = () => {
                                 {bookInfo.genres ?
                                     <>
                                         <div className={"literaryGenres"}>
-                                            <span>Literary genres</span>
+                                            <span>Literary genre </span>
                                         </div>
                                         <div className={"literaryGenres"}>
                                             <span> {bookInfo.genres.value}</span>
