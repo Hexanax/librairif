@@ -234,6 +234,32 @@ export async function fetchAssociatedMusics(name, author) {
     return await axiosQuery(query);
 }
 
+<<<<<<< HEAD
+export async function queryAuthor(authorURI) {
+  let author = `dbr:${authorURI}`;
+  let query = `SELECT ?name ?description ?birthDate ?deathDate ?occupation ?educ ?image 
+  GROUP_CONCAT(DISTINCT ?listAwards, ";") as ?listAwards 
+  GROUP_CONCAT(DISTINCT ?listGenres, ";") as ?listGenres 
+  GROUP_CONCAT(DISTINCT ?books, ";") as ?books
+  WHERE {
+  ${author} dbp:name ?name.
+  ${author} dbo:abstract ?description.
+  OPTIONAL{${author} dbo:birthDate ?birthDate}
+  OPTIONAL{${author} dbo:deathDate ?deathDate}
+  OPTIONAL{${author} dbo:thumbnail ?image}
+  OPTIONAL{${author} dbp:occupation ?occupation}
+  OPTIONAL{${author} dbo:education ?education. ?education rdfs:label ?educ}
+  OPTIONAL{${author} dbp:awards ?awards. ?awards rdfs:label ?listAwards}
+  OPTIONAL{${author} ^dbp:author ?books}
+  OPTIONAL{${author} dbo:genre ?genres. ?genres rdfs:label ?listGenres}
+  FILTER(lang(?description) = "en")
+  FILTER(lang(?educ) = "en")
+  FILTER(lang(?listAwards) = "en")
+  FILTER(lang(?listGenres) = "en")
+  }`;
+  console.log("query" + query);
+  return await axiosQuery(query);
+=======
 export async function queryAuthor() {
     let query = [
         `SELECT ?name, GROUP_CONCAT(DISTINCT ?listGenres, ";"), GROUP_CONCAT(DISTINCT ?listBooks, ";") WHERE {
@@ -265,6 +291,7 @@ export async function getAuthorTimeLife(ressourceURI) {
         OPTIONAL{${currentAuthor} dbo:deathDate ?deathDate }}`
     ].join("");
     return await axiosQuery(query);
+>>>>>>> 4e7e8df8f833a49d5753a7e56604f590dd8b6d0b
 }
 
 export async function researchQuery(bookName, author) {
@@ -324,10 +351,18 @@ export async function autocompleteQuery(text) {
 
 export async function getSearch(name) {
   return new Promise((resolve, reject) => {
+<<<<<<< HEAD
+    axios
+      .get(queryURL)
+      .then((response) => {resolve(response.data.results.bindings); console.log(response.data.results)})
+      .catch((err) => {
+        console.error(err);
+=======
     researchQuery(name, "").then(results1 => {
       researchQuery("", name).then(results2 => {
         let finalResults = results1.concat(results2);
         return resolve(finalResults.sort((a, b) => {return a.name.value.toUpperCase().localeCompare(b.name.value.toUpperCase())}));
+>>>>>>> 4e7e8df8f833a49d5753a7e56604f590dd8b6d0b
       });
     });
   });

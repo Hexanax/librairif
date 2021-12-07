@@ -7,6 +7,7 @@ import {BrowserRouter as Router, Route, Routes} from "react-router-dom";
 import Books from "./components/Books";
 import Editor from "./components/Editor";
 import Results from "./components/Results";
+import Author from "./components/Author";
 
 export default function App() {
   const theme = createTheme(lightTheme);
@@ -23,11 +24,17 @@ export default function App() {
                         </Route>
                         <Route path="/bookInfo/:bookURI" element={<Books/>}>
                         </Route>
+<<<<<<< HEAD
+                        <Route path="/authorInfo/:authorURI" element={<Author/>}>
+                        </Route>
+                    </React.Fragment>
+=======
 
                         <Route path="/editorInfo/:editorURI" element={<Editor/>}>
                         </Route>
 
                     </>
+>>>>>>> 4e7e8df8f833a49d5753a7e56604f590dd8b6d0b
                 </Routes>
             </div>
         </Router>
