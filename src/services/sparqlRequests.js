@@ -1,24 +1,43 @@
 import axios from "axios";
 
-export async function getBookInfo(resourceURI) {
-  //TODO CHANGE HARDCODED URI
-  const book = `dbr:${resourceURI}`;
-  const content = `SELECT ?name ?titleOrig ?releaseDate ?imageURL ?abstract ?authorURI ?authorName ?publisherURI
+export async function fetchBookInfo(resourceURI) {
+    //TODO CHANGE HARDCODED URI
+    const book = `dbr:${resourceURI}`;
+    const content = `SELECT ?name ?titleOrig ?imageURL ?abstract ?authorURI ?authorName
+    (GROUP_CONCAT(DISTINCT ?publisherURI;   SEPARATOR=", ") AS ?publishers)
+    (GROUP_CONCAT(DISTINCT ?releaseDate;   SEPARATOR=", ") AS ?releaseDates)
         WHERE {
-        ${book} dbp:name ?name;
-        dbp:titleOrig ?titleOrig;
-        dbp:releaseDate ?releaseDate;
-        dbo:thumbnail ?imageURL;
-        dbo:abstract ?abstract;
-        dbp:publisher ?publisherURI;
-        dbp:author ?authorURI.
-        ?authorURI dbp:name ?authorName.
-        FILTER(lang(?abstract) = "en")
-        FILTER(lang(?releaseDate) = "en")
-        }
-        GROUP BY ?publisherURI`;
-  console.log(content);
-  return await axiosQuery(content);
+            ${book} dbp:name ?name;
+            dbo:abstract ?abstract.
+            OPTIONAL{${book} dbp:titleOrig ?titleOrig.}
+            OPTIONAL{${book} dbp:releaseDate ?releaseDate.}
+            OPTIONAL{${book} dbo:thumbnail ?imageURL.}
+            OPTIONAL{${book} dbp:publisher ?publisherURI.}
+            OPTIONAL{${book} dbp:author ?authorURI.
+            ?authorURI dbp:name ?authorName.}
+            FILTER(lang(?abstract) = "en")
+        }`;
+    console.log(content);
+    return await axiosQuery(content);
+}
+
+/**
+ * Allows to get the list of book associated with the current on if 
+ * it is in a series of book Uri of the current book
+ * @param {*} ressourceURI 
+ */
+ export async function fetchListInSeries(ressourceURI){
+  const currentBook = `dbr:${ressourceURI}`;
+  let query = [
+    "Select ?bookUri ?serie ?name ?imageURL WHERE { ",
+    `${currentBook} dbo:series ?serie.`,
+    "?bookUri a dbo:Book; ",
+    "dbp:name ?name; ",
+    "dbo:series ?serie. ",
+    "OPTIONAL{?bookUri dbo:thumbnail ?imageURL} ",
+    "}",
+  ].join("");
+  return await axiosQuery(query);
 }
 
 export async function getEditorInfo(editorName){
@@ -48,7 +67,7 @@ export async function getEditorInfo(editorName){
  * @param {String} ressourceURI Uri of the current book
  * @returns ?book => the uri of the book; ?name => the name in english; ?position => before or after
  */
-export async function getBookNeighbor(ressourceURI){
+export async function fetchBookNeighbor(ressourceURI){
   const currentBook = `dbr:${ressourceURI}`;
   let query = [
     "Select ?book ?name ?position WHERE { ",
@@ -62,8 +81,8 @@ export async function getBookNeighbor(ressourceURI){
     "?book a dbo:Book. ",
     "?book rdfs:label ?name. ",
     "BIND('after' AS ?position) ",
-    "}} ORDER BY DESC(?position)",
-    'FILTER(lang(?name) = "en") }',
+    "}} ",
+    'FILTER(lang(?name) = "en") } ORDER BY DESC(?position)',
   ].join("");
   return await axiosQuery(query);
 }
@@ -74,7 +93,7 @@ export async function getBookNeighbor(ressourceURI){
  * @param {String} author the author of the current book
  * @returns 
  */
-export async function getAssociatedGames(name, author){
+export async function fetchAssociatedGames(name, author){
   let query = [
     "select DISTINCT(STR(?label)) as ?game ?uri ?date ?developer where{ ",
     "?uri rdf:type dbo:VideoGame; ",
@@ -94,7 +113,7 @@ export async function getAssociatedGames(name, author){
  * @param {String} author the author of the current book
  * @returns 
  */
- export async function getAssociatedMovies(name, author){
+ export async function fetchAssociatedMovies(name, author){
   let query = [
     "select DISTINCT(STR(?label)) as ?movie ?uri ?runtime ?producer where{ ",
     "?uri rdf:type dbo:Film; ",
@@ -114,7 +133,7 @@ export async function getAssociatedGames(name, author){
  * @param {String} author the author of the current book
  * @returns 
  */
- export async function getAssociatedMusicals(name, author){
+ export async function fetchAssociatedMusicals(name, author){
   let query = [
     "select DISTINCT(STR(?label)) as ?musical ?uri ?author ?lyric ?music where{ ",
     "?uri rdf:type dbo:Musical; ",
@@ -135,7 +154,7 @@ export async function getAssociatedGames(name, author){
  * @param {String} author the author of the current book
  * @returns 
  */
- export async function getAssociatedSeries(name, author){
+ export async function fetchAssociatedSeries(name, author){
   let query = [
     "select DISTINCT(STR(?label)) as ?serie ?uri ?composer ?season where{ ",
     "?uri rdf:type dbo:TelevisionShow; ",
@@ -155,7 +174,7 @@ export async function getAssociatedGames(name, author){
  * @param {String} author the author of the current book
  * @returns 
  */
- export async function getAssociatedArts(name, author){
+ export async function fetchAssociatedArts(name, author){
   let query = [
     "select DISTINCT(STR(?label)) as ?art ?uri ?image ?artist where{ ",
     "?uri rdf:type dbo:Artwork; ",
@@ -175,7 +194,7 @@ export async function getAssociatedGames(name, author){
  * @param {String} author the author of the current book
  * @returns 
  */
- export async function getAssociatedMusics(name, author){
+ export async function fetchAssociatedMusics(name, author){
   let query = [
     "select DISTINCT(STR(?label)) as ?music ?uri ?type ?artist where{ ",
     ` {{
@@ -187,8 +206,8 @@ export async function getAssociatedGames(name, author){
       } UNION {
       ?uri a dbo:Single;
       dbo:abstract ?abstract;
-      rdfs:label ?label.
-      dbo:artist ?artist;
+      rdfs:label ?label;
+      dbo:artist ?artist.
       BIND("single" as ?type)
       } UNION {
       ?uri a dbo:Sound;
@@ -221,24 +240,44 @@ export async function queryAuthor() {
   return await axiosQuery(query);
 }
 
+export async function getAuthorTimeLife(ressourceURI){
+  const currentAuthor = `dbr:${ressourceURI}`;
+  let query = [
+    'SELECT ?birthDate ?deathDate GROUP_CONCAT(?notableWorkName, ";") GROUP_CONCAT(?releaseDate, ";") WHERE { ',
+    `${currentAuthor} a dbo:Writer; `,
+    "dbo:birthDate ?birthDate; ",
+    "dbo:notableWork ?notableWork. ",
+    "?notableWork dbp:name ?notableWorkName. ",
+    "?notableWork dbp:releaseDate ?releaseDate. ",
+    `OPTIONAL{${currentAuthor} dbo:deathDate ?deathDate }}`,
+  ].join("");
+  return await axiosQuery(query);
+}
+
 export async function researchQuery(bookName, author) {
-  let query = `SELECT ?name ?authorName ?book
-  (GROUP_CONCAT(DISTINCT ?releaseDate;   SEPARATOR=", ") AS ?releaseDates)
-  (GROUP_CONCAT(DISTINCT ?imageURL;   SEPARATOR=", ") AS ?imageUrls)
-  (GROUP_CONCAT(DISTINCT ?abstract;   SEPARATOR=", ") AS ?abstracts) 
+
+  let query = `SELECT ?authorName ?book
+  (MIN(?name) AS ?name)
+  (MIN(?releaseDate) AS ?releaseDate)
+  (MAX(?imageURL) AS ?imageUrl)
+  (MAX(?abstract) AS ?abstract) 
+
     WHERE {
     ?book a dbo:Book.
     ?book dbp:name ?name.
     ?book dbo:author ?author;
     dbo:abstract ?abstract.
-    OPTIONAL {?book dbo:thumbnail ?imageURL;
-    dbp:releaseDate ?releaseDate.}
+
+    OPTIONAL {?book dbo:thumbnail ?imageURL.}
+    OPTIONAL {?book dbp:releaseDate ?releaseDate.}
+
     ?author dbp:name ?authorName.
     FILTER(lang(?name) = "en")
     FILTER(lang(?abstract) = "en")
     FILTER (regex(?name, "${bookName}", "i"))
     FILTER (regex(?author, "${author}",  "i"))
-    } GROUP BY ?name ?authorName ?book`
+
+    } GROUP BY ?authorName ?book`
 
   return await axiosQuery(query);
 }
@@ -268,6 +307,17 @@ export async function autocompleteQuery(text) {
     "LIMIT 10 ",
   ].join("");
   return await axiosQuery(query);
+}
+
+export async function getSearch(name) {
+  return new Promise((resolve, reject) => {
+    researchQuery(name, "").then(results1 => {
+      researchQuery("", name).then(results2 => {
+        let finalResults = results1.concat(results2);
+        return resolve(finalResults.sort((a, b) => {return a.name.value.toUpperCase().localeCompare(b.name.value.toUpperCase())}));
+      });
+    });
+  });
 }
 
 async function axiosQuery(query) {
