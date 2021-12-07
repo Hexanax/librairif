@@ -1,9 +1,17 @@
 import axios from "axios";
 
-export async function fetchBookInfo(resourceURI) {
-    //TODO CHANGE HARDCODED URI
+function encodeResource(resourceURI) {
     resourceURI = resourceURI.replace(/[( ]/g, '\\(')
     resourceURI = resourceURI.replace(/[) ]/g, '\\)')
+    resourceURI = resourceURI.replace(/[' ]/g, "\\'")
+    resourceURI = resourceURI.replace(/[" ]/g, `\\"`)
+    return resourceURI;
+}
+
+export async function fetchBookInfo(resourceURI) {
+    //TODO CHANGE HARDCODED URI
+    resourceURI = encodeResource(resourceURI);
+
     console.log(resourceURI);
     const book = `dbr:${resourceURI}`;
     const content = `SELECT ?name ?titleOrig ?imageURL ?abstract ?authorURI ?authorName
@@ -31,8 +39,9 @@ export async function fetchBookInfo(resourceURI) {
  * it is in a series of book Uri of the current book
  * @param {*} ressourceURI
  */
-export async function fetchListInSeries(ressourceURI) {
-    const currentBook = `dbr:${ressourceURI}`;
+export async function fetchListInSeries(resourceURI) {
+    resourceURI = encodeResource(resourceURI);
+    const currentBook = `dbr:${resourceURI}`;
     let query = [
         `Select ?bookUri ?serie ?name ?imageURL WHERE {
         ${currentBook} dbo:series ?serie.
@@ -46,6 +55,7 @@ export async function fetchListInSeries(ressourceURI) {
 }
 
 export async function getEditorInfo(editorName) {
+    editorName = encodeResource(editorName);
     let editorRsrc = `dbr:${editorName}`;
     let query =
         `SELECT ?label ?abstract
@@ -71,8 +81,9 @@ export async function getEditorInfo(editorName) {
  * @param {String} ressourceURI Uri of the current book
  * @returns ?book => the uri of the book; ?name => the name in english; ?position => before or after
  */
-export async function fetchBookNeighbor(ressourceURI) {
-    const currentBook = `dbr:${ressourceURI}`;
+export async function fetchBookNeighbor(resourceURI) {
+    resourceURI = encodeResource(resourceURI);
+    const currentBook = `dbr:${resourceURI}`;
     let query = [
         `Select ?book ?name ?position WHERE {
         {{ 
@@ -98,6 +109,8 @@ export async function fetchBookNeighbor(ressourceURI) {
  * @returns
  */
 export async function fetchAssociatedGames(name, author) {
+    name = encodeResource(name);
+    author=encodeResource(author);
     let query = [
         `SELECT DISTINCT(STR(?label)) as ?game ?uri ?date ?developer
     WHERE{
@@ -119,6 +132,8 @@ export async function fetchAssociatedGames(name, author) {
  * @returns
  */
 export async function fetchAssociatedMovies(name, author) {
+    name = encodeResource(name);
+    author=encodeResource(author);
     let query = [
         `SELECT DISTINCT(STR(?label)) as ?movie ?uri ?runtime
     (GROUP_CONCAT(DISTINCT ?producer; SEPARATOR=", ") AS ?producers)
@@ -142,6 +157,8 @@ export async function fetchAssociatedMovies(name, author) {
  * @returns
  */
 export async function fetchAssociatedMusicals(name, author) {
+    name = encodeResource(name);
+    author=encodeResource(author);
     let query = [
         `SELECT DISTINCT(STR(?label)) as ?musical ?uri ?author ?lyric ?music
          WHERE{
@@ -165,6 +182,8 @@ export async function fetchAssociatedMusicals(name, author) {
  * @returns
  */
 export async function fetchAssociatedSeries(name, author) {
+    name = encodeResource(name);
+    author=encodeResource(author);
     let query = [
         `SELECT DISTINCT(STR(?label)) as ?serie ?uri ?composer ?season
          WHERE{
@@ -187,6 +206,8 @@ export async function fetchAssociatedSeries(name, author) {
  * @returns
  */
 export async function fetchAssociatedArts(name, author) {
+    name = encodeResource(name);
+    author=encodeResource(author);
     let query = [
         `select DISTINCT(STR(?label)) as ?art ?uri ?image ?artist WHERE{
         ?uri rdf:type dbo:Artwork;
@@ -208,6 +229,8 @@ export async function fetchAssociatedArts(name, author) {
  * @returns
  */
 export async function fetchAssociatedMusics(name, author) {
+    name = encodeResource(name);
+    author=encodeResource(author);
     let query = [
         `SELECT DISTINCT(STR(?label)) as ?music ?uri ?type ?artist
          WHERE{
@@ -237,8 +260,7 @@ export async function fetchAssociatedMusics(name, author) {
 }
 
 export async function queryAuthor(authorURI) {
-    authorURI = authorURI.replace(/[( ]/g, '\\(')
-    authorURI = authorURI.replace(/[) ]/g, '\\)')
+    authorURI = encodeResource(authorURI);
     let author = `dbr:${authorURI}`;
     let query = `SELECT ?name ?description ?birthDate ?deathDate ?occupation ?educ ?image ?listGenres
   GROUP_CONCAT(DISTINCT ?listAwards, ";") as ?listAwards 
@@ -264,8 +286,9 @@ export async function queryAuthor(authorURI) {
 }
 
 
-export async function getAuthorTimeLife(ressourceURI) {
-    const currentAuthor = `dbr:${ressourceURI}`;
+export async function getAuthorTimeLife(resourceURI) {
+    resourceURI=encodeResource(resourceURI)
+    const currentAuthor = `dbr:${resourceURI}`;
     let query = [
         `SELECT ?birthDate ?deathDate GROUP_CONCAT(?notableWorkName, ";") GROUP_CONCAT(?releaseDate, ";") WHERE {
         ${currentAuthor} a dbo:Writer;
@@ -285,7 +308,8 @@ export async function getAuthorTimeLife(ressourceURI) {
  * @returns result array
  */
 export async function researchQuery(bookName, author) {
-
+    bookName=encodeResource(bookName);
+    author=encodeResource(author)
     let query = `SELECT ?authorName ?book
   (MIN(?name) AS ?name)
   (MIN(?releaseDate) AS ?releaseDate)
@@ -309,6 +333,7 @@ export async function researchQuery(bookName, author) {
 }
 
 export async function getAuthors(name) {
+    name=encodeResource(name)
   let query = `SELECT ?writer (MIN(?name) AS ?name) (MAX(?image) AS ?imageUrl) (MIN(?birthDate) AS ?birthDate) (MIN(?deathDate) AS ?deathDate) WHERE {
     ?writer a dbo:Writer.
     ?writer dbp:name ?name.
@@ -327,6 +352,7 @@ export async function getAuthors(name) {
  * @returns List of names associated with a type of Book or Writer
  */
 export async function autocompleteQuery(text) {
+    encodeResource(text);
     let query = [
         `SELECT DISTINCT ?name ?type
         WHERE {
@@ -339,7 +365,7 @@ export async function autocompleteQuery(text) {
         BIND('Writer' AS ?type)}} 
         FILTER (isLiteral(?name)) 
         FILTER(lang(?name) = "en") 
-        FILTER (regex(?name, '${text}',"i")) 
+        FILTER (regex(?name, "${text}","i")) 
         }
         ORDER BY ASC(?name)
         LIMIT 10`
