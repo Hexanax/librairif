@@ -10,6 +10,7 @@ import {useNavigate} from 'react-router-dom'
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import * as React from "react";
+import Game from "./Game";
 
 const Books = () => {
 
@@ -188,11 +189,9 @@ const Books = () => {
                             </div>
                         </div>
                         <div>
-                            <h2> Related Content</h2>
                             <div className={"relatedWrapper"}>
-                                <h3 Related Books>
-
-                                </h3>
+                                <h3>Related Games</h3>
+                                {associatedGames !== null && associatedGames.map(game => <Game game={game}/>)}
                             </div>
                         </div>
                     </div>
