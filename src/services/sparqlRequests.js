@@ -180,22 +180,29 @@ export async function getAssociatedGames(name, author){
   return await axiosQuery(query);
 }
 
-export async function queryAuthor() {
-  let query = [
-    'SELECT ?name, GROUP_CONCAT(DISTINCT ?listGenres, ";"), GROUP_CONCAT(DISTINCT ?listBooks, ";") WHERE {',
-    "?writer a dbo:Writer.",
-    "?writer dbp:name ?name.",
-    "?writer dbp:occupation ?occupation.",
-    "?writer dbo:thumbnail ?image.",
-    "?writer ^dbp:author ?books.",
-    "?books rdfs:label ?listBooks.",
-    "?writer dbo:genre ?genres.",
-    "?genres rdfs:label ?listGenres.",
-    'FILTER(lang(?listBooks) = "en").',
-    'FILTER(lang(?listGenres) = "en").',
-    'FILTER (regex(?name, "Antoine de"))',
-    "}",
-  ].join("");
+export async function queryAuthor(authorURI) {
+  let author = `dbr:${authorURI}`;
+  let query = `SELECT ?name ?description ?birthDate ?deathDate ?occupation ?educ ?image 
+  GROUP_CONCAT(DISTINCT ?listAwards, ";") as ?listAwards 
+  GROUP_CONCAT(DISTINCT ?listGenres, ";") as ?listGenres 
+  GROUP_CONCAT(DISTINCT ?books, ";") as ?books
+  WHERE {
+  ${author} dbp:name ?name.
+  ${author} dbo:abstract ?description.
+  OPTIONAL{${author} dbo:birthDate ?birthDate}
+  OPTIONAL{${author} dbo:deathDate ?deathDate}
+  OPTIONAL{${author} dbo:thumbnail ?image}
+  OPTIONAL{${author} dbp:occupation ?occupation}
+  OPTIONAL{${author} dbo:education ?education. ?education rdfs:label ?educ}
+  OPTIONAL{${author} dbp:awards ?awards. ?awards rdfs:label ?listAwards}
+  OPTIONAL{${author} ^dbp:author ?books}
+  OPTIONAL{${author} dbo:genre ?genres. ?genres rdfs:label ?listGenres}
+  FILTER(lang(?description) = "en")
+  FILTER(lang(?educ) = "en")
+  FILTER(lang(?listAwards) = "en")
+  FILTER(lang(?listGenres) = "en")
+  }`;
+  console.log("query" + query);
   return await axiosQuery(query);
 }
 
@@ -250,7 +257,7 @@ async function axiosQuery(query) {
   return new Promise((resolve, reject) => {
     axios
       .get(queryURL)
-      .then((response) => resolve(response.data.results.bindings))
+      .then((response) => {resolve(response.data.results.bindings); console.log(response.data.results)})
       .catch((err) => {
         console.error(err);
       });
