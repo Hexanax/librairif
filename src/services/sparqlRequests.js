@@ -6,12 +6,14 @@ export async function fetchBookInfo(resourceURI) {
     const content = `SELECT ?name ?titleOrig ?imageURL ?abstract ?authorURI ?authorName
     (GROUP_CONCAT(DISTINCT ?publisherURI;   SEPARATOR=", ") AS ?publishers)
     (GROUP_CONCAT(DISTINCT ?releaseDate;   SEPARATOR=", ") AS ?releaseDates)
+    (GROUP_CONCAT(DISTINCT ?genre;   SEPARATOR=", ") AS ?genres)
         WHERE {
             ${book} dbp:name ?name;
             dbo:abstract ?abstract.
             OPTIONAL{${book} dbp:titleOrig ?titleOrig.}
             OPTIONAL{${book} dbp:releaseDate ?releaseDate.}
             OPTIONAL{${book} dbo:thumbnail ?imageURL.}
+            OPTIONAL{${book} dbo:literaryGenre ?genre.}
             OPTIONAL{${book} dbp:publisher ?publisherURI.}
             OPTIONAL{${book} dbp:author ?authorURI.}
             OPTIONAL{?authorURI dbp:name ?authorName.}
