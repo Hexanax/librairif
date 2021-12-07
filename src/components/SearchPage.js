@@ -1,12 +1,17 @@
 import * as React from "react";
 import Box from "@mui/material/Box";
 
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
-import {researchQuery, autocompleteQuery, getSearch, getAuthors} from "../services/sparqlRequests";
+import {
+  researchQuery,
+  autocompleteQuery,
+  getSearch,
+  getAuthors,
+} from "../services/sparqlRequests";
 import SearchIcon from "@mui/icons-material/Search";
-import {useNavigate} from "react-router-dom"
+import { useNavigate } from "react-router-dom";
 
 import Autocomplete from "@mui/material/Autocomplete";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -161,19 +166,6 @@ export default function SearchPage() {
           flexDirection: "row ",
         }}
       >
-        <ToggleButtonGroup
-          color="primary"
-          value={searchType}
-          exclusive
-          onChange={handleSelectorChange}
-          sx={{
-            pr: 2,
-            height: 1,
-          }}
-        >
-          <ToggleButton value="Book">Books</ToggleButton>
-          <ToggleButton value="Author">Author</ToggleButton>
-        </ToggleButtonGroup>
         <Autocomplete
           freeSolo
           margin="normal"
@@ -263,6 +255,18 @@ export default function SearchPage() {
             );
           }}
         />
+        <ToggleButtonGroup
+          color="primary"
+          value={searchType}
+          exclusive
+          onChange={handleSelectorChange}
+          sx={{
+            pl: 2,
+          }}
+        >
+          <ToggleButton value="Book">Books</ToggleButton>
+          <ToggleButton value="Author">Author</ToggleButton>
+        </ToggleButtonGroup>
       </Box>
       <Button
         type="submit"
