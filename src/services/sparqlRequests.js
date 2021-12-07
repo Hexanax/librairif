@@ -233,7 +233,8 @@ export async function getAuthorTimeLife(ressourceURI){
 }
 
 export async function researchQuery(bookName, author) {
-  let query = `SELECT ?name ?authorName ?book
+  let query = `SELECT ?authorName ?book
+  (MIN(?name) AS ?name)
   (MIN(?releaseDate) AS ?releaseDate)
   (MAX(?imageURL) AS ?imageUrl)
   (MAX(?abstract) AS ?abstract) 
@@ -249,7 +250,7 @@ export async function researchQuery(bookName, author) {
     FILTER(lang(?abstract) = "en")
     FILTER (regex(?name, "${bookName}", "i"))
     FILTER (regex(?author, "${author}",  "i"))
-    } GROUP BY ?name ?authorName ?book`
+    } GROUP BY ?authorName ?book`
   return await axiosQuery(query);
 }
 
@@ -278,6 +279,17 @@ export async function autocompleteQuery(text) {
     "LIMIT 10 ",
   ].join("");
   return await axiosQuery(query);
+}
+
+export async function getSearch(name) {
+  return new Promise((resolve, reject) => {
+    researchQuery(name, "").then(results1 => {
+      researchQuery("", name).then(results2 => {
+        let finalResults = results1.concat(results2);
+        return resolve(finalResults.sort((a, b) => {return a.name.value.toUpperCase().localeCompare(b.name.value.toUpperCase())}));
+      });
+    });
+  });
 }
 
 async function axiosQuery(query) {
