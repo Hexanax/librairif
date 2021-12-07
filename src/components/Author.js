@@ -46,23 +46,31 @@ function Author(data) {
             // initialise arrays
             setListAwards(splitString(response[0].listAwards.value));
             setListBooks(splitString(response[0].books.value));
+
             if (response[0].listGenres !== null) {
                 setListGenres(response[0].listGenres?.value.split(','));
             }
            
-        
 
-            for (let element of response[0].books.value.split(";")) {
+            const lists = response[0].books.value.split(";");
+            
+
+            for (let element of lists) {
                 console.log("this is the book" + element.split("/").pop());
                 let responseBook = await fetchBookInfo(element.split("/").pop());
-                setBooks(Books => [...Books, responseBook]);
+                
+                setBooks(
+                    Books => [...Books, responseBook]
+                );
+                
+              
             }
             
         }
         loadAuthorInfo();
-
-
+        
     }, [])
+
 
     useEffect(() => {
 
@@ -199,13 +207,15 @@ function Author(data) {
                                         justifyContent="flex-start"
                                         alignItems="flex-start"
                                     >
-                                        {Books[0]?.map((obj, index) => {
+                                        {Books?.map((obj, index) => {
+                                            console.log(obj);
+                                            let term = obj[0];
                                             const data = {
-                                                title: obj.name.value,
-                                                author: obj.authorName?.value,
-                                                img: obj.imageURL?.value,
-                                                releaseDate: obj.releasesDates?.value,
-                                                bookURI: listBooks[index].split("http://dbpedia.org/resource/")[1]
+                                                title: term?.name?.value,
+                                                author: term?.authorName?.value,
+                                                img: term?.imageURL?.value,
+                                                releaseDate: term?.releasesDates?.value,
+                                                bookURI: listBooks[index]?.split("http://dbpedia.org/resource/")[1]
                                             };
                                             return BookResult(index, data, navigate);
                                         })}
