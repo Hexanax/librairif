@@ -3,7 +3,9 @@ import axios from "axios";
 export async function getBookInfo(resourceURI) {
     //TODO CHANGE HARDCODED URI
     const book = `dbr:${resourceURI}`;
-    const content = `SELECT ?name ?titleOrig ?releaseDate ?imageURL ?abstract ?authorURI ?authorName ?publisherURI
+    const content = `SELECT ?name ?titleOrig ?imageURL ?abstract ?authorURI ?authorName
+    (GROUP_CONCAT(DISTINCT ?publisherURI;   SEPARATOR=", ") AS ?publishers)
+    (GROUP_CONCAT(DISTINCT ?releaseDate;   SEPARATOR=", ") AS ?releaseDates)
         WHERE {
             ${book} dbp:name ?name;
             dbo:abstract ?abstract.

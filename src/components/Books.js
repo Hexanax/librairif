@@ -161,13 +161,13 @@ const Books = () => {
                         <div>
                             <h2>Info</h2>
                             <div className={"infoWrapper"}>
-                                {bookInfo.publisherURI ?
+                                {bookInfo.publishers ?
                                     <>
                                         <div className={"publishersWrapper"}>
                                             Publishers
                                         </div>
-                                        <div>
-                                            {bookInfo.publisherURI.value}
+                                        <div className={"publishersWrapper"}>
+                                            {bookInfo.publishers.value}
                                         </div>
                                     </>
                                     : null}
@@ -176,8 +176,8 @@ const Books = () => {
                                         <div className={"releaseDateWrapper"}>
                                             <span>Release Date</span>
                                         </div>
-                                        <div>
-                                            {bookInfo.releaseDate.value}
+                                        <div className={"releaseDateWrapper"}>
+                                            {bookInfo.releaseDates.value}
                                         </div>
                                     </> : null}
                                 {bookInfo.titleOrig ?
