@@ -1,17 +1,20 @@
 import {getEditorInfo} from '../services/sparqlRequests'
 import {useEffect, useState} from "react";
+import { useParams } from 'react-router';
 
-const Editor = ({resourceURI}) => {
+const Editor = () => {
 
     const [editorInfo, setEditorInfo] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
+    let {editorURI} = useParams();
 
     useEffect(() => {
 
         const loadEditorInfo = async () => {
             setIsLoading(true);
-            const response = await getEditorInfo(resourceURI);
-            setEditorInfo(response);
+            const response = await getEditorInfo(editorURI);
+            console.log(response);
+            setEditorInfo(response[0]);
             setIsLoading(false);
         }
         loadEditorInfo();
@@ -25,60 +28,59 @@ const Editor = ({resourceURI}) => {
     const render = () => {
         return (
             <div>
-            {editorInfo === null &&
-            <div>
-                Loading results
-            </div>}
-            {editorInfo !== null &&
+                {editorInfo === null &&
+                <div>
+                    Loading results
+                </div>}
+                {editorInfo !== null &&
 
-            <div className={"editorContainer"}>
-                <div className={"historyBack"}>
-                    <button onClick={() => navigate(-1)}>Go back</button>
-                </div>
-                <div className={"nameWrapper"}>
-                    <h1 className={"editorName"}>
-                        {editorInfo.name.value}
-                    </h1>
-                    <h2>Info</h2>
-                        <div className={"infoWrapper"}>
-                            <div className={"founders"}>
-                                Founders
-                            </div>
-                            <div>
-                                {editorInfo.founders.value}
-                            </div>
-                            <div className={"foundingYearWrapper"}>
-                                <span>Foundation Year</span>
-                            </div>
-                            <div>
-                                {editorInfo.foundingYear.value}
-                            </div>
-                        </div>
-                    <div className={"founderWrapper"}>
-                        <span className={"founder"}>{editorInfo.founderURI.value}</span>
-                    </div>
-                    <div className={"mainContent"}>
-                        <div className={"abstractWrapper"}>
-                            <h2>Abstract</h2>
-                            {editorInfo.abstract.value}
-                        </div>
-                        <div className={"imageWrapper"}>
-                            <img src={editorInfo.imageURL.value}/>
-                        </div>
-                    </div>
-                    <div>
+                <div className={"editorContainer"}>
+                    <div className={"historyBack"}>
                         
                     </div>
-                    <div>
-                        <h2> Published Books</h2>
-                        <div className={"relatedWrapper"}>
+                    <div className={"nameWrapper"}>
+                        <h1 className={"editorName"}>
+                            {editorInfo.name?.value}
+                        </h1>
+                        <h2>Info</h2>
+                            <div className={"infoWrapper"}>
+                                <div className={"founders"}>
+                                    Founders
+                                </div>
+                                <div>
+                                    {editorInfo.founders?.value.split(",")[0]}
+                                </div>
+                                <div className={"foundingYearWrapper"}>
+                                    <span>Foundation Year</span>
+                                </div>
+                                <div>
+                                    {editorInfo.foundingYears?.value.split(",")[0]}
+                                </div>
+                                <div className={"headquartersWrapper"}>
+                                    <span>HeadQuarters</span>
+                                </div>
+                                <div>
+                                    {editorInfo.headquarters?.value.split(",")[0]}
+                                </div>
+                            </div>
+                        <div className={"mainContent"}>
+                            <div className={"abstractWrapper"}>
+                                <h2>Abstract</h2>
+                                {editorInfo.abstract?.value}
+                            </div>
+                            
+                        </div>
+                        <div>
+                            <h2> Published Books</h2>
+                            <div className={"publishedBooksWrapper"}>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </div>}
-        </div>
+                </div>}
+            </div>
         )
     }
+    
     return (
         <div>
             {render()}

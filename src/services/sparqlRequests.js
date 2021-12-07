@@ -20,21 +20,26 @@ export async function getBookInfo(resourceURI) {
   console.log(content);
   return await axiosQuery(content);
 }
+
 export async function getEditorInfo(editorName){
   let editorRsrc = `dbr:${editorName}`;
   let query = [
-    "SELECT DISTINCT ?label ?abstract ?founded ?homepage ?headquarters ?founder",
-    "WHERE {",
-    ` ${editorRsrc} rdfs:label ?label;`,
-        'dbo:abstract ?abstract;',
-        'dbo:founder ?founder;',
-        'dbo:foundingYear ?founded;',
-        'foaf:homepage ?homepage;',
-        'dbp:headquarters ?headquarters.',
-        'FILTER(lang(?abstract) = "en").',
-        'FILTER(lang(?label) = "en").',
-    "}",
+    `SELECT ?label ?abstract
+    (GROUP_CONCAT(DISTINCT ?founded;   SEPARATOR=", ") AS ?foundingYears)
+    (GROUP_CONCAT(DISTINCT ?founder;   SEPARATOR=", ") AS ?founders)
+    (GROUP_CONCAT(DISTINCT ?homepage;    SEPARATOR=", ") AS ?homepages)
+    (GROUP_CONCAT(DISTINCT ?headquarters; SEPARATOR=", ") AS ?headquartersLocations) WHERE {
+      ${editorRsrc} rdfs:label ?label;
+      dbo:abstract ?abstract.
+      OPTIONAL{${editorRsrc} dbo:founder ?founder}
+      OPTIONAL{${editorRsrc} dbo:foundingYear ?founded}
+      OPTIONAL{${editorRsrc} foaf:homepage ?homepage}
+      OPTIONAL{${editorRsrc} dbp:headquarters ?headquarters}
+      FILTER(lang(?abstract) = "en").
+      FILTER(lang(?label) = "en").
+    }`           
   ].join("");
+  console.log(query);
   return await axiosQuery(query);
 }
 
