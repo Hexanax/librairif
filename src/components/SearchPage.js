@@ -14,6 +14,9 @@ import parse from "autosuggest-highlight/parse";
 import match from "autosuggest-highlight/match";
 import Results from "./Results";
 
+import Lottie from "react-lottie";
+import animationData from "../lotties/book-loading.json";
+
 /**
  * Allows to wait the time given
  * @param {int} delay time in ms
@@ -31,7 +34,17 @@ export default function SearchPage() {
   const [bookTitle, setBookTitle] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-
+  /**
+   * Set animation settings
+   */
+  const defaultOptions = {
+    loop: true,
+    autoplay: true,
+    animationData: animationData,
+    rendererSettings: {
+      preserveAspectRatio: "xMidYMid slice",
+    },
+  };
   /**
    * Searches the list of corresponding books that match with textfield value
    * @param {*} event
@@ -229,7 +242,11 @@ export default function SearchPage() {
           bgcolor: "background.paper",
         }}
       >
-        <Results books={searchResults} />
+        {isLoading ? (
+          <Lottie options={defaultOptions} height={400} width={400} />
+        ) : (
+          <Results books={searchResults} />
+        )}
       </Box>
     </Box>
   );
