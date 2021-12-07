@@ -277,6 +277,12 @@ export async function getAuthorTimeLife(ressourceURI) {
     return await axiosQuery(query);
 }
 
+/**
+ * Research books containing the correct name and author
+ * @param {*} bookName 
+ * @param {*} author 
+ * @returns result array
+ */
 export async function researchQuery(bookName, author) {
 
     let query = `SELECT ?authorName ?book
@@ -284,24 +290,32 @@ export async function researchQuery(bookName, author) {
   (MIN(?releaseDate) AS ?releaseDate)
   (MAX(?imageURL) AS ?imageUrl)
   (MAX(?abstract) AS ?abstract) 
-
     WHERE {
     ?book a dbo:Book.
     ?book dbp:name ?name.
     ?book dbo:author ?author;
     dbo:abstract ?abstract.
-
     OPTIONAL {?book dbo:thumbnail ?imageURL.}
     OPTIONAL {?book dbp:releaseDate ?releaseDate.}
-
     ?author dbp:name ?authorName.
     FILTER(lang(?name) = "en")
     FILTER(lang(?abstract) = "en")
     FILTER (regex(?name, "${bookName}", "i"))
     FILTER (regex(?author, "${author}",  "i"))
-
     } GROUP BY ?authorName ?book`
 
+    return await axiosQuery(query);
+}
+
+export async function getAuthors(name) {
+  let query = `SELECT ?writer (MIN(?name) AS ?name) (MAX(?image) AS ?imageUrl) (MIN(?birthDate) AS ?birthDate) (MIN(?deathDate) AS ?deathDate) WHERE {
+    ?writer a dbo:Writer.
+    ?writer dbp:name ?name.
+    OPTIONAL {?writer dbp:birthDate ?birthDate.}
+    OPTIONAL {?writer dbp:deathDate ?deathDate.}
+    OPTIONAL  {?writer dbo:thumbnail ?image.}
+    FILTER (regex(?name, "${name}", "i"))
+    } GROUP BY ?writer`;
     return await axiosQuery(query);
 }
 
