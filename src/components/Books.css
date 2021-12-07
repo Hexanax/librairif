@@ -62,7 +62,7 @@
 
 }
 
-.game {
+.game, .movie {
     box-shadow: 0 0 10px -2px rgb(0, 0, 0, 0.1);
     border-radius: 10px;
     padding: 10px;

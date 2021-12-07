@@ -2,6 +2,9 @@ import axios from "axios";
 
 export async function fetchBookInfo(resourceURI) {
     //TODO CHANGE HARDCODED URI
+    resourceURI = resourceURI.replace(/[( ]/g, '\\(')
+    resourceURI = resourceURI.replace(/[) ]/g, '\\)')
+    console.log(resourceURI);
     const book = `dbr:${resourceURI}`;
     const content = `SELECT ?name ?titleOrig ?imageURL ?abstract ?authorURI ?authorName
     (GROUP_CONCAT(DISTINCT ?publisherURI;   SEPARATOR=", ") AS ?publishers)
@@ -44,7 +47,7 @@ export async function fetchListInSeries(ressourceURI) {
 
 export async function getEditorInfo(editorName) {
     let editorRsrc = `dbr:${editorName}`;
-    let query = [
+    let query =
         `SELECT ?label ?abstract
     (GROUP_CONCAT(DISTINCT ?founded;   SEPARATOR=", ") AS ?foundingYears)
     (GROUP_CONCAT(DISTINCT ?founder;   SEPARATOR=", ") AS ?founders)
@@ -59,7 +62,6 @@ export async function getEditorInfo(editorName) {
       FILTER(lang(?abstract) = "en").
       FILTER(lang(?label) = "en").
     }`
-    ].join("");
     console.log(query);
     return await axiosQuery(query);
 }
@@ -346,12 +348,20 @@ export async function getSearch(name) {
 
 async function axiosQuery(query) {
     let url = "http://dbpedia.org/sparql";
-    let queryURL = encodeURI(url + "?query=" + query + "&format=json");
-    queryURL = queryURL.replace(/#/g, "%23");
+    query  = query.replace(/&/g, "\\&");
+    query = query.replace(/#/g, "%23");
+    console.log(query);
+    let config = {
+        params: {
+            "default-graph-uri": "http://dbpedia.org",
+            "query" : query,
+            "format":"application/json"
+        },
+    }
     return new Promise((resolve, reject) => {
         axios
-            .get(queryURL)
-            .then((response) => {resolve(response.data.results.bindings); console.log(response.data.results)})
+            .get(url, config)
+            .then((response) => resolve(response.data.results.bindings))
             .catch((err) => {
                 console.error(err);
             });
