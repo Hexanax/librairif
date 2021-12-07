@@ -1,16 +1,7 @@
 import React, { useEffect, useState } from "react";
-import {
-  CardActionArea,
-  Grid,
-  Card,
-  CardContent,
-  CardMedia,
-  Typography,
-} from "@mui/material";
-import { researchQuery } from "../services/sparqlRequests";
+import Grid from "@mui/material/Grid";
 import BookResult from "./BookResult";
 import { useNavigate } from "react-router-dom";
-import { useParams } from "react-router-dom";
 
 export default function Results({ books }) {
   let navigate = useNavigate();
@@ -20,7 +11,7 @@ export default function Results({ books }) {
       {books === null ? (
         <div>Loading</div>
       ) : books.length === 0 ? (
-        <div>No results</div>
+        <div></div>
       ) : (
         <Grid
           container

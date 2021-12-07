@@ -17,6 +17,9 @@ import Results from "./Results";
 import Lottie from "react-lottie";
 import animationData from "../lotties/book-loading.json";
 
+import ToggleButton from "@mui/material/ToggleButton";
+import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
+
 /**
  * Allows to wait the time given
  * @param {int} delay time in ms
@@ -69,6 +72,7 @@ export default function SearchPage() {
   const [value, setValue] = useState("");
   const [inputValue, setInputValue] = useState("");
   const [highlightedOption, setHighlightedOption] = useState(0);
+  const [searchType, setSearchType] = React.useState("Books");
 
   const loading = open && options.length === 0;
 
@@ -82,10 +86,14 @@ export default function SearchPage() {
     setOptions([...response]);
   };
 
+  const handleSelectorChange = (event, searchType) => {
+    setSearchType(searchType);
+  };
+
   const handleChange = async (event, newValue) => {
     event.preventDefault();
     setIsLoading(true);
-    if(newValue.name === undefined){
+    if (newValue.name === undefined) {
       setValue(newValue);
       setInputValue(newValue);
       const response = await getSearch(newValue);
@@ -104,9 +112,9 @@ export default function SearchPage() {
       setInputValue(highlightedOption.name.value);
       setValue(highlightedOption.name.value);
     }
-    
-    if (event.key === 'Enter') {
-      if(highlightedOption===null){
+
+    if (event.key === "Enter") {
+      if (highlightedOption === null) {
         event.defaultMuiPrevented = true;
       }
     }
@@ -134,100 +142,122 @@ export default function SearchPage() {
       noValidate
       sx={{
         mt: 1,
-        width: 1,
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
+        width: 1,
       }}
     >
-      <Autocomplete
-        freeSolo
-        margin="normal"
-        required
-        fullWidth
-        id="submit"
-        name="submit"
-        disableClearable
-        inputValue={inputValue}
-        onInputChange={(event, newInputValue) => {
-          if (event != null && event.type === "change") {
-            setInputValue(newInputValue);
-            setValue(event.target.value);
-            handleInputChange(event);
-          }
-        }}
-        onChange={(event, newValue) => {
-          handleChange(event, newValue);
-        }}
-        onKeyDown={(event) => {
-          handleKeyDown(event);
-        }}
-        onHighlightChange={(event, option) => {
-          setHighlightedOption(option);
-        }}
+      <Box
         sx={{
-          border: "1px solid #D8D8D8",
-          boxSizing: "border-box",
-          boxShadow: "0px 0px 8px rgba(135, 135, 135, 0.25)",
-          borderRadius: 2,
-          "&:hover": {
-            boxShadow: "0px 0px 16px rgba(135, 135, 135, 0.25)",
-          },
+          width: 1,
+          display: "flex",
+          flexDirection: "row ",
         }}
-        open={open}
-        onOpen={() => {
-          setOpen(true);
-        }}
-        onClose={() => {
-          setOpen(false);
-        }}
-        options={options.sort((a, b) =>
-          a.type.value.localeCompare(b.type.value)
-        )}
-        groupBy={(option) => option.type.value}
-        getOptionLabel={(option) => option.name?.value}
-        loading={loading}
-        renderInput={(params) => (
-          <TextField
-            id="search"
-            name="search"
-            label="Search your book by name or author"
-            {...params}
-            InputProps={{
-              ...params.InputProps,
-              endAdornment: (
-                <>
-                  {loading ? (
-                    <CircularProgress color="inherit" size={20} />
-                  ) : null}
-                  {params.InputProps.endAdornment}
-                </>
-              ),
-            }}
-          />
-        )}
-        renderOption={(props, option, { inputValue }) => {
-          const matches = match(option.name.value, inputValue);
-          const parts = parse(option.name.value, matches);
+      >
+        <ToggleButtonGroup
+          color="primary"
+          value={searchType}
+          exclusive
+          onChange={handleSelectorChange}
+          sx={{
+            pr: 2,
+            height: 1,
+          }}
+        >
+          <ToggleButton value="Books">Books</ToggleButton>
+          <ToggleButton value="Author">Author</ToggleButton>
+        </ToggleButtonGroup>
+        <Autocomplete
+          freeSolo
+          margin="normal"
+          required
+          fullWidth
+          id="submit"
+          name="submit"
+          disableClearable
+          inputValue={inputValue}
+          onInputChange={(event, newInputValue) => {
+            if (event != null && event.type === "change") {
+              setInputValue(newInputValue);
+              setValue(event.target.value);
+              handleInputChange(event);
+            }
+          }}
+          onChange={(event, newValue) => {
+            handleChange(event, newValue);
+          }}
+          onKeyDown={(event) => {
+            handleKeyDown(event);
+          }}
+          onHighlightChange={(event, option) => {
+            setHighlightedOption(option);
+          }}
+          sx={{
+            border: "1px solid #D8D8D8",
+            boxSizing: "border-box",
+            boxShadow: "0px 0px 8px rgba(135, 135, 135, 0.25)",
+            borderRadius: 2,
+            "&:hover": {
+              boxShadow: "0px 0px 16px rgba(135, 135, 135, 0.25)",
+            },
+            height: 1,
+          }}
+          open={open}
+          onOpen={() => {
+            setOpen(true);
+          }}
+          onClose={() => {
+            setOpen(false);
+          }}
+          options={options.sort((a, b) =>
+            a.type.value.localeCompare(b.type.value)
+          )}
+          groupBy={(option) => option.type.value}
+          getOptionLabel={(option) => option.name?.value}
+          loading={loading}
+          renderInput={(params) => (
+            <TextField
+              id="search"
+              name="search"
+              label="Search your book by name or author"
+              {...params}
+              InputProps={{
+                ...params.InputProps,
+                endAdornment: (
+                  <>
+                    {loading ? (
+                      <CircularProgress color="inherit" size={20} />
+                    ) : null}
+                    {params.InputProps.endAdornment}
+                  </>
+                ),
+              }}
+            />
+          )}
+          renderOption={(props, option, { inputValue }) => {
+            const matches = match(option.name.value, inputValue);
+            const parts = parse(option.name.value, matches);
 
-          return (
-            <li {...props}>
-              <div>
-                {parts.map((part, index) => (
-                  <span
-                    key={index}
-                    style={{
-                      fontWeight: part.highlight ? 700 : 400,
-                    }}
-                  >
-                    {part.text}
-                  </span>
-                ))}
-              </div>
-            </li>
-          );
-        }}
-      />
+            return (
+              <li {...props}>
+                <div>
+                  {parts.map((part, index) => (
+                    <span
+                      key={index}
+                      style={{
+                        fontWeight: part.highlight ? 700 : 400,
+                      }}
+                    >
+                      {part.text}
+                    </span>
+                  ))}
+                </div>
+              </li>
+            );
+          }}
+        />
+      </Box>
       <Button
         type="submit"
         variant="contained"
