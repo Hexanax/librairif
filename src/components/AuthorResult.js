@@ -6,9 +6,16 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import { CardActionArea, Grid } from "@mui/material";
 
+function dateFormat(date) {
+  if (date != null && date.split('-')[0] != '') {
+    return date.split('-')[0];
+  } else {
+    return '';
+  }
+}
+
 function AuthorResult(index, data, navigate) {
   const handleClick = () => {
-    console.log("click");
     navigate(`../../bookInfo/${data.authorURI}`);
   };
   // uri, nom date naissance, date mort, thumbnail
@@ -72,7 +79,7 @@ function AuthorResult(index, data, navigate) {
               {data.name}
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              {data.birthDate ? data.birthDate : ""} {data.deathDate ? " - " + data.deathDate : ""}
+              {data.birthDate ? dateFormat(data.birthDate) : ""} {data.deathDate && dateFormat(data.deathDate) != '' ? (" - " + dateFormat(data.deathDate)) : ""}
             </Typography>
           </CardContent>
         </CardActionArea>

@@ -35,11 +35,10 @@ export default function Results({ type, data }) {
             const authorData = {
               name: obj.name.value,
               img: obj.imageUrl?.value,
-              birthDate: obj.birthDate?.value,
-              deathDate: obj.deathDate?.value,
+              birthDate: obj.birthDate?.value ?? '',
+              deathDate: obj.deathDate?.value ?? '',
               authorURI: obj.writer.value.split("http://dbpedia.org/resource/")[1],
             };
-            console.log(authorData);
             return AuthorResult(index, authorData, navigate);
           })}
         </Grid>

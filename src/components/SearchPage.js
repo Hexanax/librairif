@@ -64,11 +64,9 @@ export default function SearchPage() {
     setIsLoading(true);
     if (searchType == "Book") {
       const bookResponse = await getSearch(searchInput);
-      console.log(bookResponse);
       setSearchResults(bookResponse);
     } else if (searchType == "Author") {
       const authorResponse = await getAuthors(searchInput);
-      console.log(authorResponse);
       setSearchResults(authorResponse);
     }
     setIsLoading(false);
