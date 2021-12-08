@@ -307,29 +307,57 @@ export async function getAuthorTimeLife(resourceURI) {
  * @param {*} author 
  * @returns result array
  */
-export async function researchQuery(name) {
+export async function researchQuery(name, offset) {
     name=encodeResource(name);
-    let query = `SELECT ?authorName ?book
+    let query = `SELECT ?book (GROUP_CONCAT(DISTINCT ?authorName;   SEPARATOR=", ") AS ?authorNames)
     (MAX(?name) AS ?name)
     (MAX(?releaseDate) AS ?releaseDate)
     (MAX(?imageURL) AS ?imageUrl)
-    (MAX(?abstract) AS ?abstract) 
         WHERE {
-        ?book a dbo:Book.
-        ?book dbp:name ?name.
-        ?book dbo:author ?author;
-        dbo:abstract ?abstract.
-        OPTIONAL {?book dbo:thumbnail ?imageURL.}
-        OPTIONAL {?book dbp:releaseDate ?releaseDate.}
-        ?author dbp:name ?authorName.
-        FILTER(lang(?name) = "en")
-        FILTER(lang(?abstract) = "en")
-        FILTER (regex(?name, "${name}", "i") || regex(?author, "${name}",  "i"))
-        } GROUP BY ?authorName ?book LIMIT 300`
+         	?book a dbo:Book.
+	        ?book dbp:name ?name.
+	        ?book dbo:author ?author;
+	        dbo:abstract ?abstract.
+	        OPTIONAL {?book dbo:thumbnail ?imageURL.}
+	        OPTIONAL {?book dbp:releaseDate ?releaseDate.}
+	        ?author dbp:name ?authorName.
+	        FILTER(lang(?name) = "en")
+	        FILTER(lang(?abstract) = "en")
+        {{
+	        FILTER (regex(?name, "${name}", "i") || regex(?authorName, "${name}","i"))
+	    } UNION {
+	    	?book dbo:literaryGenre ?literaryGenre.
+	    	?literaryGenre rdfs:label ?literaryGenreLabel.
+	    	FILTER(lang(?literaryGenreLabel) = "en")
+	    	FILTER(regex(?literaryGenreLabel, "${name}", "i"))
+	    } UNION {
+	    	?book dbp:genre ?genre.
+	    	FILTER(lang(?genre) = "en")
+	    	FILTER(regex(?genre, "${name}", "i"))
+	    } UNION {
+	    	?book dbp:country ?country;
+	    	dbp:language ?language.
+	    	FILTER(lang(?country) = "en")
+	    	FILTER(lang(?language) = "en")
+	    	FILTER (regex(?country, "${name}", "i") || regex(?language, "${name}","i"))
+	    } UNION {
+	    	?book dct:subject ?subject.
+	    	?subject rdfs:label ?subjectLabel.
+	    	FILTER(lang(?subjectLabel) = "en")
+	    	FILTER(regex(?subjectLabel, "${name}", "i"))
+	    } UNION {
+	    	?book gold:hypernym ?hypernym.
+	    	?hypernym rdfs:label ?hypernymLabel.
+	    	FILTER(lang(?hypernymLabel) = "en")
+	    	FILTER(regex(?hypernymLabel, "${name}", "i"))
+	    }}
+
+     	} ORDER BY ASC(?name) OFFSET ${offset} LIMIT 50`
     return await axiosQuery(query);
 }
 
 export async function getAuthors(name) {
+    const offset = 0;
     name=encodeResource(name)
   let query = `SELECT ?writer (MIN(?name) AS ?name) (MAX(?image) AS ?imageUrl) (MIN(?birthDate) AS ?birthDate) (MIN(?deathDate) AS ?deathDate) WHERE {
     ?writer a dbo:Writer.
@@ -337,8 +365,34 @@ export async function getAuthors(name) {
     OPTIONAL {?writer dbp:birthDate ?birthDate.}
     OPTIONAL {?writer dbp:deathDate ?deathDate.}
     OPTIONAL  {?writer dbo:thumbnail ?image.}
-    FILTER (regex(?name, "${name}", "i"))
-    } GROUP BY ?writer LIMIT 300`;
+    {{
+    	FILTER (regex(?name, "${name}", "i"))
+    } UNION {
+    	?writer dbp:nationality ?nationality.
+    	FILTER(lang(?nationality) = "en")
+    	FILTER (regex(?nationality, "${name}", "i"))
+    } UNION {
+    	?writer dbo:occupation ?occupation.
+    	?occupation rdfs:label ?occupationLabel.
+    	FILTER(lang(?occupationLabel) = "en")
+    	FILTER (regex(?occupationLabel, "${name}", "i"))
+    } UNION {
+    	?writer dct:subject ?subject.
+    	?subject rdfs:label ?subjectLabel.
+    	FILTER(lang(?subjectLabel) = "en")
+    	FILTER (regex(?subjectLabel, "${name}", "i"))
+    } UNION {
+		?writer dbo:movement ?movement.
+    	?movement rdfs:label ?movementLabel.
+    	FILTER(lang(?movementLabel) = "en")
+    	FILTER (regex(?movementLabel, "${name}", "i"))
+    } UNION {
+		?writer dbo:genre ?genre.
+    	?genre rdfs:label ?genreLabel.
+    	FILTER(lang(?genreLabel) = "en")
+    	FILTER (regex(?genreLabel, "${name}", "i"))
+    }}
+    } ORDER BY ASC(?name) OFFSET ${offset} LIMIT 50`;
     return await axiosQuery(query);
 }
 
@@ -372,10 +426,11 @@ export async function autocompleteQuery(text) {
 
 export async function getSearch(name) {
     return new Promise((resolve, reject) => {
-        researchQuery(name).then(results => {
-            return resolve(results.sort((a, b) => {
-                return a.name.value.toUpperCase().localeCompare(b.name.value.toUpperCase());
-            }));
+        researchQuery(name, 0).then(results => {
+            //return resolve(results.sort((a, b) => {
+            //    return a.name.value.toUpperCase().localeCompare(b.name.value.toUpperCase());
+            //}));
+            return resolve(results);
         });
     });
 }

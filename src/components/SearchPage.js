@@ -25,17 +25,6 @@ import animationData from "../lotties/book-loading.json";
 import ToggleButton from "@mui/material/ToggleButton";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 
-/**
- * Allows to wait the time given
- * @param {int} delay time in ms
- * @returns
- */
-function sleep(delay = 0) {
-  return new Promise((resolve) => {
-    setTimeout(resolve, delay);
-  });
-}
-
 export default function SearchPage() {
   //used to push a new page to the history stack
   let navigate = useNavigate();
