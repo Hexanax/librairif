@@ -16,7 +16,7 @@ function dateFormat(date) {
 
 function AuthorResult(index, data, navigate) {
   const handleClick = () => {
-    navigate(`../../bookInfo/${data.authorURI}`);
+    navigate(`../../authorInfo/${data.authorURI}`);
   };
   // uri, nom date naissance, date mort, thumbnail
   let authorCover;
