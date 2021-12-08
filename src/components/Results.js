@@ -24,7 +24,7 @@ export default function Results({ type, data }) {
           {type=='Book' && data.map((obj, index) => {
             const bookData = {
               title: obj.name.value,
-              author: obj.authorName.value,
+              author: obj.authorNames.value,
               img: obj.imageUrl?.value,
               releaseDate: obj.releaseDate?.value,
               bookURI: obj.book.value.split("http://dbpedia.org/resource/")[1],

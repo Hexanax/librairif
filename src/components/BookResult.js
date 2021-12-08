@@ -11,7 +11,7 @@ function BookResult(index, data, navigate) {
         console.log("click");
         navigate(`../../bookInfo/${data.bookURI}`);
     };
-
+    console.log("Data" + JSON.stringify(data))
     let bookCover;
     if (data.img) {
       bookCover = (
@@ -76,7 +76,7 @@ function BookResult(index, data, navigate) {
                 {data.title}
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                {data.author} {data.releaseDate ? -data.releaseDate : ""}
+                {data.author} {data.releaseDate ? " - " + data.releaseDate : ""}
               </Typography>
             </CardContent>
           </CardActionArea>
