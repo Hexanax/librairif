@@ -1,10 +1,10 @@
 import axios from "axios";
 
 function encodeResource(resourceURI) {
-    resourceURI = resourceURI.replace(/[( ]/g, '\\(')
-    resourceURI = resourceURI.replace(/[) ]/g, '\\)')
-    resourceURI = resourceURI.replace(/[' ]/g, "\\'")
-    resourceURI = resourceURI.replace(/[" ]/g, `\\"`)
+    resourceURI = resourceURI.replace(/[(]/g, '\\(')
+    resourceURI = resourceURI.replace(/[)]/g, '\\)')
+    resourceURI = resourceURI.replace(/[']/g, "\\'")
+    resourceURI = resourceURI.replace(/["]/g, `\\"`)
     return resourceURI;
 }
 
