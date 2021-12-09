@@ -1,4 +1,5 @@
 import {getEditorInfo} from '../services/sparqlRequests'
+import "./Editor.css"
 import {useEffect, useState} from "react";
 import { useParams } from 'react-router';
 
@@ -48,7 +49,9 @@ const Editor = () => {
                                     Founders
                                 </div>
                                 <div>
-                                    {editorInfo.founders?.value.split(",")[0]}
+                                    <ul>
+                                        {editorInfo.founders?.value.split(",").map(founder => <li>{founder.split("http://dbpedia.org/resource/")[1]} </li>)}
+                                    </ul>
                                 </div>
                                 <div className={"foundingYearWrapper"}>
                                     <span>Foundation Year</span>

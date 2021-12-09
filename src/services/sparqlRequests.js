@@ -41,6 +41,7 @@ export async function fetchBookInfo(resourceURI) {
 }
 
 export async function getEditorInfo(editorName){
+  
   let editorRsrc = `dbr:${editorName}`;
   let query = [
     `SELECT ?label ?abstract
@@ -50,7 +51,9 @@ export async function getEditorInfo(editorName){
     (GROUP_CONCAT(DISTINCT ?headquarters; SEPARATOR=", ") AS ?headquartersLocations) WHERE {
       ${editorRsrc} rdfs:label ?label;
       dbo:abstract ?abstract.
-      OPTIONAL{${editorRsrc} dbo:founder ?founder}
+      OPTIONAL{${editorRsrc} dbo:founder ?founder
+              UNION ${editorRsrc} dbp:founder ?founder
+    }
       OPTIONAL{${editorRsrc} dbo:foundingYear ?founded}
       OPTIONAL{${editorRsrc} foaf:homepage ?homepage}
       OPTIONAL{${editorRsrc} dbp:headquarters ?headquarters}
@@ -324,6 +327,7 @@ async function axiosQuery(query) {
   let url = "http://dbpedia.org/sparql";
   let queryURL = encodeURI(url + "?query=" + query + "&format=json");
   queryURL = queryURL.replace(/#/g, "%23");
+  queryURL = queryURL.replace(/&/g, "%26");
   return new Promise((resolve, reject) => {
     axios
       .get(queryURL)
