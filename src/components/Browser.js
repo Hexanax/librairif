@@ -24,6 +24,7 @@ export default function Browser() {
             display: "flex",
             flexDirection: "row",
             alignItems: "center",
+            maxWidth: 1500,
           }}
         >
           <Box
