@@ -261,8 +261,9 @@ const Books = () => {
                             </div>
                         </div>
                         <div>
-                            <div className={"relatedWrapper"}>
 
+                            {sameGenreBooks?.length!==0 &&
+                            <div className={"relatedWrapper"}>
                                 <h3>Same genre books</h3>
                                 <div className={"sameGenreWrapper"}>
                                     {sameGenreBooks !== null && sameGenreBooks.map((obj, index) => {
@@ -276,13 +277,14 @@ const Books = () => {
 
                                         return (
                                             <div className={"cardWrapper"}>
-                                                <BookResult key={index} index={index} data={bookData} navigate={navigate}/>
+                                                <BookResult key={index} index={index} data={bookData}
+                                                            navigate={navigate}/>
                                             </div>
                                         );
                                     })
                                     }
                                 </div>
-                            </div>
+                            </div>}
                             <div className={"relatedWrapper"}>
                                 <h3>Related Games</h3>
                                 {associatedGames !== null && associatedGames.map(game => <Game game={game}/>)}
