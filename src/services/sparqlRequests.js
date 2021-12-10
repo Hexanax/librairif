@@ -394,7 +394,7 @@ export async function queryAuthorAdvancedInfo(authorURI) {
   return await axiosQuery(query);
 }
 
-export async function fetchBookAssiociatedToAuthor(authorURI) {
+export async function fetchBookAssociatedToAuthor(authorURI) {
   authorURI = encodeResource(authorURI);
   let author = `dbr:${authorURI}`;
   let query = `SELECT ?book
@@ -412,7 +412,10 @@ export async function fetchBookAssiociatedToAuthor(authorURI) {
         FILTER(lang(?abstract) = "en")
     } ORDER BY ASC(?name)
     `;
-  return await axiosQuery(query);
+  console.log(query);
+  let response = await axiosQuery(query);
+  console.log(response);
+  return response;
 }
 
 export async function getAuthorTimeLife(resourceURI) {
