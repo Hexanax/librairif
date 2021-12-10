@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import {
   queryAuthor,
   queryAuthorAdvancedInfo,
-  fetchBookAssiociatedToAuthor,
+  fetchBookAssociatedToAuthor,
   getAuthorTimeLife,
   getAuthorInspiration,
   getRelatedAuthor,
@@ -102,7 +102,8 @@ function Author(data) {
   useEffect(() => {
     const loadBookInfo = async () => {
       setIsLoading(true);
-      const responseBook = await fetchBookAssiociatedToAuthor(authorURI);
+      const responseBook = await fetchBookAssociatedToAuthor(authorURI);
+      console.log(responseBook);
       setIsLoading(false);
       setBooks(responseBook);
     };

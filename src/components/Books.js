@@ -1,7 +1,7 @@
 import {
     fetchBookInfo, fetchAssociatedGames, fetchAssociatedMovies, fetchAssociatedMusicals,
     fetchAssociatedTVShow, fetchAssociatedArts, fetchAssociatedMusics, fetchListInSeries,
-    fetchBookNeighbor, fetchSameGenreBooks
+    fetchBookNeighbor, fetchSameGenreBooks, fetchBookAssociatedToAuthor
 } from '../services/sparqlRequests'
 import {useEffect, useState} from "react";
 import {useParams} from 'react-router-dom'
@@ -32,7 +32,8 @@ const Books = () => {
 
     const [seriesOfBook, setSeriesOfBook] = useState(null);
     const [neighbors, setNeighbors] = useState(null);
-    const [sameGenreBooks, setSameGenreBooks] = useState(null);
+    const [sameGenreBooks, setSameGenreBooks] = useState([]);
+    const [sameAuthorBooks, setSameAuthorBooks] = useState([]);
 
     useEffect(() => {
 
@@ -42,15 +43,15 @@ const Books = () => {
             const content = response[0]
             console.log(content);
             const bookData = {
-                name:content.name.value,
-                abstract:content.abstract.value,
-                authorURI:content.authorURI.value,
-                authorName:content.authorName.value,
-                publishersURI:content.publishersURI.value.split(","),
-                publishers:content.publishers.value.split(","),
-                releaseDates:content.releaseDates.value.split(","),
-                genres:content.genres.value.split(","),
-                imageURL:content.imageURL?.value,
+                name: content.name.value,
+                abstract: content.abstract.value,
+                authorURI: content.authorURI.value.split("http://dbpedia.org/resource/")[1],
+                authorName: content.authorName.value,
+                publishersURI: content.publishersURI.value.split(","),
+                publishers: content.publishers.value.split(","),
+                releaseDates: content.releaseDates.value.split(","),
+                genres: content.genres.value.split(","),
+                imageURL: content.imageURL?.value,
             }
             console.log(bookData);
             setIsLoading(false);
@@ -62,24 +63,8 @@ const Books = () => {
     }, [bookURI]);
 
     useEffect(() => {
-        const loadAssociatedWork = async () => {
-            setIsLoading(true);
-            if (bookInfo !== null) {
-                const games = await fetchAssociatedGames(bookInfo.name, bookInfo.authorName);
-                setAssociatedGames(games);
-                const movies = await fetchAssociatedMovies(bookInfo.name, bookInfo.authorName);
-                setAssociatedMovies(movies);
-                const musicals = await fetchAssociatedMusicals(bookInfo.name, bookInfo.authorName);
-                setAssociatedMusicals(musicals);
-                const tvShows = await fetchAssociatedTVShow(bookInfo.name, bookInfo.authorName);
-                setAssociatedTVShows(tvShows);
-                const arts = await fetchAssociatedArts(bookInfo.name, bookInfo.authorName);
-                setAssociatedArts(arts);
-                const musics = await fetchAssociatedMusics(bookInfo.name, bookInfo.authorName);
-                setAssociatedMusics(musics);
-            }
-            setIsLoading(false);
-        }
+
+
         const loadAssociatedSeriesOfBook = async () => {
             setIsLoading(true);
             const response = await fetchListInSeries(bookURI);
@@ -102,28 +87,59 @@ const Books = () => {
         }
 
         (async () => {
-            await loadAssociatedWork();
             await loadAssociatedSeriesOfBook();
             await loadBookNeighbors();
             await loadSameGenreBooks();
+
         })();
-    }, [bookInfo, bookURI])
+    }, [bookURI])
 
     useEffect(() => {
-        // console.log("Book infos : ")
-        // console.log(bookInfo);
-        // console.log(associatedGames);
-        // console.log(associatedMovies);
-        // console.log(associatedMusicals);
-        // console.log(associatedTVShows);
-        // console.log(associatedArts);
-        // console.log(associatedMusics);
-        // console.log(seriesOfBook);
-        // console.log(neighbors);
-        setIsLoading(false)
-    }, [bookInfo, associatedGames, associatedMovies,
-        associatedMusicals, associatedTVShows, associatedArts,
-        associatedMusics, seriesOfBook, neighbors, sameGenreBooks])
+
+        const loadAssociatedWork = async () => {
+            setIsLoading(true);
+            const responseBook = await fetchBookAssociatedToAuthor(bookInfo.authorURI);
+            const authorBooks = responseBook.filter((book) => {
+                return (book.name.value !== bookInfo.name)
+            })
+            console.log(authorBooks);
+            setSameAuthorBooks(authorBooks);
+            const games = await fetchAssociatedGames(bookInfo.name, bookInfo.authorName);
+            setAssociatedGames(games);
+            const movies = await fetchAssociatedMovies(bookInfo.name, bookInfo.authorName);
+            setAssociatedMovies(movies);
+            const musicals = await fetchAssociatedMusicals(bookInfo.name, bookInfo.authorName);
+            setAssociatedMusicals(musicals);
+            const tvShows = await fetchAssociatedTVShow(bookInfo.name, bookInfo.authorName);
+            setAssociatedTVShows(tvShows);
+            const arts = await fetchAssociatedArts(bookInfo.name, bookInfo.authorName);
+            setAssociatedArts(arts);
+            const musics = await fetchAssociatedMusics(bookInfo.name, bookInfo.authorName);
+            setAssociatedMusics(musics);
+            setIsLoading(false);
+        }
+
+        if (bookInfo !== null) {
+            console.log(bookInfo);
+            loadAssociatedWork();
+        }
+
+    }, [bookInfo])
+    // useEffect(() => {
+    //     // console.log("Book infos : ")
+    //     // console.log(bookInfo);
+    //     // console.log(associatedGames);
+    //     // console.log(associatedMovies);
+    //     // console.log(associatedMusicals);
+    //     // console.log(associatedTVShows);
+    //     // console.log(associatedArts);
+    //     // console.log(associatedMusics);
+    //     // console.log(seriesOfBook);
+    //     // console.log(neighbors);
+    //     setIsLoading(false)
+    // }, [bookInfo, associatedGames, associatedMovies,
+    //     associatedMusicals, associatedTVShows, associatedArts,
+    //     associatedMusics, seriesOfBook, neighbors, sameGenreBooks])
 
     const render = () => {
         return (
@@ -146,7 +162,7 @@ const Books = () => {
                         <div className={"authorWrapper"}>
                             <span className={"author"}>{bookInfo.authorName ?
                                 <Link
-                                    to={`../../authorInfo/${bookInfo.authorURI.split("http://dbpedia.org/resource/")[1]}`}> {bookInfo.authorName}</Link>
+                                    to={`../../authorInfo/${bookInfo.authorURI}`}> {bookInfo.authorName}</Link>
                                 : bookInfo.authorURI}</span>
                         </div>
                         <div className={"mainContent"}>
@@ -196,14 +212,14 @@ const Books = () => {
                                             Publishers
                                         </div>
                                         <div className={"publishersWrapper"}>
-                                           <span> {bookInfo.publishers.map( (publisher, index) => {
-                                               return(
+                                           <span> {bookInfo.publishers.map((publisher, index) => {
+                                               return (
                                                    <span>
                                                        <Link
                                                            to={`../../editorInfo/${bookInfo.publishersURI[index].split("http://dbpedia.org/resource/")[1]}`}>
                                                            {publisher}
                                                        </Link>
-                                                       {index!==bookInfo.publishers.length-1 && <span>,</span>}
+                                                       {index !== bookInfo.publishers.length - 1 && <span>,</span>}
                                                     </span>
                                                )
                                            })
@@ -218,11 +234,11 @@ const Books = () => {
                                             <span>Release Date</span>
                                         </div>
                                         <div className={"releaseDateWrapper"}>
-                                            <span> {bookInfo.releaseDates.map( (date, index) => {
-                                                return(
+                                            <span> {bookInfo.releaseDates.map((date, index) => {
+                                                return (
                                                     <span>
                                                         {date}
-                                                        {index!==bookInfo.releaseDates.length-1 && <span>,</span>}
+                                                        {index !== bookInfo.releaseDates.length - 1 && <span>,</span>}
                                                     </span>
                                                 )
                                             })
@@ -239,18 +255,19 @@ const Books = () => {
                                             <span> {bookInfo.titleOrig}</span>
                                         </div>
                                     </> : null}
-                                {bookInfo.genres[0] !=="" ?
+
+                                {bookInfo.genres[0] !== "" ?
                                     <>
                                         {console.log(bookInfo.genres)}
                                         <div className={"literaryGenres"}>
                                             <span>Literary genre </span>
                                         </div>
                                         <div className={"literaryGenres"}>
-                                            <span> {bookInfo.genres.map( (genre, index) => {
-                                                return(
+                                            <span> {bookInfo.genres.map((genre, index) => {
+                                                return (
                                                     <span>
                                                         {genre}
-                                                        {index!==bookInfo.genres.length-1 && <span>,</span>}
+                                                        {index !== bookInfo.genres.length - 1 && <span>,</span>}
                                                     </span>
                                                 )
                                             })
@@ -261,12 +278,37 @@ const Books = () => {
                             </div>
                         </div>
                         <div>
+                            {sameAuthorBooks.length !== 0 &&
+                            <>
+                                <div className={"relatedWrapper"}>
+                                    <h3>From the same author</h3>
+                                    <div className={"otherBooksWrapper"}>
+                                        {sameAuthorBooks.map((obj, index) => {
+                                            const bookData = {
+                                                title: obj.name?.value,
+                                                author: obj.authorNames?.value,
+                                                img: obj.imageUrl?.value,
+                                                releaseDate: obj.releaseDate?.value,
+                                                bookURI: obj.book?.value.split("http://dbpedia.org/resource/")[1],
+                                            };
 
-                            {sameGenreBooks?.length!==0 &&
+                                            return (
+                                                <div className={"cardWrapper"}>
+                                                    <BookResult key={index} index={index} data={bookData}
+                                                                navigate={navigate}/>
+                                                </div>
+                                            );
+                                        })
+                                        }
+                                    </div>
+                                </div>
+                            </>
+                            }
+                            {sameGenreBooks.length !== 0 &&
                             <div className={"relatedWrapper"}>
-                                <h3>Same genre books</h3>
-                                <div className={"sameGenreWrapper"}>
-                                    {sameGenreBooks !== null && sameGenreBooks.map((obj, index) => {
+                                <h3>From the same genre</h3>
+                                <div className={"otherBooksWrapper"}>
+                                    {sameGenreBooks.map((obj, index) => {
                                         const bookData = {
                                             title: obj.name?.value,
                                             author: obj.authorNames?.value,

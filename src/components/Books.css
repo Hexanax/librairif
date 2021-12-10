@@ -74,10 +74,11 @@
     margin: 10px;
     width: fit-content;
 }
-.sameGenreWrapper{
+.otherBooksWrapper{
     display:flex;
     align-items: center;
     justify-content: center;
+    flex-wrap: wrap;
 }
 
 .cardWrapper{
