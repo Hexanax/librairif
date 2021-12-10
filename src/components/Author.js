@@ -180,14 +180,16 @@ function Author(data) {
           if (authorInfo.birthDate?.value != null) {
             notableWork.push({
               "work": "Birth Date",
-              "date": authorInfo.birthDate?.value
+              "date": authorInfo.birthDate?.value,
+              "type": "birth"
             });
           }
         }
         while (works[++i]) {
           notableWork.push({
             "work": works[i],
-            "date": dates[i]
+            "date": dates[i],
+            "type": "work"
           });
         }
         if (authorInfo !== null) {
@@ -195,7 +197,8 @@ function Author(data) {
             if (authorInfo.deathDate?.value != null) {
               notableWork.push({
                 "work": "Death Date",
-                "date": authorInfo.deathDate?.value
+                "date": authorInfo.deathDate?.value,
+                "type": "death"
               })
             }
           }
