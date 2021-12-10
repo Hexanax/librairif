@@ -51,8 +51,8 @@ export async function getEditorInfo(editorName){
     (GROUP_CONCAT(DISTINCT ?headquarters; SEPARATOR=", ") AS ?headquartersLocations) WHERE {
       ${editorRsrc} rdfs:label ?label;
       dbo:abstract ?abstract.
-      OPTIONAL{${editorRsrc} dbo:founder ?founder
-              UNION ${editorRsrc} dbp:founder ?founder
+      OPTIONAL{${editorRsrc} dbo:founder ?founder}
+              UNION {${editorRsrc} dbp:founder ?founder
     }
       OPTIONAL{${editorRsrc} dbo:foundingYear ?founded}
       OPTIONAL{${editorRsrc} foaf:homepage ?homepage}
@@ -307,7 +307,7 @@ export async function autocompleteQuery(text) {
     `FILTER (regex(?name, '${text}',"i")) `,
     "} ",
     "ORDER BY ASC(?name) ",
-    "LIMIT 10 ",
+    "LIMIT 10",
   ].join("");
   return await axiosQuery(query);
 }
@@ -325,7 +325,7 @@ export async function getSearch(name) {
 
 async function axiosQuery(query) {
   let url = "http://dbpedia.org/sparql";
-  let queryURL = encodeURI(url + "?query=" + query + "&format=json");
+  let queryURL = encodeURI(url + "?query=" + query );
   queryURL = queryURL.replace(/#/g, "%23");
   queryURL = queryURL.replace(/&/g, "%26");
   return new Promise((resolve, reject) => {
