@@ -5,6 +5,7 @@ import {
   queryAuthor,
   queryAuthorAdvancedInfo,
   fetchBookAssiociatedToAuthor,
+  getAuthorTimeLife,
 } from "../services/sparqlRequests";
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
@@ -16,8 +17,11 @@ import IconButton from "@mui/material/IconButton";
 import ArrowBackRounded from "@bit/mui-org.material-ui-icons.arrow-back-rounded";
 import Lottie from "react-lottie";
 import BookResult from "./BookResult";
+import TimelineElement from "./Timeline"
 import { fetchBookInfo } from "../services/sparqlRequests";
 import animationData from "../lotties/book-loading.json";
+import useEnhancedEffect from "@mui/utils/useEnhancedEffect";
+
 
 const defaultOptions = {
   loop: true,
@@ -37,12 +41,14 @@ function Author(data) {
   const [listAwards, setListAwards] = useState(null);
   const [listGenres, setListGenres] = useState(null);
   const [listOccupation, setListOccupation] = useState(null);
+  const [authorTimeline, setAuthorTimeline] = useState(null);
   const [books, setBooks] = useState([]);
 
   useEffect(() => {
     const loadAuthorInfo = async () => {
       setIsLoading(true);
       const response = await queryAuthor(authorURI);
+      console.log("response" + JSON.stringify(response[0]));
       setAuthorInfo(response[0]);
       setIsLoading(false);
 
@@ -70,7 +76,7 @@ function Author(data) {
     const loadAdvancedInfo = async () => {
       setIsLoading(true);
       const responseAdvanced = await queryAuthorAdvancedInfo(authorURI);
-      console.log("response = "+ JSON.stringify(responseAdvanced));
+      console.log("response = " + JSON.stringify(responseAdvanced));
       setIsLoading(false);
       if (responseAdvanced[0].occupation !== null) {
         setListOccupation(responseAdvanced[0].occupation?.value.split(","));
@@ -80,17 +86,69 @@ function Author(data) {
     loadAdvancedInfo();
   }, [authorURI]);
 
+
+  useEffect(() => {
+    const loadTimeline = async () => {
+      setIsLoading(true);
+      const timeline = await getAuthorTimeLife(authorURI);
+      console.log("author timeline" + JSON.stringify(timeline));
+      let works, dates;
+      if (timeline[0].notableWorkName !== null) {
+        works = timeline[0].notableWorkName?.value.split(";");
+      }
+      if (timeline[0].releaseDate !== null) {
+        dates = timeline[0].releaseDate?.value.split(";");
+      }
+      let i = -1;
+      const notableWork = [];
+
+      if (authorInfo !== null) {
+        if (authorInfo.birthDate !== null) {
+          if (authorInfo.birthDate?.value != null) {
+            notableWork.push({
+              "work": "Birth Date",
+              "date": authorInfo.birthDate?.value
+            });
+          }
+        }
+        while (works[++i]) {
+          notableWork.push({
+            "work": works[i],
+            "date": dates[i]
+          });
+        }
+        if (authorInfo !== null) {
+          if (authorInfo.deathDate !== null) {
+            if (authorInfo.deathDate?.value != null) {
+              notableWork.push({
+                "work": "Death Date",
+                "date": authorInfo.deathDate?.value
+              })
+            }
+          }
+        }
+
+      }
+      setAuthorTimeline(notableWork);
+      setIsLoading(false);
+    };
+    loadTimeline();
+  }, [authorInfo, authorURI]);
+
   let splitString = (string) => {
     if (string !== null) {
       return string.split(";");
     }
   };
 
+ 
   const render = () => {
+
+
     return (
       <div>
         {authorInfo === null && <div>Loading results</div>}
-        {authorInfo !== null && advancedInfo !== null && books !== null && (
+        {authorInfo !== null && advancedInfo !== null && books !== null && authorTimeline !== null && (
           <div className={"bookContainer"}>
             <div className={"historyBack"}>
               <IconButton
@@ -128,6 +186,23 @@ function Author(data) {
                   <img src={authorInfo.image?.value} />
                 </div>
               </div>
+
+              <div>
+                {authorTimeline ?
+                  <div className="timelineWrapper">
+                    <div>
+                      <Typography component="h6" variant="h6">
+                        Timeline
+                      </Typography>
+                    </div>
+
+                    <div>
+                      <div><TimelineElement data={authorTimeline} /></div>
+                    </div>
+                  </div> : null}
+              </div>
+
+
               <div>
                 <h2>Info</h2>
                 <div className={"infoWrapper"}>
@@ -146,6 +221,7 @@ function Author(data) {
                     )}
                   </div>
 
+              
                   <div>
                     {advancedInfo.movement !== null && (
                       <div>
@@ -160,7 +236,7 @@ function Author(data) {
                       <div>{advancedInfo.movement?.value}</div>
                     )}
                   </div>
-                        
+
                   <div><Typography component="h6" variant="h6">Awards</Typography></div>
                   <div>
                     <ul>

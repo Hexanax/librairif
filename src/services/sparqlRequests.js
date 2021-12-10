@@ -375,15 +375,12 @@ export async function fetchBookAssiociatedToAuthor(authorURI) {
 export async function getAuthorTimeLife(resourceURI) {
   resourceURI = encodeResource(resourceURI);
   const currentAuthor = `dbr:${resourceURI}`;
-  let query = [
-    `SELECT ?birthDate ?deathDate GROUP_CONCAT(?notableWorkName, ";") GROUP_CONCAT(?releaseDate, ";") WHERE {
-        ${currentAuthor} a dbo:Writer;
-        dbo:birthDate ?birthDate;
-        dbo:notableWork ?notableWork.
+  let query = `SELECT GROUP_CONCAT(?notableWorkName, ";") as ?notableWorkName GROUP_CONCAT(?releaseDate, ";") as ?releaseDate WHERE {
+        ${currentAuthor} dbo:notableWork ?notableWork.
         ?notableWork dbp:name ?notableWorkName.
         ?notableWork dbp:releaseDate ?releaseDate.
-        OPTIONAL{${currentAuthor} dbo:deathDate ?deathDate }}`,
-  ].join("");
+      }`;
+  
   return await axiosQuery(query);
 }
 
