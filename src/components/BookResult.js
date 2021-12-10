@@ -11,7 +11,6 @@ function BookResult(index, data, navigate) {
         console.log("click");
         navigate(`../../bookInfo/${data.bookURI}`);
     };
-    console.log("Data" + JSON.stringify(data))
     let bookCover;
     if (data.img) {
       bookCover = (

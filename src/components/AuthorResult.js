@@ -14,8 +14,11 @@ function dateFormat(date) {
   }
 }
 
-function AuthorResult(index, data, navigate) {
+function AuthorResult(index, data, navigate, resetState) {
   const handleClick = () => {
+    if(resetState !== null) {
+      resetState();
+    }
     navigate(`../../authorInfo/${data.authorURI}`);
   };
   // uri, nom date naissance, date mort, thumbnail
