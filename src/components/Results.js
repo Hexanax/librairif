@@ -39,7 +39,7 @@ export default function Results({ type, data }) {
               deathDate: obj.deathDate?.value ?? '',
               authorURI: obj.writer.value.split("http://dbpedia.org/resource/")[1],
             };
-            return AuthorResult(index, authorData, navigate);
+            return AuthorResult(index, authorData, navigate,null);
           })}
         </Grid>
       )}
