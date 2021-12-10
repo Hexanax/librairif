@@ -68,8 +68,10 @@ let FamilyTree = (props) => {
       name: child,
     });
   });
+  if(children.length > 0){
+    author.children = children;
+  }
 
-  author.children = children;
   let dataTree = author;
 
   return (

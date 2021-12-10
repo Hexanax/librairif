@@ -287,7 +287,7 @@ export async function fetchAssociatedMusics(name, author) {
 export async function queryAuthor(authorURI) {
   authorURI = encodeResource(authorURI);
   let author = `dbr:${authorURI}`;
-  let query = `SELECT ?name ?description ?birthDate ?deathDate ?image 
+  let query = `SELECT (MIN(?name) AS ?name) ?description ?birthDate ?deathDate ?image 
     GROUP_CONCAT(DISTINCT ?education, ", ") as ?education
     GROUP_CONCAT(DISTINCT ?listGenres, ",") as ?listGenres
     GROUP_CONCAT(DISTINCT ?listAwards, ";") as ?listAwards 
@@ -327,6 +327,7 @@ export async function queryAuthor(authorURI) {
     FILTER(?listGenres != ""@en)
     FILTER(lang(?listGenres) = "en")
   }
+  FILTER(?name != ""@en)
   FILTER(lang(?description) = "en")
   FILTER(lang(?listAwards) = "en")
   }`;

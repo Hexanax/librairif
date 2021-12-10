@@ -434,7 +434,7 @@ function Author(data) {
                               "http://dbpedia.org/resource/"
                             )[1],
                           };
-                          return <BookResult index={index} data={data} navigate={navigate}/>
+                          return <BookResult key={index} index={index} data={data} navigate={navigate}/>
                         })}
                       </Grid>
                     </>
