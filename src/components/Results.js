@@ -29,7 +29,7 @@ export default function Results({ type, data }) {
               releaseDate: obj.releaseDate?.value,
               bookURI: obj.book.value.split("http://dbpedia.org/resource/")[1],
             };
-            return BookResult(index, bookData, navigate);
+            return(<BookResult index={index} data={bookData} navigate={navigate}/>);
           })}
           {type=='Author' && data.map((obj, index) => {
             const authorData = {

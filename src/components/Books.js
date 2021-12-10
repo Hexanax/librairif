@@ -1,7 +1,7 @@
 import {
     fetchBookInfo, fetchAssociatedGames, fetchAssociatedMovies, fetchAssociatedMusicals,
-    fetchAssociatedSeries, fetchAssociatedArts, fetchAssociatedMusics, fetchListInSeries,
-    fetchBookNeighbor
+    fetchAssociatedTVShow, fetchAssociatedArts, fetchAssociatedMusics, fetchListInSeries,
+    fetchBookNeighbor, fetchSameGenreBooks
 } from '../services/sparqlRequests'
 import {useEffect, useState} from "react";
 import {useParams} from 'react-router-dom'
@@ -14,6 +14,7 @@ import ArrowBackRounded from "@bit/mui-org.material-ui-icons.arrow-back-rounded"
 import * as React from "react";
 import Game from "./Game";
 import Movie from "./Movie";
+import BookResult from "./BookResult";
 
 const Books = () => {
 
@@ -25,12 +26,13 @@ const Books = () => {
     const [associatedGames, setAssociatedGames] = useState(null);
     const [associatedMovies, setAssociatedMovies] = useState(null);
     const [associatedMusicals, setAssociatedMusicals] = useState(null);
-    const [associatedSeries, setAssociatedSeries] = useState(null);
+    const [associatedTVShows, setAssociatedTVShows] = useState(null);
     const [associatedArts, setAssociatedArts] = useState(null);
     const [associatedMusics, setAssociatedMusics] = useState(null);
 
     const [seriesOfBook, setSeriesOfBook] = useState(null);
     const [neighbors, setNeighbors] = useState(null);
+    const [sameGenreBooks, setSameGenreBooks] = useState(null);
 
     useEffect(() => {
 
@@ -55,8 +57,8 @@ const Books = () => {
                 setAssociatedMovies(movies);
                 const musicals = await fetchAssociatedMusicals(bookInfo.name.value, bookInfo.authorName?.value);
                 setAssociatedMusicals(musicals);
-                const series = await fetchAssociatedSeries(bookInfo.name.value, bookInfo.authorName?.value);
-                setAssociatedSeries(series);
+                const tvShows = await fetchAssociatedTVShow(bookInfo.name.value, bookInfo.authorName?.value);
+                setAssociatedTVShows(tvShows);
                 const arts = await fetchAssociatedArts(bookInfo.name.value, bookInfo.authorName?.value);
                 setAssociatedArts(arts);
                 const musics = await fetchAssociatedMusics(bookInfo.name.value, bookInfo.authorName?.value);
@@ -67,6 +69,7 @@ const Books = () => {
         const loadAssociatedSeriesOfBook = async () => {
             setIsLoading(true);
             const response = await fetchListInSeries(bookURI);
+            console.log(response);
             setSeriesOfBook(response);
             setIsLoading(false);
         }
@@ -77,28 +80,36 @@ const Books = () => {
             setIsLoading(false);
         }
 
+        const loadSameGenreBooks = async () => {
+            setIsLoading(true);
+            const response = await fetchSameGenreBooks(bookURI);
+            setSameGenreBooks(response);
+            setIsLoading(false);
+        }
+
         (async () => {
             await loadAssociatedWork();
             await loadAssociatedSeriesOfBook();
             await loadBookNeighbors();
+            await loadSameGenreBooks();
         })();
     }, [bookInfo, bookURI])
 
     useEffect(() => {
-        console.log("Book infos : ")
-        console.log(bookInfo);
-        console.log(associatedGames);
-        console.log(associatedMovies);
-        console.log(associatedMusicals);
-        console.log(associatedSeries);
-        console.log(associatedArts);
-        console.log(associatedMusics);
-        console.log(seriesOfBook);
-        console.log(neighbors);
+        // console.log("Book infos : ")
+        // console.log(bookInfo);
+        // console.log(associatedGames);
+        // console.log(associatedMovies);
+        // console.log(associatedMusicals);
+        // console.log(associatedTVShows);
+        // console.log(associatedArts);
+        // console.log(associatedMusics);
+        // console.log(seriesOfBook);
+        // console.log(neighbors);
         setIsLoading(false)
     }, [bookInfo, associatedGames, associatedMovies,
-        associatedMusicals, associatedSeries, associatedArts,
-        associatedMusics, seriesOfBook, neighbors])
+        associatedMusicals, associatedTVShows, associatedArts,
+        associatedMusics, seriesOfBook, neighbors, sameGenreBooks])
 
     const render = () => {
         return (
@@ -110,8 +121,8 @@ const Books = () => {
                 {bookInfo !== null &&
                 <div className={"bookContainer"}>
                     <div className={"historyBack"}>
-                        <IconButton onClick={() => navigate(-1)} aria-label="delete" size="large">
-                            <ArrowBackRounded fontSize="inherit" />
+                        <IconButton onClick={() => navigate(-1, {state: {}})} aria-label="delete" size="large">
+                            <ArrowBackRounded fontSize="inherit"/>
                         </IconButton>
                     </div>
                     <div className={"titleWrapper"}>
@@ -120,8 +131,9 @@ const Books = () => {
                         </h1>
                         <div className={"authorWrapper"}>
                             <span className={"author"}>{bookInfo.authorName ?
-                                <Link to={`../../authorInfo/${bookInfo.authorURI.value.split("http://dbpedia.org/resource/")[1]}`}> {bookInfo.authorName.value}</Link>
-                                : bookInfo.authorURI?.value }</span>
+                                <Link
+                                    to={`../../authorInfo/${bookInfo.authorURI.value.split("http://dbpedia.org/resource/")[1]}`}> {bookInfo.authorName.value}</Link>
+                                : bookInfo.authorURI?.value}</span>
                         </div>
                         <div className={"mainContent"}>
                             <div className={"abstractWrapper"}>
@@ -161,10 +173,10 @@ const Books = () => {
                                     </Box>}
                             </div>
                         </div>
-                        <div style={{'margin-bottom':'10px'}}>
+                        <div style={{'margin-bottom': '10px'}}>
                             <h2>Info</h2>
                             <div className={"infoWrapper"}>
-                                {bookInfo.publishers.value!=="" ?
+                                {bookInfo.publishers.value !== "" ?
                                     <>
                                         <div className={"publishersWrapper"}>
                                             Publishers
@@ -174,7 +186,7 @@ const Books = () => {
                                         </div>
                                     </>
                                     : null}
-                                {bookInfo.releaseDates.value!=="" ?
+                                {bookInfo.releaseDates.value !== "" ?
                                     <>
                                         <div className={"releaseDateWrapper"}>
                                             <span>Release Date</span>
@@ -205,6 +217,28 @@ const Books = () => {
                         </div>
                         <div>
                             <div className={"relatedWrapper"}>
+
+                                <h3>Same genre books</h3>
+                                <div className={"sameGenreWrapper"}>
+                                    {sameGenreBooks !== null && sameGenreBooks.map((obj, index) => {
+                                        const bookData = {
+                                            title: obj.name.value,
+                                            author: obj.authorNames.value,
+                                            img: obj.imageUrl?.value,
+                                            releaseDate: obj.releaseDate?.value,
+                                            bookURI: obj.book.value.split("http://dbpedia.org/resource/")[1],
+                                        };
+
+                                        return (
+                                            <div className={"cardWrapper"}>
+                                                <BookResult index={index} data={bookData} navigate={navigate}/>
+                                            </div>
+                                        );
+                                    })
+                                    }
+                                </div>
+                            </div>
+                            <div className={"relatedWrapper"}>
                                 <h3>Related Games</h3>
                                 {associatedGames !== null && associatedGames.map(game => <Game game={game}/>)}
                             </div>
@@ -226,4 +260,4 @@ const Books = () => {
 
 }
 
-export default Books
+export default Books;

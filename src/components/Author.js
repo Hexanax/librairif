@@ -240,7 +240,7 @@ function Author(data) {
                         "http://dbpedia.org/resource/"
                       )[1],
                     };
-                    return BookResult(index, data, navigate);
+                    return <BookResult index={index} data={data} navigate={navigate}/>
                   })}
                 </Grid>
               </div>

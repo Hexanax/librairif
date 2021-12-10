@@ -69,3 +69,12 @@
     margin: 10px;
     width: fit-content;
 }
+.sameGenreWrapper{
+    display:flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cardWrapper{
+    margin:10px;
+}
