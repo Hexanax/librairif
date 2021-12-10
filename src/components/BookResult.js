@@ -6,12 +6,11 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import {CardActionArea, Grid} from "@mui/material";
 
-function BookResult(index, data, navigate) {
+function BookResult({index, data, navigate}) {
     const handleClick = () => {
         console.log("click");
         navigate(`../../bookInfo/${data.bookURI}`);
     };
-    console.log("Data" + JSON.stringify(data))
     let bookCover;
     if (data.img) {
       bookCover = (

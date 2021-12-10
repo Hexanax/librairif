@@ -1,14 +1,17 @@
 
 
-.bookContainer {
-    margin: 5% 20%;
+.editorContainer{
+    margin-right:20%;
+    margin-left:20%;
+    margin-top:5%;
+    margin-bottom: 5%;
 }
 
-.bookContainer h1{
+.editorContainer h1{
     font-size: xxx-large;
 }
 
-.bookContainer h2{
+.editorContainer h2{
     font-size:xx-large;
 }
 
@@ -23,22 +26,17 @@
     justify-content: center;
 }
 
-.imageWrapper {
-    margin-left: 3em;
+.imageWrapper{
+    margin-left:3em;
 }
 
-
-
-.imageWrapper img {
+.imageWrapper img{
     border-radius: 10px;
     box-shadow: 2px 2px 2px 2px grey;
+
 }
 
-.timelineWrapper{
-    display: grid;
-}
-
-.infoWrapper {
+.infoWrapper{
     display:grid;
     width:100%;
     height:100%;
@@ -48,7 +46,7 @@
 
 }
 
-.publishersWrapper {
+.publishersWrapper{
     width:fit-content;
     height: fit-content;
 }
@@ -61,25 +59,4 @@
 .titleOrig{
     width:fit-content;
     height: fit-content;
-}
-
-.game-container {
-
-}
-
-.game, .movie {
-    box-shadow: 0 0 10px -2px rgb(0, 0, 0, 0.1);
-    border-radius: 10px;
-    padding: 10px;
-    margin: 10px;
-    width: fit-content;
-}
-.sameGenreWrapper{
-    display:flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.cardWrapper{
-    margin:10px;
 }

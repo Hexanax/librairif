@@ -44,7 +44,7 @@ export async function fetchListInSeries(resourceURI) {
   const currentBook = `dbr:${resourceURI}`;
   let query = [
     `Select ?bookUri ?serie ?name ?imageURL WHERE {
-        ${currentBook} dbo:series ?serie.
+        ${currentBook} ^dbo:series ?serie.
         ?bookUri a dbo:Book;
         dbp:name ?name;
         dbo:series ?serie.
@@ -52,6 +52,32 @@ export async function fetchListInSeries(resourceURI) {
         }`,
   ].join("");
   return await axiosQuery(query);
+}
+
+export async function fetchSameGenreBooks(resourceURI) {
+  resourceURI = encodeResource(resourceURI);
+  const currentBook = `dbr:${resourceURI}`;
+  let query = [
+    `Select ?book ?genre ?name ?imageUrl
+    (GROUP_CONCAT(DISTINCT ?authorName;   SEPARATOR=", ") AS ?authorNames)
+    (MAX(?releaseDate) AS ?releaseDate)
+        WHERE {
+        ${currentBook} dbo:literaryGenre ?genre.
+        ?book a dbo:Book;
+        dbp:name ?name;
+        dbp:author ?author;
+        dbo:literaryGenre ?genre.
+        ?author dbp:name ?authorName.
+        OPTIONAL {?book dbp:releaseDate ?releaseDate.}
+        OPTIONAL{?book dbo:thumbnail ?imageUrl}
+        OPTIONAL{?book dbp:author ?authorURI.}
+        }`,
+  ].join("");
+  const response = await axiosQuery(query);
+  const shuffled = response.sort(() => 0.5 - Math.random());
+  let selected = shuffled.slice(0, 5);
+  console.log(selected);
+  return selected;
 }
 
 export async function getEditorInfo(editorName) {
@@ -180,7 +206,7 @@ export async function fetchAssociatedMusicals(name, author) {
  * @param {String} author the author of the current book
  * @returns
  */
-export async function fetchAssociatedSeries(name, author) {
+export async function fetchAssociatedTVShow(name, author) {
   name = encodeResource(name);
   author = encodeResource(author);
   let query = [
@@ -281,10 +307,13 @@ export async function queryAuthor(authorURI) {
     	} UNION {
     	${author} dbp:education ?education
     }}
-    FILTER(?education != "")
+    FILTER(?education != ""@en)
     FILTER(lang(?education) = "en")
   }
-  OPTIONAL{${author} dbp:awards ?awards. ?awards rdfs:label ?listAwards}
+  OPTIONAL{${author} dbp:awards ?awards. ?awards rdfs:label ?listAwards.
+    FILTER(?listAwards != ""@en)
+    FILTER(lang(?listAwards) = "en")
+  }
   OPTIONAL {
     {{
     	${author} dbo:genre ?genreLink.
@@ -295,7 +324,7 @@ export async function queryAuthor(authorURI) {
     	} UNION {
     	${author} dbp:genre ?listGenres
     }}
-    FILTER(?listGenres != "")
+    FILTER(?listGenres != ""@en)
     FILTER(lang(?listGenres) = "en")
   }
   FILTER(lang(?description) = "en")
@@ -311,9 +340,17 @@ export async function queryAuthorAdvancedInfo(authorURI) {
   let query = `SELECT ?name
     GROUP_CONCAT(DISTINCT ?occupation, ",") as ?occupation
     GROUP_CONCAT(DISTINCT ?nationality, ", ") as ?nationality
+    GROUP_CONCAT(DISTINCT ?mainInterest, ",") as ?mainInterest
+    GROUP_CONCAT(DISTINCT ?notableIdea, ",") as ?notableIdea
+    GROUP_CONCAT(DISTINCT ?philosophicalSchool, ",") as ?philosophicalSchool
+    GROUP_CONCAT(DISTINCT ?academicDiscipline, ",") as ?academicDiscipline
     ?movement
   WHERE {
     ${author} dbp:name ?name.
+    OPTIONAL{${author} dbo:mainInterest ?mainInterestLink. ?mainInterestLink rdfs:label ?mainInterest. FILTER(lang(?mainInterest) = "en")}
+    OPTIONAL{${author} dbo:notableIdea ?notableIdeaLink. ?notableIdeaLink rdfs:label ?notableIdea. FILTER(lang(?notableIdea) = "en")}
+    OPTIONAL{${author} dbo:philosophicalSchool ?philosophicalSchoolLink. ?philosophicalSchoolLink rdfs:label ?philosophicalSchool. FILTER(lang(?philosophicalSchool) = "en")}
+    OPTIONAL{${author} dbo:academicDiscipline ?academicDisciplineLink. ?academicDisciplineLink rdfs:label ?academicDiscipline. FILTER(lang(?academicDiscipline) = "en")}
     OPTIONAL {
         {{
             ${author} dbo:occupation ?occupationLink.
@@ -324,7 +361,7 @@ export async function queryAuthorAdvancedInfo(authorURI) {
             } UNION {
             ${author} dbp:occupation ?occupation
         }}
-        FILTER(?occupation != "")
+        FILTER(?occupation != ""@en)
         FILTER(lang(?occupation) = "en")
       }
       OPTIONAL {
@@ -337,13 +374,13 @@ export async function queryAuthorAdvancedInfo(authorURI) {
             } UNION {
             ${author} dbp:nationality ?nationality
         }}
-        FILTER(?nationality != "")
+        FILTER(?nationality != ""@en)
         FILTER(lang(?nationality) = "en")
       }
       OPTIONAL{
           ${author} dbo:movement ?movementLink. 
           ?movementLink rdfs:label ?movement.
-          FILTER(?movement != "")
+          FILTER(?movement != ""@en)
           FILTER(lang(?movement) = "en")
         }
   }`;
@@ -383,6 +420,125 @@ export async function getAuthorTimeLife(resourceURI) {
   
   return await axiosQuery(query);
 }
+
+export async function getAuthorInspiration(resourceURI,isInspiratedBy){
+  resourceURI = encodeResource(resourceURI);
+  const currentAuthor = `dbr:${resourceURI}`;
+  let query = ""
+  if(isInspiratedBy){
+    query = `SELECT DISTINCT ?writer 
+    (MIN(?name) AS ?name) 
+    (MAX(?image) AS ?imageUrl) 
+    (MIN(?birthDate) AS ?birthDate) 
+    (MIN(?deathDate) AS ?deathDate)
+    WHERE {
+        {{
+          ?writer a dbo:Writer.
+          } UNION {
+            ?writer a dbo:Scientist.
+          } UNION {
+            ?writer a dbo:Philosopher.
+          }
+        }
+        ?writer dbp:name ?name.
+        OPTIONAL  {?writer dbo:thumbnail ?image.}
+        OPTIONAL {?writer dbp:birthDate ?birthDate.}
+        OPTIONAL {?writer dbp:deathDate ?deathDate.}
+        {{
+            ?writer dbo:influencedBy ${currentAuthor}.
+        } UNION {
+            ?writer dbp:influences ${currentAuthor}.
+        }}
+    } ORDER BY ASC(?name)  
+    `
+  } else {
+    query = `SELECT DISTINCT ?writer 
+    (MIN(?name) AS ?name) 
+    (MAX(?image) AS ?imageUrl) 
+    (MIN(?birthDate) AS ?birthDate) 
+    (MIN(?deathDate) AS ?deathDate)
+    WHERE {
+      {{
+        ?writer a dbo:Writer.
+        } UNION {
+          ?writer a dbo:Scientist.
+        } UNION {
+          ?writer a dbo:Philosopher.
+        }
+      }
+        ?writer dbp:name ?name.
+        OPTIONAL  {?writer dbo:thumbnail ?image.}
+        OPTIONAL {?writer dbp:birthDate ?birthDate.}
+        OPTIONAL {?writer dbp:deathDate ?deathDate.}
+        {{
+            ?writer dbo:influenced ${currentAuthor}.
+        } UNION {
+            ?writer dbp:influenced ${currentAuthor}.
+        }}
+    } ORDER BY ASC(?name)    
+    `
+  }
+  return await axiosQuery(query);
+}
+
+
+export async function getRelatedAuthor(resourceURI, filtre){
+  resourceURI = encodeResource(resourceURI);
+  const currentAuthor = `dbr:${resourceURI}`;
+  let query = `SELECT DISTINCT ?writer ?filtre
+  (MIN(?name) AS ?name) 
+  (MAX(?image) AS ?imageUrl) 
+  (MIN(?birthDate) AS ?birthDate) 
+  (MIN(?deathDate) AS ?deathDate)
+  WHERE {
+      ?writer dbp:name ?name.
+      {{
+        ?writer a dbo:Writer.
+        } UNION {
+          ?writer a dbo:Scientist.
+        } UNION {
+          ?writer a dbo:Philosopher.
+        }
+      }
+      OPTIONAL  {?writer dbo:thumbnail ?image.}
+      OPTIONAL {?writer dbp:birthDate ?birthDate.}
+      OPTIONAL {?writer dbp:deathDate ?deathDate.}
+      ${filtre}
+      FILTER(?writer != ${currentAuthor})
+  } LIMIT 4`
+  return await axiosQuery(query);
+}
+
+export async function getFamilyTree(resourceURI){
+  resourceURI = encodeResource(resourceURI);
+  const currentAuthor = `dbr:${resourceURI}`;
+  let query = `SELECT ?spouse
+  GROUP_CONCAT(DISTINCT ?children , ";") as ?children 
+  WHERE {
+      OPTIONAL {
+      {{
+          ${currentAuthor} dbo:spouse ?spouseLink.
+          ?spouseLink rdfs:label ?spouse
+          } UNION {
+          ${currentAuthor} dbp:spouse ?spouseLink.
+          ?spouseLink rdfs:label ?spouse
+          } UNION {
+          ${currentAuthor} dbp:spouse ?spouse
+      }}
+      FILTER(?spouse != ""@en)
+      FILTER(lang(?spouse) = "en")
+    }
+    OPTIONAL {
+      ${currentAuthor} dbo:child ?childLink.
+      ?childLink rdfs:label ?children
+      FILTER(?children != ""@en)
+      FILTER(lang(?children) = "en")
+    }
+  } LIMIT 1
+  `
+  return await axiosQuery(query);
+}
+
 
 /**
  * Research books containing the correct name and author
@@ -434,7 +590,6 @@ export async function researchQuery(name, offset) {
 	    	FILTER(lang(?hypernymLabel) = "en")
 	    	FILTER(regex(?hypernymLabel, "${name}", "i"))
 	    }}
-
      	} ORDER BY ASC(?name) OFFSET ${offset} LIMIT 50`;
   return await axiosQuery(query);
 }
