@@ -425,7 +425,6 @@ function Author(data) {
                       >
                         {books?.map((obj, index) => {
                           let term = obj;
-                          console.log(term);
                           const data = {
                             title: term.name?.value,
                             author: authorInfo.name?.value,
@@ -435,7 +434,6 @@ function Author(data) {
                               "http://dbpedia.org/resource/"
                             )[1],
                           };
-                          console.log(data);
                           return <BookResult index={index} data={data} navigate={navigate}/>
                         })}
                       </Grid>

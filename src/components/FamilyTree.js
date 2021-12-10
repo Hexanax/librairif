@@ -2,13 +2,11 @@ import React from "react";
 import { useEffect, useState, useRef } from "react";
 import Tree from "react-d3-tree";
 
-
 const containerStyles = {
   width: "100%",
   height: "50vh",
   border: "1px solid black"
 };
-
 
 const Card = ({ nodeData }) => (
   <div>
@@ -72,19 +70,7 @@ let FamilyTree = (props) => {
   });
 
   author.children = children;
-  if (data.spouse) {
-    author = [author, {
-      name: data.spouse,
-      children: children
-    }]
-  } else {
-    author = [author]
-  }
   let dataTree = author;
-
-  
-
-
 
   return (
     <div style={containerStyles} ref={tc => (treeContainer = tc)}>
