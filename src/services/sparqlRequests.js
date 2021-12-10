@@ -1,3 +1,4 @@
+import { NearMe } from "@mui/icons-material";
 import axios from "axios";
 
 function encodeResource(resourceURI) {
@@ -309,7 +310,6 @@ export async function fetchAssociatedMusics(name, author) {
   return await axiosQuery(query);
 }
 
-
 export async function queryAuthor(authorURI) {
   authorURI = encodeResource(authorURI);
   let author = `dbr:${authorURI}`;
@@ -351,9 +351,9 @@ export async function queryAuthor(authorURI) {
 }
 
 /**
- * Allows to try to get on DBpedia the advanced information of an author 
+ * Allows to try to get on DBpedia the advanced information of an author
  * that the user wants to know more about
- * @param {String} authorURI URI that allows to identify the resource in DBpedia 
+ * @param {String} authorURI URI that allows to identify the resource in DBpedia
  * @returns Advanced information available
  */
 export async function queryAuthorAdvancedInfo(authorURI) {
@@ -400,7 +400,7 @@ export async function queryAuthorAdvancedInfo(authorURI) {
 
 /**
  * Allows to get the list of books with resources in DBpedia written by the current author
- * @param {String} authorURI URI that allows to identify the resource in DBpedia 
+ * @param {String} authorURI URI that allows to identify the resource in DBpedia
  * @returns list of books written by the author
  */
 export async function fetchBookAssociatedToAuthor(authorURI) {
@@ -435,23 +435,23 @@ export async function getAuthorTimeLife(resourceURI) {
         ?notableWork dbp:name ?notableWorkName;
         dbp:releaseDate ?releaseDate.
       }`;
-  
+
   return await axiosQuery(query);
 }
 
 /**
- * Allows to get the list of author in DBpedia that have influenced the author or that have been 
+ * Allows to get the list of author in DBpedia that have influenced the author or that have been
  * influenced by the current author
- * @param {String} resourceURI URI that allows to identify the resource in DBpedia 
- * @param {Boolean} isInspiratedBy true if we want author inspirated by the current author 
+ * @param {String} resourceURI URI that allows to identify the resource in DBpedia
+ * @param {Boolean} isInspiratedBy true if we want author inspirated by the current author
  * false if we want author that inspirated the current author
  * @returns the list of associated author depending on the boolean isInspiratedBy
  */
-export async function getAuthorInspiration(resourceURI,isInspiratedBy){
+export async function getAuthorInspiration(resourceURI, isInspiratedBy) {
   resourceURI = encodeResource(resourceURI);
   const currentAuthor = `dbr:${resourceURI}`;
-  let query = ""
-  if(isInspiratedBy){
+  let query = "";
+  if (isInspiratedBy) {
     query = `SELECT DISTINCT ?writer 
     (MIN(?name) AS ?name) 
     (MAX(?image) AS ?imageUrl) 
@@ -475,7 +475,7 @@ export async function getAuthorInspiration(resourceURI,isInspiratedBy){
         
         }}
     } ORDER BY ASC(?name)  
-    `
+    `;
   } else {
     query = `SELECT DISTINCT ?writer 
     (MIN(?name) AS ?name) 
@@ -500,7 +500,7 @@ export async function getAuthorInspiration(resourceURI,isInspiratedBy){
         
         }}
     } ORDER BY ASC(?name)    
-    `
+    `;
   }
   return await axiosQuery(query);
 }
@@ -508,11 +508,11 @@ export async function getAuthorInspiration(resourceURI,isInspiratedBy){
 /**
  * Allows to get the list of authors in DBpedia associated with the current author
  * filter with parameter
- * @param {String} resourceURI URI that allows to identify the resource in DBpedia 
+ * @param {String} resourceURI URI that allows to identify the resource in DBpedia
  * @param {String} filtre the SPARQL filter used
  * @returns  the list of associated author depending on the filter
  */
-export async function getRelatedAuthor(resourceURI, filtre){
+export async function getRelatedAuthor(resourceURI, filtre) {
   resourceURI = encodeResource(resourceURI);
   const currentAuthor = `dbr:${resourceURI}`;
   let query = `SELECT DISTINCT ?writer ?filtre
@@ -535,16 +535,16 @@ export async function getRelatedAuthor(resourceURI, filtre){
       OPTIONAL {?writer dbp:deathDate ?deathDate.}
       ${filtre}
       FILTER(?writer != ${currentAuthor})
-  } LIMIT 4`
+  } LIMIT 4`;
   return await axiosQuery(query);
 }
 
 /**
  * Allows to get the family tree with name of the current author
- * @param {String} resourceURI URI that allows to identify the resource in DBpedia 
+ * @param {String} resourceURI URI that allows to identify the resource in DBpedia
  * @returns the list of names of children of the author and name of his/her spouse
  */
-export async function getFamilyTree(resourceURI){
+export async function getFamilyTree(resourceURI) {
   resourceURI = encodeResource(resourceURI);
   const currentAuthor = `dbr:${resourceURI}`;
   let query = `SELECT ?spouse
@@ -563,10 +563,9 @@ export async function getFamilyTree(resourceURI){
       FILTER(lang(?children) = "en")
     }
   } LIMIT 1
-  `
+  `;
   return await axiosQuery(query);
 }
-
 
 /**
  * Research books containing the correct name and author
@@ -574,7 +573,28 @@ export async function getFamilyTree(resourceURI){
  * @param {*} author
  * @returns result array
  */
-export async function researchQuery(name, offset) {
+export async function researchQuery(name, limit) {
+  name = encodeResource(name);
+  let query = `SELECT ?book (GROUP_CONCAT(DISTINCT ?authorName;   SEPARATOR=", ") AS ?authorNames)
+  (MAX(?name) AS ?name)
+  (MAX(?releaseDate) AS ?releaseDate)
+  (MAX(?imageURL) AS ?imageUrl)
+      WHERE {
+          ?book a dbo:Book.
+          ?book dbp:name ?name.
+          ?book dbo:author ?author;
+          dbo:abstract ?abstract.
+          OPTIONAL {?book dbo:thumbnail ?imageURL.}
+          OPTIONAL {?book dbp:releaseDate ?releaseDate.}
+          ?author dbp:name ?authorName.
+          FILTER(lang(?name) = "en")
+          FILTER(lang(?abstract) = "en")
+          FILTER (regex(?name, "${name}", "i") || regex(?authorName, "${name}","i"))
+    } ORDER BY ASC(?name) LIMIT ${limit}`;
+  return await axiosQuery(query);
+}
+
+async function getLiteraryGenre(name, limit) {
   name = encodeResource(name);
   let query = `SELECT ?book (GROUP_CONCAT(DISTINCT ?authorName;   SEPARATOR=", ") AS ?authorNames)
     (MAX(?name) AS ?name)
@@ -590,35 +610,116 @@ export async function researchQuery(name, offset) {
 	        ?author dbp:name ?authorName.
 	        FILTER(lang(?name) = "en")
 	        FILTER(lang(?abstract) = "en")
-        {{
-	        FILTER (regex(?name, "${name}", "i") || regex(?authorName, "${name}","i"))
-	    } UNION {
-	    	?book dbo:literaryGenre ?literaryGenre.
+        {
+            ?book dbo:literaryGenre ?literaryGenre.
 	    	?literaryGenre rdfs:label ?literaryGenreLabel.
 	    	FILTER(lang(?literaryGenreLabel) = "en")
 	    	FILTER(regex(?literaryGenreLabel, "${name}", "i"))
-	    } UNION {
-	    	?book dbp:genre ?genre.
+     	}} ORDER BY ASC(?name) LIMIT ${limit}`;
+  return await axiosQuery(query);
+}
+
+async function getGenre(name, limit) {
+  name = encodeResource(name);
+  let query = `SELECT ?book (GROUP_CONCAT(DISTINCT ?authorName;   SEPARATOR=", ") AS ?authorNames)
+    (MAX(?name) AS ?name)
+    (MAX(?releaseDate) AS ?releaseDate)
+    (MAX(?imageURL) AS ?imageUrl)
+        WHERE {
+         	?book a dbo:Book.
+	        ?book dbp:name ?name.
+	        ?book dbo:author ?author;
+	        dbo:abstract ?abstract.
+	        OPTIONAL {?book dbo:thumbnail ?imageURL.}
+	        OPTIONAL {?book dbp:releaseDate ?releaseDate.}
+	        ?author dbp:name ?authorName.
+	        FILTER(lang(?name) = "en")
+	        FILTER(lang(?abstract) = "en")
+        {
+               ?book dbp:genre ?genre.
 	    	FILTER(lang(?genre) = "en")
 	    	FILTER(regex(?genre, "${name}", "i"))
-	    } UNION {
-	    	?book dbp:country ?country;
+	   }
+     	} ORDER BY ASC(?name) LIMIT ${limit}`;
+  return await axiosQuery(query);
+}
+
+async function getCountry(name, limit) {
+  name = encodeResource(name);
+  let query = `SELECT ?book (GROUP_CONCAT(DISTINCT ?authorName;   SEPARATOR=", ") AS ?authorNames)
+    (MAX(?name) AS ?name)
+    (MAX(?releaseDate) AS ?releaseDate)
+    (MAX(?imageURL) AS ?imageUrl)
+        WHERE {
+         	?book a dbo:Book.
+	        ?book dbp:name ?name.
+	        ?book dbo:author ?author;
+	        dbo:abstract ?abstract.
+	        OPTIONAL {?book dbo:thumbnail ?imageURL.}
+	        OPTIONAL {?book dbp:releaseDate ?releaseDate.}
+	        ?author dbp:name ?authorName.
+	        FILTER(lang(?name) = "en")
+	        FILTER(lang(?abstract) = "en")
+        {
+               ?book dbp:country ?country;
 	    	dbp:language ?language.
 	    	FILTER(lang(?country) = "en")
 	    	FILTER(lang(?language) = "en")
 	    	FILTER (regex(?country, "${name}", "i") || regex(?language, "${name}","i"))
-	    } UNION {
-	    	?book dct:subject ?subject.
+	   }
+     	} ORDER BY ASC(?name) LIMIT ${limit}`;
+  return await axiosQuery(query);
+}
+
+async function getSubject(name, limit) {
+  name = encodeResource(name);
+  let query = `SELECT ?book (GROUP_CONCAT(DISTINCT ?authorName;   SEPARATOR=", ") AS ?authorNames)
+    (MAX(?name) AS ?name)
+    (MAX(?releaseDate) AS ?releaseDate)
+    (MAX(?imageURL) AS ?imageUrl)
+        WHERE {
+         	?book a dbo:Book.
+	        ?book dbp:name ?name.
+	        ?book dbo:author ?author;
+	        dbo:abstract ?abstract.
+	        OPTIONAL {?book dbo:thumbnail ?imageURL.}
+	        OPTIONAL {?book dbp:releaseDate ?releaseDate.}
+	        ?author dbp:name ?authorName.
+	        FILTER(lang(?name) = "en")
+	        FILTER(lang(?abstract) = "en")
+        {
+               ?book dbp:subject ?subject.
 	    	?subject rdfs:label ?subjectLabel.
 	    	FILTER(lang(?subjectLabel) = "en")
 	    	FILTER(regex(?subjectLabel, "${name}", "i"))
-	    } UNION {
-	    	?book gold:hypernym ?hypernym.
+	   }
+     	} ORDER BY ASC(?name) LIMIT ${limit}`;
+  return await axiosQuery(query);
+}
+
+async function getHypernym(name, limit) {
+  name = encodeResource(name);
+  let query = `SELECT ?book (GROUP_CONCAT(DISTINCT ?authorName;   SEPARATOR=", ") AS ?authorNames)
+    (MAX(?name) AS ?name)
+    (MAX(?releaseDate) AS ?releaseDate)
+    (MAX(?imageURL) AS ?imageUrl)
+        WHERE {
+         	?book a dbo:Book.
+	        ?book dbp:name ?name.
+	        ?book dbo:author ?author;
+	        dbo:abstract ?abstract.
+	        OPTIONAL {?book dbo:thumbnail ?imageURL.}
+	        OPTIONAL {?book dbp:releaseDate ?releaseDate.}
+	        ?author dbp:name ?authorName.
+	        FILTER(lang(?name) = "en")
+	        FILTER(lang(?abstract) = "en")
+        {
+            ?book gold:hypernym ?hypernym.
 	    	?hypernym rdfs:label ?hypernymLabel.
 	    	FILTER(lang(?hypernymLabel) = "en")
 	    	FILTER(regex(?hypernymLabel, "${name}", "i"))
-	    }}
-     	} ORDER BY ASC(?name) OFFSET ${offset} LIMIT 50`;
+	   }
+     	} ORDER BY ASC(?name) LIMIT ${limit}`;
   return await axiosQuery(query);
 }
 
@@ -631,34 +732,89 @@ export async function getAuthors(name) {
     OPTIONAL {?writer dbp:birthDate ?birthDate.}
     OPTIONAL {?writer dbp:deathDate ?deathDate.}
     OPTIONAL  {?writer dbo:thumbnail ?image.}
-    {{
-    	FILTER (regex(?name, "${name}", "i"))
-    } UNION {
-    	?writer dbp:nationality ?nationality.
-    	FILTER(lang(?nationality) = "en")
-    	FILTER (regex(?nationality, "${name}", "i"))
-    } UNION {
-    	?writer dbo:occupation ?occupation.
+    FILTER (regex(?name, "${name}", "i"))
+    } ORDER BY ASC(?name) OFFSET ${offset}`;
+  return await axiosQuery(query);
+}
+
+async function getNationality(name, limit) {
+  name = encodeResource(name);
+  let query = `SELECT ?writer (MIN(?name) AS ?name) (MAX(?image) AS ?imageUrl) (MIN(?birthDate) AS ?birthDate) (MIN(?deathDate) AS ?deathDate) WHERE {
+        ?writer a dbo:Writer.
+        ?writer dbp:name ?name.
+        OPTIONAL {?writer dbp:birthDate ?birthDate.}
+        OPTIONAL {?writer dbp:deathDate ?deathDate.}
+        OPTIONAL  {?writer dbo:thumbnail ?image.}
+        ?writer dbp:nationality ?nationality.
+            FILTER(lang(?nationality) = "en")
+            FILTER (regex(?nationality, "fr", "i"))
+    
+        } ORDER BY ASC(?name) OFFSET ${limit}`;
+  return await axiosQuery(query);
+}
+
+async function getOccupation(name, limit) {
+  name = encodeResource(name);
+  let query = `SELECT ?writer (MIN(?name) AS ?name) (MAX(?image) AS ?imageUrl) (MIN(?birthDate) AS ?birthDate) (MIN(?deathDate) AS ?deathDate) WHERE {
+        ?writer a dbo:Writer.
+        ?writer dbp:name ?name.
+        OPTIONAL {?writer dbp:birthDate ?birthDate.}
+        OPTIONAL {?writer dbp:deathDate ?deathDate.}
+        OPTIONAL  {?writer dbo:thumbnail ?image.}
+        ?writer dbo:occupation ?occupation.
     	?occupation rdfs:label ?occupationLabel.
     	FILTER(lang(?occupationLabel) = "en")
     	FILTER (regex(?occupationLabel, "${name}", "i"))
-    } UNION {
+    
+        } ORDER BY ASC(?name) OFFSET ${limit}`;
+  return await axiosQuery(query);
+}
+async function getAuthorSubject(name, limit) {
+  name = encodeResource(name);
+  let query = `SELECT ?writer (MIN(?name) AS ?name) (MAX(?image) AS ?imageUrl) (MIN(?birthDate) AS ?birthDate) (MIN(?deathDate) AS ?deathDate) WHERE {
+        ?writer a dbo:Writer.
+        ?writer dbp:name ?name.
+        OPTIONAL {?writer dbp:birthDate ?birthDate.}
+        OPTIONAL {?writer dbp:deathDate ?deathDate.}
+        OPTIONAL  {?writer dbo:thumbnail ?image.}
     	?writer dct:subject ?subject.
     	?subject rdfs:label ?subjectLabel.
     	FILTER(lang(?subjectLabel) = "en")
     	FILTER (regex(?subjectLabel, "${name}", "i"))
-    } UNION {
-		?writer dbo:movement ?movement.
+    
+        } ORDER BY ASC(?name) OFFSET ${limit}`;
+  return await axiosQuery(query);
+}
+async function getMovement(name, limit) {
+  name = encodeResource(name);
+  let query = `SELECT ?writer (MIN(?name) AS ?name) (MAX(?image) AS ?imageUrl) (MIN(?birthDate) AS ?birthDate) (MIN(?deathDate) AS ?deathDate) WHERE {
+        ?writer a dbo:Writer.
+        ?writer dbp:name ?name.
+        OPTIONAL {?writer dbp:birthDate ?birthDate.}
+        OPTIONAL {?writer dbp:deathDate ?deathDate.}
+        OPTIONAL  {?writer dbo:thumbnail ?image.}
+        ?writer dbo:movement ?movement.
     	?movement rdfs:label ?movementLabel.
     	FILTER(lang(?movementLabel) = "en")
     	FILTER (regex(?movementLabel, "${name}", "i"))
-    } UNION {
-		?writer dbo:genre ?genre.
+    
+        } ORDER BY ASC(?name) OFFSET ${limit}`;
+  return await axiosQuery(query);
+}
+async function getAuthorGenre(name, limit) {
+  name = encodeResource(name);
+  let query = `SELECT ?writer (MIN(?name) AS ?name) (MAX(?image) AS ?imageUrl) (MIN(?birthDate) AS ?birthDate) (MIN(?deathDate) AS ?deathDate) WHERE {
+        ?writer a dbo:Writer.
+        ?writer dbp:name ?name.
+        OPTIONAL {?writer dbp:birthDate ?birthDate.}
+        OPTIONAL {?writer dbp:deathDate ?deathDate.}
+        OPTIONAL  {?writer dbo:thumbnail ?image.}
+        ?writer dbo:genre ?genre.
     	?genre rdfs:label ?genreLabel.
     	FILTER(lang(?genreLabel) = "en")
     	FILTER (regex(?genreLabel, "${name}", "i"))
-    }}
-    } ORDER BY ASC(?name) OFFSET ${offset} LIMIT 10`;
+    
+        } ORDER BY ASC(?name) OFFSET ${limit}`;
   return await axiosQuery(query);
 }
 
@@ -690,14 +846,83 @@ export async function autocompleteQuery(text) {
   return await axiosQuery(query);
 }
 
-export async function getSearch(name) {
-  return new Promise((resolve, reject) => {
-    researchQuery(name, 0).then((results) => {
-      //return resolve(results.sort((a, b) => {
-      //    return a.name.value.toUpperCase().localeCompare(b.name.value.toUpperCase());
-      //}));
-      return resolve(results);
+export async function getBookSearch(name) {
+  let resultSet = new Set();
+  return Promise.all([
+    researchQuery(name, 300).then((result) => {
+      result.forEach(resultSet.add, resultSet);
+    }),
+    getLiteraryGenre(name, 200).then((result) => {
+      result.forEach(resultSet.add, resultSet);
+    }),
+    getGenre(name, 200).then((result) => {
+      result.forEach(resultSet.add, resultSet);
+    }),
+    getCountry(name, 100).then((result) => {
+      result.forEach(resultSet.add, resultSet);
+    }),
+    getHypernym(name, 200).then((result) => {
+      result.forEach(resultSet.add, resultSet);
+    }),
+  ]).then(() => {
+    return Array.from(resultSet).sort(function (a, b) {
+      /**
+       * Criteres de comparaisons pour l'ordre des résultats:
+       * 1. Le titre du livre contiens la chaine de characacteres `name` dans la recherche
+       * 2. L'auteur du livre contiens `name` dans la recherche
+       *
+       * Dans le code une compaison réalisée en bas de la fonction a plus d'importance!
+       */
+
+      // Comparaison par nom de l'auteur
+      // a est supérieur à b si son titre contiens le mot dans la recherche et que b non
+      if (
+        a.authorNames?.value.includes(name) &&
+        !b.authorNames?.value.includes(name)
+      )
+        return 1;
+      // b est supérieur à a si son titre contiens le mot dans la recherche et que a non
+      if (
+        !a.authorNames?.value.includes(name) &&
+        b.authorNames?.value.includes(name)
+      )
+        return -1;
+
+      // Comparaison par titre du livre
+      // a est supérieur à b si son titre contiens le mot dans la recherche et que b non
+      if (a.name.value.includes(name) && !b.name.value.includes(name)) return 1;
+      // b est supérieur à a si son titre contiens le mot dans la recherche et que a non
+      if (!a.name.value.includes(name) && b.name.value.includes(name))
+        return -1;
+
+      return 0;
     });
+  });
+}
+
+export async function getAuthorSearch(name) {
+  let resultSet = new Set();
+  return Promise.all([
+    getAuthors(name, 300).then((result) => {
+      result.forEach(resultSet.add, resultSet);
+    }),
+    getNationality(name, 200).then((result) => {
+      result.forEach(resultSet.add, resultSet);
+    }),
+    getOccupation(name, 100).then((result) => {
+      result.forEach(resultSet.add, resultSet);
+    }),
+    getAuthorGenre(name, 200).then((result) => {
+      result.forEach(resultSet.add, resultSet);
+    }),
+    getAuthorSubject(name, 200).then((result) => {
+      result.forEach(resultSet.add, resultSet);
+    }),
+    getMovement(name, 200).then((result) => {
+      result.forEach(resultSet.add, resultSet);
+    }),
+  ]).then(() => {
+    return Array.from(resultSet);
   });
 }
 

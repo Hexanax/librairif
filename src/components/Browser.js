@@ -21,6 +21,8 @@ export default function Browser() {
           sx={{
             minWidth: 600,
             marginTop: 8,
+            ml: 8,
+            mr: 8,
             display: "flex",
             flexDirection: "row",
             alignItems: "center",
@@ -35,9 +37,9 @@ export default function Browser() {
               alignItems: "center",
             }}
           >
-              <Typography component="h1" variant="h1" sx={{mb: 5}}>
-                  LibrairIf
-              </Typography>
+            <Typography component="h1" variant="h1" sx={{ mb: 5 }}>
+              LibrairIf
+            </Typography>
             <SearchPage />
           </Box>
         </Box>
