@@ -5,6 +5,7 @@ import {
   queryAuthor,
   queryAuthorAdvancedInfo,
   fetchBookAssiociatedToAuthor,
+  getAuthorTimeLife,
   getAuthorInspiration,
   getRelatedAuthor,
   getFamilyTree,
@@ -20,11 +21,14 @@ import ArrowBackRounded from "@bit/mui-org.material-ui-icons.arrow-back-rounded"
 import Lottie from "react-lottie";
 
 import BookResult from "./BookResult";
+import TimelineElement from "./Timeline"
 import AuthorResult from "./AuthorResult";
 import FamilyTree from "./FamilyTree";
 
 import { fetchBookInfo } from "../services/sparqlRequests";
 import animationData from "../lotties/book-loading.json";
+import useEnhancedEffect from "@mui/utils/useEnhancedEffect";
+
 
 const defaultOptions = {
   loop: true,
@@ -46,6 +50,7 @@ function Author(data) {
   const [listAwards, setListAwards] = useState(null);
   const [listGenres, setListGenres] = useState(null);
   const [listOccupation, setListOccupation] = useState(null);
+  const [authorTimeline, setAuthorTimeline] = useState(null);
   const [listInterest, setListInterest] = useState(null);
   const [listNotableIdea, setListNotableIdea] = useState(null);
   const [listPhilosophicalSchool, setListPhilosophicalSchool] = useState(null);
@@ -64,6 +69,7 @@ function Author(data) {
     setListNotableIdea(null);
     setListPhilosophicalSchool(null);
     setListAcademicDiscipline(null);
+    setAuthorTimeline(null);
     setBooks([])
   }
 
@@ -72,7 +78,6 @@ function Author(data) {
     const loadAuthorInfo = async () => {
       setIsLoading(true);
       const response = await queryAuthor(authorURI);
-
       setAuthorInfo(response[0]);
       setIsLoading(false);
 
@@ -153,6 +158,55 @@ function Author(data) {
     loadAdvancedInfo();
   }, [authorURI]);
 
+
+  useEffect(() => {
+    const loadTimeline = async () => {
+      setIsLoading(true);
+      const timeline = await getAuthorTimeLife(authorURI);
+      console.log("author timeline" + JSON.stringify(timeline));
+      let works, dates;
+      if (timeline[0].notableWorkName !== null) {
+        works = timeline[0].notableWorkName?.value.split(";");
+      }
+      if (timeline[0].releaseDate !== null) {
+        dates = timeline[0].releaseDate?.value.split(";");
+      }
+      let i = -1;
+      const notableWork = [];
+
+      if (authorInfo !== null) {
+        if (authorInfo.birthDate !== null) {
+          if (authorInfo.birthDate?.value != null) {
+            notableWork.push({
+              "work": "Birth Date",
+              "date": authorInfo.birthDate?.value
+            });
+          }
+        }
+        while (works[++i]) {
+          notableWork.push({
+            "work": works[i],
+            "date": dates[i]
+          });
+        }
+        if (authorInfo !== null) {
+          if (authorInfo.deathDate !== null) {
+            if (authorInfo.deathDate?.value != null) {
+              notableWork.push({
+                "work": "Death Date",
+                "date": authorInfo.deathDate?.value
+              })
+            }
+          }
+        }
+
+      }
+
+      setAuthorTimeline(notableWork);
+      setIsLoading(false);
+    };
+    loadTimeline();
+  }, [authorInfo, authorURI]);
   useEffect(() => {
     const loadRelatedAuthors = async () => {
       if (authorInfo !== null && advancedInfo !== null) {
@@ -203,14 +257,18 @@ function Author(data) {
     }
   };
 
+
   const render = () => {
+
+
     return (
       <div>
         {authorInfo === null && <div>Loading results</div>}
         {authorInfo !== null &&
           advancedInfo !== null &&
           books !== null &&
-          relatedAuthor != null && (
+          relatedAuthor != null &&
+          authorTimeline != null && (
             <div className={"bookContainer"}>
               <div className={"historyBack"}>
                 <IconButton
@@ -231,13 +289,14 @@ function Author(data) {
 
                 {authorInfo.birthDate ? (
                   <h3> {authorInfo.birthDate.value} </h3>
+                  
                 ) : (
-                  <h3>Pas d'informations</h3>
+                  <h3>No informations</h3>
                 )}
                 {authorInfo.deathDate ? (
                   <h3> {authorInfo.deathDate.value} </h3>
                 ) : (
-                  <h3>Présent</h3>
+                  null
                 )}
 
                 <div className={"mainContent"}>
@@ -251,305 +310,326 @@ function Author(data) {
                     <img src={authorInfo.image?.value} />
                   </div>
                 </div>
+              </div>
+
+              <div>
+                {authorTimeline.length !==0 ?
+                  <div className="timelineWrapper">
+                    <br/>
+                    <div>
+                      <Typography component="h6" variant="h6">
+                        Timeline
+                      </Typography>
+                    </div>
+
+                    <div>
+                      <div><TimelineElement key={authorTimeline} data={authorTimeline} /></div>
+                    </div>
+                  </div> : null}
+              </div>
+
+
+
+              <div>
+                <h2>Info</h2>
+                <div className={"infoWrapper"}>
+                  {advancedInfo.nationality?.value !== "" ? (
+                    <>
+                      <div>
+                        <div>
+                          <Typography component="h6" variant="h6">
+                            Nationality
+                          </Typography>
+                        </div>
+                      </div>
+                      <div>
+                        <div>{advancedInfo.nationality?.value}</div>
+                      </div>
+                    </>
+                  ) : null}
+                  {advancedInfo.movement ? (
+                    <>
+                      <div>
+                        <div>
+                          <Typography component="h6" variant="h6">
+                            Movement
+                          </Typography>
+                        </div>
+                      </div>
+                      <div>
+                        <div>{advancedInfo.movement?.value}</div>
+                      </div>
+                    </>
+                  ) : null}
+                  {listAwards ? (
+                    <>
+                      <div>
+                        <Typography component="h6" variant="h6">
+                          Awards
+                        </Typography>
+                      </div>
+                      <div>
+                        <ul>
+                          {listAwards.map((award) => (
+                            <li key={award}>{award}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    </>
+                  ) : null}
+                  {listOccupation ? (
+                    <>
+                      <div>
+                        <Typography component="h6" variant="h6">
+                          Occupation
+                        </Typography>
+                      </div>
+                      <div>
+                        <ul>
+                          {listOccupation.map((award) => (
+                            <li key={award}>{award}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    </>
+                  ) : null}
+                  {authorInfo.education?.value !== "" ? (
+                    <>
+                      <div>
+                        <div>
+                          <Typography component="h6" variant="h6">
+                            Education
+                          </Typography>
+                        </div>
+                      </div>
+                      <div>
+                        <div>{authorInfo.education?.value}</div>
+                      </div>
+                    </>
+                  ) : null}
+                  {listGenres ? (
+                    <>
+                      <div>
+                        <Typography component="h6" variant="h6">
+                          Genres
+                        </Typography>
+                      </div>
+                      <div>
+                        <ul>
+                          {listGenres?.map((genre) => (
+                            <li key={genre}>{genre}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    </>
+                  ) : null}{" "}
+                  {listInterest ? (
+                    <>
+                      <div>
+                        <Typography component="h6" variant="h6">
+                          Main Interest
+                        </Typography>
+                      </div>
+                      <div>
+                        <ul>
+                          {listInterest.map((award) => (
+                            <li key={award}>{award}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    </>
+                  ) : null}{" "}
+                  {listNotableIdea ? (
+                    <>
+                      <div>
+                        <Typography component="h6" variant="h6">
+                          Notable Idea
+                        </Typography>
+                      </div>
+                      <div>
+                        <ul>
+                          {listNotableIdea.map((award) => (
+                            <li key={award}>{award}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    </>
+                  ) : null}{" "}
+                  {listPhilosophicalSchool ? (
+                    <>
+                      <div>
+                        <Typography component="h6" variant="h6">
+                          Philosophical School
+                        </Typography>
+                      </div>
+                      <div>
+                        <ul>
+                          {listPhilosophicalSchool.map((award) => (
+                            <li key={award}>{award}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    </>
+                  ) : null}{" "}
+                  {listAcademicDiscipline ? (
+                    <>
+                      <div>
+                        <Typography component="h6" variant="h6">
+                          Academic Discipline
+                        </Typography>
+                      </div>
+                      <div>
+                        <ul>
+                          {listAcademicDiscipline.map((award) => (
+                            <li key={award}>{award}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    </>
+                  ) : null}
+                </div>
+                {books.length !== 0 ? (
+                  <>
+                    <div>
+                      <Typography component="h2" variant="h2" sx={{ mb: 3 }}>
+                        Books by this author
+                      </Typography>
+                    </div>
+                    <Grid
+                      container
+                      spacing={2}
+                      direction="row"
+                      justifyContent="flex-start"
+                      alignItems="flex-start"
+                    >
+                      {books?.map((obj, index) => {
+                        let term = obj;
+                        const data = {
+                          title: term.name?.value,
+                          author: authorInfo.name?.value,
+                          img: term.imageUrl?.value,
+                          releaseDate: term.releaseDate?.value,
+                          bookURI: term.book?.value.split(
+                            "http://dbpedia.org/resource/"
+                          )[1],
+                        };
+                        return <BookResult key={index} index={index} data={data} navigate={navigate} />
+                      })}
+                    </Grid>
+                  </>
+                ) : null}
+                {advancedInfo.authorInfluenced?.length !== 0 ? (
+                  <>
+                    <div>
+                      <Typography component="h2" variant="h2" sx={{ mb: 3 }}>
+                        Writer influenced this author
+                      </Typography>
+                    </div>
+                    <Grid
+                      container
+                      spacing={2}
+                      direction="row"
+                      justifyContent="flex-start"
+                      alignItems="flex-start"
+                    >
+                      {advancedInfo.authorInfluenced?.map((obj, index) => {
+                        let term = obj;
+                        const data = {
+                          name: term.name?.value,
+                          img: term.imageUrl?.value,
+                          birthDate: term.birthDate?.value,
+                          deathDate: term.deathDate?.value,
+                          authorURI: term.writer?.value.split(
+                            "http://dbpedia.org/resource/"
+                          )[1],
+                        };
+                        return AuthorResult(index, data, navigate, resetState);
+                      })}
+                    </Grid>
+                  </>
+                ) : null}{" "}
+                {advancedInfo.authorInspiredBy?.length !== 0 ? (
+                  <>
+                    <div>
+                      <Typography component="h2" variant="h2" sx={{ mb: 3 }}>
+                        Writer influenced by this author
+                      </Typography>
+                    </div>
+                    <Grid
+                      container
+                      spacing={2}
+                      direction="row"
+                      justifyContent="flex-start"
+                      alignItems="flex-start"
+                    >
+                      {advancedInfo.authorInspiredBy?.map((obj, index) => {
+                        let term = obj;
+                        const data = {
+                          name: term.name?.value,
+                          img: term.imageUrl?.value,
+                          birthDate: term.birthDate?.value,
+                          deathDate: term.deathDate?.value,
+                          authorURI: term.writer?.value.split(
+                            "http://dbpedia.org/resource/"
+                          )[1],
+                        };
+                        return AuthorResult(index, data, navigate, resetState);
+                      })}
+                    </Grid>
+                  </>
+                ) : null}{" "}
+                {relatedAuthor.length !== 0 ? (
+                  <>
+                    <div>
+                      <Typography component="h2" variant="h2" sx={{ mb: 3 }}>
+                        Authors related
+                      </Typography>
+                    </div>
+                    <Grid
+                      container
+                      spacing={2}
+                      direction="row"
+                      justifyContent="flex-start"
+                      alignItems="flex-start"
+                    >
+                      {relatedAuthor?.map((obj, index) => {
+                        let term = obj;
+                        const data = {
+                          name: term.name?.value,
+                          img: term.imageUrl?.value,
+                          birthDate: term.birthDate?.value,
+                          deathDate: term.deathDate?.value,
+                          authorURI: term.writer?.value.split(
+                            "http://dbpedia.org/resource/"
+                          )[1],
+                        };
+                        return AuthorResult(index, data, navigate, resetState);
+                      })}
+                    </Grid>
+                  </>
+                ) : null}
                 <div>
-                  <h2>Info</h2>
-                  <div className={"infoWrapper"}>
-                    {advancedInfo.nationality?.value !== "" ? (
-                      <>
-                        <div>
-                          <div>
-                            <Typography component="h6" variant="h6">
-                              Nationality
-                            </Typography>
-                          </div>
-                        </div>
-                        <div>
-                          <div>{advancedInfo.nationality?.value}</div>
-                        </div>
-                      </>
-                    ) : null}
-                    {advancedInfo.movement ? (
-                      <>
-                        <div>
-                          <div>
-                            <Typography component="h6" variant="h6">
-                              Movement
-                            </Typography>
-                          </div>
-                        </div>
-                        <div>
-                          <div>{advancedInfo.movement?.value}</div>
-                        </div>
-                      </>
-                    ) : null}
-                    {listAwards ? (
-                      <>
-                        <div>
-                          <Typography component="h6" variant="h6">
-                            Awards
-                          </Typography>
-                        </div>
-                        <div>
-                          <ul>
-                            {listAwards.map((award) => (
-                              <li key={award}>{award}</li>
-                            ))}
-                          </ul>
-                        </div>
-                      </>
-                    ) : null}
-                    {listOccupation ? (
-                      <>
-                        <div>
-                          <Typography component="h6" variant="h6">
-                            Occupation
-                          </Typography>
-                        </div>
-                        <div>
-                          <ul>
-                            {listOccupation.map((award) => (
-                              <li key={award}>{award}</li>
-                            ))}
-                          </ul>
-                        </div>
-                      </>
-                    ) : null}
-                    {authorInfo.education?.value !== "" ? (
-                      <>
-                        <div>
-                          <div>
-                            <Typography component="h6" variant="h6">
-                              Education
-                            </Typography>
-                          </div>
-                        </div>
-                        <div>
-                          <div>{authorInfo.education?.value}</div>
-                        </div>
-                      </>
-                    ) : null}
-                    {listGenres ? (
-                      <>
-                        <div>
-                          <Typography component="h6" variant="h6">
-                            Genres
-                          </Typography>
-                        </div>
-                        <div>
-                          <ul>
-                            {listGenres?.map((genre) => (
-                              <li key={genre}>{genre}</li>
-                            ))}
-                          </ul>
-                        </div>
-                      </>
-                    ) : null}{" "}
-                    {listInterest ? (
-                      <>
-                        <div>
-                          <Typography component="h6" variant="h6">
-                            Main Interest
-                          </Typography>
-                        </div>
-                        <div>
-                          <ul>
-                            {listInterest.map((award) => (
-                              <li key={award}>{award}</li>
-                            ))}
-                          </ul>
-                        </div>
-                      </>
-                    ) : null}{" "}
-                    {listNotableIdea ? (
-                      <>
-                        <div>
-                          <Typography component="h6" variant="h6">
-                            Notable Idea
-                          </Typography>
-                        </div>
-                        <div>
-                          <ul>
-                            {listNotableIdea.map((award) => (
-                              <li key={award}>{award}</li>
-                            ))}
-                          </ul>
-                        </div>
-                      </>
-                    ) : null}{" "}
-                    {listPhilosophicalSchool ? (
-                      <>
-                        <div>
-                          <Typography component="h6" variant="h6">
-                            Philosophical School
-                          </Typography>
-                        </div>
-                        <div>
-                          <ul>
-                            {listPhilosophicalSchool.map((award) => (
-                              <li key={award}>{award}</li>
-                            ))}
-                          </ul>
-                        </div>
-                      </>
-                    ) : null}{" "}
-                    {listAcademicDiscipline ? (
-                      <>
-                        <div>
-                          <Typography component="h6" variant="h6">
-                            Academic Discipline
-                          </Typography>
-                        </div>
-                        <div>
-                          <ul>
-                            {listAcademicDiscipline.map((award) => (
-                              <li key={award}>{award}</li>
-                            ))}
-                          </ul>
-                        </div>
-                      </>
-                    ) : null}
-                  </div>
-                  {books.length !== 0 ? (
-                    <>
-                      <div>
-                        <Typography component="h2" variant="h2" sx={{ mb: 3 }}>
-                          Books by this author
-                        </Typography>
-                      </div>
-                      <Grid
-                        container
-                        spacing={2}
-                        direction="row"
-                        justifyContent="flex-start"
-                        alignItems="flex-start"
-                      >
-                        {books?.map((obj, index) => {
-                          let term = obj;
-                          const data = {
-                            title: term.name?.value,
-                            author: authorInfo.name?.value,
-                            img: term.imageUrl?.value,
-                            releaseDate: term.releaseDate?.value,
-                            bookURI: term.book?.value.split(
-                              "http://dbpedia.org/resource/"
-                            )[1],
-                          };
-                          return <BookResult key={index} index={index} data={data} navigate={navigate}/>
-                        })}
-                      </Grid>
-                    </>
-                  ) : null}
-                  {advancedInfo.authorInfluenced?.length !== 0 ? (
-                    <>
-                      <div>
-                        <Typography component="h2" variant="h2" sx={{ mb: 3 }}>
-                          Writer influenced this author
-                        </Typography>
-                      </div>
-                      <Grid
-                        container
-                        spacing={2}
-                        direction="row"
-                        justifyContent="flex-start"
-                        alignItems="flex-start"
-                      >
-                        {advancedInfo.authorInfluenced?.map((obj, index) => {
-                          let term = obj;
-                          const data = {
-                            name: term.name?.value,
-                            img: term.imageUrl?.value,
-                            birthDate: term.birthDate?.value,
-                            deathDate: term.deathDate?.value,
-                            authorURI: term.writer?.value.split(
-                              "http://dbpedia.org/resource/"
-                            )[1],
-                          };
-                          return AuthorResult(index, data, navigate, resetState);
-                        })}
-                      </Grid>
-                    </>
-                  ) : null}{" "}
-                  {advancedInfo.authorInspiredBy?.length !== 0 ? (
-                    <>
-                      <div>
-                        <Typography component="h2" variant="h2" sx={{ mb: 3 }}>
-                          Writer influenced by this author
-                        </Typography>
-                      </div>
-                      <Grid
-                        container
-                        spacing={2}
-                        direction="row"
-                        justifyContent="flex-start"
-                        alignItems="flex-start"
-                      >
-                        {advancedInfo.authorInspiredBy?.map((obj, index) => {
-                          let term = obj;
-                          const data = {
-                            name: term.name?.value,
-                            img: term.imageUrl?.value,
-                            birthDate: term.birthDate?.value,
-                            deathDate: term.deathDate?.value,
-                            authorURI: term.writer?.value.split(
-                              "http://dbpedia.org/resource/"
-                            )[1],
-                          };
-                          return AuthorResult(index, data, navigate, resetState);
-                        })}
-                      </Grid>
-                    </>
-                  ) : null}{" "}
-                  {relatedAuthor.length !== 0 ? (
-                    <>
-                      <div>
-                        <Typography component="h2" variant="h2" sx={{ mb: 3 }}>
-                          Authors related
-                        </Typography>
-                      </div>
-                      <Grid
-                        container
-                        spacing={2}
-                        direction="row"
-                        justifyContent="flex-start"
-                        alignItems="flex-start"
-                      >
-                        {relatedAuthor?.map((obj, index) => {
-                          let term = obj;
-                          const data = {
-                            name: term.name?.value,
-                            img: term.imageUrl?.value,
-                            birthDate: term.birthDate?.value,
-                            deathDate: term.deathDate?.value,
-                            authorURI: term.writer?.value.split(
-                              "http://dbpedia.org/resource/"
-                            )[1],
-                          };
-                          return AuthorResult(index, data, navigate, resetState);
-                        })}
-                      </Grid>
-                    </>
-                  ) : null}
-                  <div>
-                    <Typography component="h2" variant="h2" sx={{ mb: 3 }}>
-                      Children Tree
-                    </Typography>
-                  </div>
-                  <div>
-                    {
-                      <FamilyTree 
-                        family = {family}
-                        authorName = {authorInfo.name?.value}
-                        />
-                    }
-                  </div>
+                  <Typography component="h2" variant="h2" sx={{ mb: 3 }}>
+                    Children Tree
+                  </Typography>
+                </div>
+                <div>
+                  {
+                    <FamilyTree
+                      family={family}
+                      authorName={authorInfo.name?.value}
+                    />
+                  }
                 </div>
               </div>
             </div>
+            
+        
           )}
-      </div>
+        </div>
     );
-  };
-  return <div>{render()}</div>;
+};
+return <div>{render()}</div>;
 }
 
 export default Author;
