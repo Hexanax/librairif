@@ -6,7 +6,8 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import {CardActionArea, Grid} from "@mui/material";
 
-function BookResult(index, data, navigate) {
+function BookResult({index, data, navigate}) {
+    console.log(data)
     const handleClick = () => {
         console.log("click");
         navigate(`../../bookInfo/${data.bookURI}`);

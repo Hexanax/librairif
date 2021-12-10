@@ -44,7 +44,7 @@ export async function fetchListInSeries(resourceURI) {
   const currentBook = `dbr:${resourceURI}`;
   let query = [
     `Select ?bookUri ?serie ?name ?imageURL WHERE {
-        ${currentBook} dbo:series ?serie.
+        ${currentBook} ^dbo:series ?serie.
         ?bookUri a dbo:Book;
         dbp:name ?name;
         dbo:series ?serie.
@@ -52,6 +52,32 @@ export async function fetchListInSeries(resourceURI) {
         }`,
   ].join("");
   return await axiosQuery(query);
+}
+
+export async function fetchSameGenreBooks(resourceURI) {
+  resourceURI = encodeResource(resourceURI);
+  const currentBook = `dbr:${resourceURI}`;
+  let query = [
+    `Select ?book ?genre ?name ?imageUrl
+    (GROUP_CONCAT(DISTINCT ?authorName;   SEPARATOR=", ") AS ?authorNames)
+    (MAX(?releaseDate) AS ?releaseDate)
+        WHERE {
+        ${currentBook} dbo:literaryGenre ?genre.
+        ?book a dbo:Book;
+        dbp:name ?name;
+        dbp:author ?author;
+        dbo:literaryGenre ?genre.
+        ?author dbp:name ?authorName.
+        OPTIONAL {?book dbp:releaseDate ?releaseDate.}
+        OPTIONAL{?book dbo:thumbnail ?imageUrl}
+        OPTIONAL{?book dbp:author ?authorURI.}
+        }`,
+  ].join("");
+  const response = await axiosQuery(query);
+  const shuffled = response.sort(() => 0.5 - Math.random());
+  let selected = shuffled.slice(0, 5);
+  console.log(selected);
+  return selected;
 }
 
 export async function getEditorInfo(editorName) {
@@ -180,7 +206,7 @@ export async function fetchAssociatedMusicals(name, author) {
  * @param {String} author the author of the current book
  * @returns
  */
-export async function fetchAssociatedSeries(name, author) {
+export async function fetchAssociatedTVShow(name, author) {
   name = encodeResource(name);
   author = encodeResource(author);
   let query = [
@@ -567,7 +593,6 @@ export async function researchQuery(name, offset) {
 	    	FILTER(lang(?hypernymLabel) = "en")
 	    	FILTER(regex(?hypernymLabel, "${name}", "i"))
 	    }}
-
      	} ORDER BY ASC(?name) OFFSET ${offset} LIMIT 50`;
   return await axiosQuery(query);
 }
