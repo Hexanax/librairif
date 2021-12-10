@@ -12,10 +12,11 @@ export async function fetchBookInfo(resourceURI) {
   //TODO CHANGE HARDCODED URI
   resourceURI = encodeResource(resourceURI);
 
-  console.log(resourceURI);
+  //console.log(resourceURI);
   const book = `dbr:${resourceURI}`;
   const content = `SELECT ?name ?titleOrig ?imageURL ?abstract ?authorURI ?authorName
-    (GROUP_CONCAT(DISTINCT ?publisherURI;   SEPARATOR=", ") AS ?publishers)
+    (GROUP_CONCAT(DISTINCT ?publisherURI;   SEPARATOR=", ") AS ?publishersURI)
+    (GROUP_CONCAT(DISTINCT ?publisher;   SEPARATOR=", ") AS ?publishers)
     (GROUP_CONCAT(DISTINCT ?releaseDate;   SEPARATOR=", ") AS ?releaseDates)
     (GROUP_CONCAT(DISTINCT ?genre;   SEPARATOR=", ") AS ?genres)
         WHERE {
@@ -24,11 +25,15 @@ export async function fetchBookInfo(resourceURI) {
             OPTIONAL{${book} dbp:titleOrig ?titleOrig.}
             OPTIONAL{${book} dbp:releaseDate ?releaseDate.}
             OPTIONAL{${book} dbo:thumbnail ?imageURL.}
-            OPTIONAL{${book} dbo:literaryGenre ?genre.}
-            OPTIONAL{${book} dbp:publisher ?publisherURI.}
+            OPTIONAL{${book} dbo:literaryGenre ?genreURI.
+            ?genreURI rdfs:label ?genre.}
+            OPTIONAL{${book} dbp:publisher ?publisherURI.
+            ?publisherURI rdfs:label ?publisher.
+            FILTER(lang(?publisher)="en")}
             OPTIONAL{${book} dbp:author ?authorURI.}
             ?authorURI dbp:name ?authorName.
             FILTER(lang(?abstract) = "en")
+            FILTER(lang(?genre)="en")
         }`;
   console.log(content);
   return await axiosQuery(content);
@@ -76,7 +81,7 @@ export async function fetchSameGenreBooks(resourceURI) {
   const response = await axiosQuery(query);
   const shuffled = response.sort(() => 0.5 - Math.random());
   let selected = shuffled.slice(0, 5);
-  console.log(selected);
+  //console.log(selected);
   return selected;
 }
 
@@ -97,7 +102,7 @@ export async function getEditorInfo(editorName) {
       FILTER(lang(?abstract) = "en").
       FILTER(lang(?label) = "en").
     }`;
-  console.log(query);
+  //console.log(query);
   return await axiosQuery(query);
 }
 
@@ -171,7 +176,7 @@ export async function fetchAssociatedMovies(name, author) {
       Filter(( lang(?label)="en" and lang(?abstract)="en" ) and (regex(?abstract,"${name}","i")) and (regex(?abstract,"${author}","i")))
     }`,
   ].join("");
-  console.log(query);
+  //console.log(query);
   return await axiosQuery(query);
 }
 
@@ -330,7 +335,7 @@ export async function queryAuthor(authorURI) {
   FILTER(lang(?description) = "en")
   FILTER(lang(?listAwards) = "en")
   }`;
-  console.log("query" + query);
+  //console.log("query" + query);
   return await axiosQuery(query);
 }
 
@@ -384,7 +389,7 @@ export async function queryAuthorAdvancedInfo(authorURI) {
           FILTER(lang(?movement) = "en")
         }
   }`;
-  console.log("query" + query);
+  //console.log("query" + query);
   return await axiosQuery(query);
 }
 
@@ -677,7 +682,7 @@ async function axiosQuery(query) {
   let url = "http://dbpedia.org/sparql";
   query = query.replace(/&/g, "\\&");
   query = query.replace(/#/g, "%23");
-  console.log(query);
+  //console.log(query);
   let config = {
     params: {
       "default-graph-uri": "http://dbpedia.org",
