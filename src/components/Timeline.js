@@ -7,12 +7,22 @@ import TimelineContent from "@mui/lab/TimelineContent";
 import TimelineDot from "@mui/lab/TimelineDot";
 import TimelineOppositeContent from "@mui/lab/TimelineOppositeContent";
 
+import CakeTwoToneIcon from '@mui/icons-material/CakeTwoTone';
+import MenuBookTwoToneIcon from '@mui/icons-material/MenuBookTwoTone';
+import LocalFireDepartmentTwoToneIcon from '@mui/icons-material/LocalFireDepartmentTwoTone';
+
 function TimelineElement(props) {
     console.log("data rendered" + JSON.stringify(props.data));
     return (
         <React.Fragment>
             <Timeline position="alternate">     
                     {props.data.map((obj) => {
+                        let value = <MenuBookTwoToneIcon />;
+                        if(obj.type === "birth"){
+                            value = <CakeTwoToneIcon />;
+                        } else if(obj.type === "death") {
+                            value = <LocalFireDepartmentTwoToneIcon />;
+                        } 
                         return (
                         <TimelineItem key={obj.date + " "+ obj.work}>
                             <TimelineOppositeContent color="text.secondary">
@@ -20,7 +30,9 @@ function TimelineElement(props) {
                             </TimelineOppositeContent>
 
                             <TimelineSeparator>
-                                <TimelineDot />
+                                <TimelineDot>
+                                    {value}   
+                                </TimelineDot>
                                 <TimelineConnector />
                             </TimelineSeparator>
 
