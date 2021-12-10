@@ -39,9 +39,23 @@ const Books = () => {
         const loadBookInfo = async () => {
             setIsLoading(true);
             const response = await fetchBookInfo(bookURI);
-            console.log(response);
-            setBookInfo(response[0])
+            const content = response[0]
+            console.log(content);
+            const bookData = {
+                name:content.name.value,
+                abstract:content.abstract.value,
+                authorURI:content.authorURI.value,
+                authorName:content.authorName.value,
+                publishersURI:content.publishersURI.value.split(","),
+                publishers:content.publishers.value.split(","),
+                releaseDates:content.releaseDates.value.split(","),
+                genres:content.genres.value.split(","),
+                imageURL:content.imageURL?.value,
+            }
+            console.log(bookData);
             setIsLoading(false);
+            setBookInfo(bookData)
+
         }
 
         loadBookInfo();
@@ -51,17 +65,17 @@ const Books = () => {
         const loadAssociatedWork = async () => {
             setIsLoading(true);
             if (bookInfo !== null) {
-                const games = await fetchAssociatedGames(bookInfo.name.value, bookInfo.authorName?.value);
+                const games = await fetchAssociatedGames(bookInfo.name, bookInfo.authorName);
                 setAssociatedGames(games);
-                const movies = await fetchAssociatedMovies(bookInfo.name.value, bookInfo.authorName?.value);
+                const movies = await fetchAssociatedMovies(bookInfo.name, bookInfo.authorName);
                 setAssociatedMovies(movies);
-                const musicals = await fetchAssociatedMusicals(bookInfo.name.value, bookInfo.authorName?.value);
+                const musicals = await fetchAssociatedMusicals(bookInfo.name, bookInfo.authorName);
                 setAssociatedMusicals(musicals);
-                const tvShows = await fetchAssociatedTVShow(bookInfo.name.value, bookInfo.authorName?.value);
+                const tvShows = await fetchAssociatedTVShow(bookInfo.name, bookInfo.authorName);
                 setAssociatedTVShows(tvShows);
-                const arts = await fetchAssociatedArts(bookInfo.name.value, bookInfo.authorName?.value);
+                const arts = await fetchAssociatedArts(bookInfo.name, bookInfo.authorName);
                 setAssociatedArts(arts);
-                const musics = await fetchAssociatedMusics(bookInfo.name.value, bookInfo.authorName?.value);
+                const musics = await fetchAssociatedMusics(bookInfo.name, bookInfo.authorName);
                 setAssociatedMusics(musics);
             }
             setIsLoading(false);
@@ -69,7 +83,6 @@ const Books = () => {
         const loadAssociatedSeriesOfBook = async () => {
             setIsLoading(true);
             const response = await fetchListInSeries(bookURI);
-            console.log(response);
             setSeriesOfBook(response);
             setIsLoading(false);
         }
@@ -83,6 +96,7 @@ const Books = () => {
         const loadSameGenreBooks = async () => {
             setIsLoading(true);
             const response = await fetchSameGenreBooks(bookURI);
+            console.log(response);
             setSameGenreBooks(response);
             setIsLoading(false);
         }
@@ -127,22 +141,22 @@ const Books = () => {
                     </div>
                     <div className={"titleWrapper"}>
                         <h1 className={"bookTitle"}>
-                            {bookInfo.name.value}
+                            {bookInfo.name}
                         </h1>
                         <div className={"authorWrapper"}>
                             <span className={"author"}>{bookInfo.authorName ?
                                 <Link
-                                    to={`../../authorInfo/${bookInfo.authorURI.value.split("http://dbpedia.org/resource/")[1]}`}> {bookInfo.authorName.value}</Link>
-                                : bookInfo.authorURI?.value}</span>
+                                    to={`../../authorInfo/${bookInfo.authorURI.split("http://dbpedia.org/resource/")[1]}`}> {bookInfo.authorName}</Link>
+                                : bookInfo.authorURI}</span>
                         </div>
                         <div className={"mainContent"}>
                             <div className={"abstractWrapper"}>
                                 <h2>Abstract</h2>
-                                {bookInfo.abstract.value}
+                                {bookInfo.abstract}
                             </div>
                             <div className={"imageWrapper"}>
                                 {bookInfo.imageURL ?
-                                    <img src={bookInfo.imageURL.value}/> :
+                                    <img src={bookInfo.imageURL}/> :
                                     <Box
                                         sx={{
                                             pt: 8,
@@ -165,10 +179,10 @@ const Books = () => {
                                             component="div"
                                             color="primary.contrastText"
                                         >
-                                            {bookInfo.name.value}
+                                            {bookInfo.name}
                                         </Typography>
                                         <Typography variant="body2" color="#DBDBDB">
-                                            {bookInfo.authorName?.value}
+                                            {bookInfo.authorName}
                                         </Typography>
                                     </Box>}
                             </div>
@@ -176,23 +190,44 @@ const Books = () => {
                         <div style={{'margin-bottom': '10px'}}>
                             <h2>Info</h2>
                             <div className={"infoWrapper"}>
-                                {bookInfo.publishers.value !== "" ?
+                                {bookInfo.publishers !== "" ?
                                     <>
                                         <div className={"publishersWrapper"}>
                                             Publishers
                                         </div>
                                         <div className={"publishersWrapper"}>
-                                            {bookInfo.publishers.value}
+                                           <span> {bookInfo.publishers.map( (publisher, index) => {
+                                               return(
+                                                   <span>
+                                                       <Link
+                                                           to={`../../editorInfo/${bookInfo.publishersURI[index].split("http://dbpedia.org/resource/")[1]}`}>
+                                                           {publisher}
+                                                       </Link>
+                                                       {index!==bookInfo.publishers.length-1 && <span>,</span>}
+                                                    </span>
+                                               )
+                                           })
+
+                                           }</span>
                                         </div>
                                     </>
                                     : null}
-                                {bookInfo.releaseDates.value !== "" ?
+                                {bookInfo.releaseDates[0] !== "" ?
                                     <>
                                         <div className={"releaseDateWrapper"}>
                                             <span>Release Date</span>
                                         </div>
                                         <div className={"releaseDateWrapper"}>
-                                            {bookInfo.releaseDates.value}
+                                            <span> {bookInfo.releaseDates.map( (date, index) => {
+                                                return(
+                                                    <span>
+                                                        {date}
+                                                        {index!==bookInfo.releaseDates.length-1 && <span>,</span>}
+                                                    </span>
+                                                )
+                                            })
+
+                                            }</span>
                                         </div>
                                     </> : null}
                                 {bookInfo.titleOrig ?
@@ -201,43 +236,55 @@ const Books = () => {
                                             <span>Original Title</span>
                                         </div>
                                         <div className={"titleOrig"}>
-                                            <span> {bookInfo.titleOrig.value}</span>
+                                            <span> {bookInfo.titleOrig}</span>
                                         </div>
                                     </> : null}
-                                {bookInfo.genres ?
+                                {bookInfo.genres[0] !=="" ?
                                     <>
+                                        {console.log(bookInfo.genres)}
                                         <div className={"literaryGenres"}>
                                             <span>Literary genre </span>
                                         </div>
                                         <div className={"literaryGenres"}>
-                                            <span> {bookInfo.genres.value}</span>
+                                            <span> {bookInfo.genres.map( (genre, index) => {
+                                                return(
+                                                    <span>
+                                                        {genre}
+                                                        {index!==bookInfo.genres.length-1 && <span>,</span>}
+                                                    </span>
+                                                )
+                                            })
+
+                                            }</span>
                                         </div>
                                     </> : null}
                             </div>
                         </div>
                         <div>
-                            <div className={"relatedWrapper"}>
 
+                            {sameGenreBooks?.length!==0 &&
+                            <div className={"relatedWrapper"}>
                                 <h3>Same genre books</h3>
                                 <div className={"sameGenreWrapper"}>
                                     {sameGenreBooks !== null && sameGenreBooks.map((obj, index) => {
                                         const bookData = {
-                                            title: obj.name.value,
-                                            author: obj.authorNames.value,
+                                            title: obj.name?.value,
+                                            author: obj.authorNames?.value,
                                             img: obj.imageUrl?.value,
                                             releaseDate: obj.releaseDate?.value,
-                                            bookURI: obj.book.value.split("http://dbpedia.org/resource/")[1],
+                                            bookURI: obj.book?.value.split("http://dbpedia.org/resource/")[1],
                                         };
 
                                         return (
                                             <div className={"cardWrapper"}>
-                                                <BookResult index={index} data={bookData} navigate={navigate}/>
+                                                <BookResult key={index} index={index} data={bookData}
+                                                            navigate={navigate}/>
                                             </div>
                                         );
                                     })
                                     }
                                 </div>
-                            </div>
+                            </div>}
                             <div className={"relatedWrapper"}>
                                 <h3>Related Games</h3>
                                 {associatedGames !== null && associatedGames.map(game => <Game game={game}/>)}

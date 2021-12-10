@@ -8,7 +8,6 @@ import {CardActionArea, Grid} from "@mui/material";
 
 function BookResult({index, data, navigate}) {
     const handleClick = () => {
-        console.log("click");
         navigate(`../../bookInfo/${data.bookURI}`);
     };
     let bookCover;
