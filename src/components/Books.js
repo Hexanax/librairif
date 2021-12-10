@@ -199,7 +199,10 @@ const Books = () => {
                                            <span> {bookInfo.publishers.map( (publisher, index) => {
                                                return(
                                                    <span>
-                                                        {publisher}
+                                                       <Link
+                                                           to={`../../editorInfo/${bookInfo.publishersURI[index].split("http://dbpedia.org/resource/")[1]}`}>
+                                                           {publisher}
+                                                       </Link>
                                                        {index!==bookInfo.publishers.length-1 && <span>,</span>}
                                                     </span>
                                                )
