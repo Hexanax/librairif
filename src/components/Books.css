@@ -1,10 +1,7 @@
 
 
-.bookContainer{
-    margin-right:20%;
-    margin-left:20%;
-    margin-top:5%;
-    margin-bottom: 5%;
+.bookContainer {
+    margin: 5% 20%;
 }
 
 .bookContainer h1{
@@ -26,17 +23,17 @@
     justify-content: center;
 }
 
-.imageWrapper{
-    margin-left:3em;
+.imageWrapper {
+    margin-left: 3em;
 }
 
-.imageWrapper img{
+.imageWrapper img {
     border-radius: 10px;
     box-shadow: 2px 2px 2px 2px grey;
 
 }
 
-.infoWrapper{
+.infoWrapper {
     display:grid;
     width:100%;
     height:100%;
@@ -46,7 +43,7 @@
 
 }
 
-.publishersWrapper{
+.publishersWrapper {
     width:fit-content;
     height: fit-content;
 }
@@ -59,4 +56,16 @@
 .titleOrig{
     width:fit-content;
     height: fit-content;
+}
+
+.game-container {
+
+}
+
+.game, .movie {
+    box-shadow: 0 0 10px -2px rgb(0, 0, 0, 0.1);
+    border-radius: 10px;
+    padding: 10px;
+    margin: 10px;
+    width: fit-content;
 }

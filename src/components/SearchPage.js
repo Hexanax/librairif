@@ -1,12 +1,17 @@
 import * as React from "react";
 import Box from "@mui/material/Box";
 
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
-import {researchQuery, autocompleteQuery, getSearch} from "../services/sparqlRequests";
+import {
+  researchQuery,
+  autocompleteQuery,
+  getSearch,
+  getAuthors,
+} from "../services/sparqlRequests";
 import SearchIcon from "@mui/icons-material/Search";
-import {useNavigate} from "react-router-dom"
+import { useNavigate } from "react-router-dom";
 
 import Autocomplete from "@mui/material/Autocomplete";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -17,16 +22,8 @@ import Results from "./Results";
 import Lottie from "react-lottie";
 import animationData from "../lotties/book-loading.json";
 
-/**
- * Allows to wait the time given
- * @param {int} delay time in ms
- * @returns
- */
-function sleep(delay = 0) {
-  return new Promise((resolve) => {
-    setTimeout(resolve, delay);
-  });
-}
+import ToggleButton from "@mui/material/ToggleButton";
+import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 
 export default function SearchPage() {
   //used to push a new page to the history stack
@@ -54,9 +51,13 @@ export default function SearchPage() {
     const data = new FormData(event.currentTarget);
     const searchInput = data.get("search");
     setIsLoading(true);
-    const response = await getSearch(searchInput);
-    console.log(response);
-    setSearchResults(response);
+    if (searchType == "Book") {
+      const bookResponse = await getSearch(searchInput);
+      setSearchResults(bookResponse);
+    } else if (searchType == "Author") {
+      const authorResponse = await getAuthors(searchInput);
+      setSearchResults(authorResponse);
+    }
     setIsLoading(false);
     console.log({
       searchInput: searchInput,
@@ -69,6 +70,7 @@ export default function SearchPage() {
   const [value, setValue] = useState("");
   const [inputValue, setInputValue] = useState("");
   const [highlightedOption, setHighlightedOption] = useState(0);
+  const [searchType, setSearchType] = React.useState("Book");
 
   const loading = open && options.length === 0;
 
@@ -82,10 +84,18 @@ export default function SearchPage() {
     setOptions([...response]);
   };
 
+  const handleSelectorChange = (event, newSearchType) => {
+    if (newSearchType) {
+      setSearchType(newSearchType);
+      setSearchResults([]);
+      setInputValue("");
+    }
+  };
+
   const handleChange = async (event, newValue) => {
     event.preventDefault();
     setIsLoading(true);
-    if(newValue.name === undefined){
+    if (newValue.name === undefined) {
       setValue(newValue);
       setInputValue(newValue);
       const response = await getSearch(newValue);
@@ -104,9 +114,9 @@ export default function SearchPage() {
       setInputValue(highlightedOption.name.value);
       setValue(highlightedOption.name.value);
     }
-    
-    if (event.key === 'Enter') {
-      if(highlightedOption===null){
+
+    if (event.key === "Enter") {
+      if (highlightedOption === null) {
         event.defaultMuiPrevented = true;
       }
     }
@@ -134,100 +144,121 @@ export default function SearchPage() {
       noValidate
       sx={{
         mt: 1,
-        width: 1,
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
+        width: 1,
       }}
     >
-      <Autocomplete
-        freeSolo
-        margin="normal"
-        required
-        fullWidth
-        id="submit"
-        name="submit"
-        disableClearable
-        inputValue={inputValue}
-        onInputChange={(event, newInputValue) => {
-          if (event != null && event.type === "change") {
-            setInputValue(newInputValue);
-            setValue(event.target.value);
-            handleInputChange(event);
-          }
-        }}
-        onChange={(event, newValue) => {
-          handleChange(event, newValue);
-        }}
-        onKeyDown={(event) => {
-          handleKeyDown(event);
-        }}
-        onHighlightChange={(event, option) => {
-          setHighlightedOption(option);
-        }}
+      <Box
         sx={{
-          border: "1px solid #D8D8D8",
-          boxSizing: "border-box",
-          boxShadow: "0px 0px 8px rgba(135, 135, 135, 0.25)",
-          borderRadius: 2,
-          "&:hover": {
-            boxShadow: "0px 0px 16px rgba(135, 135, 135, 0.25)",
-          },
+          width: 1,
+          display: "flex",
+          flexDirection: "row ",
         }}
-        open={open}
-        onOpen={() => {
-          setOpen(true);
-        }}
-        onClose={() => {
-          setOpen(false);
-        }}
-        options={options.sort((a, b) =>
-          a.type.value.localeCompare(b.type.value)
-        )}
-        groupBy={(option) => option.type.value}
-        getOptionLabel={(option) => option.name?.value}
-        loading={loading}
-        renderInput={(params) => (
-          <TextField
-            id="search"
-            name="search"
-            label="Search your book by name or author"
-            {...params}
-            InputProps={{
-              ...params.InputProps,
-              endAdornment: (
-                <>
-                  {loading ? (
-                    <CircularProgress color="inherit" size={20} />
-                  ) : null}
-                  {params.InputProps.endAdornment}
-                </>
-              ),
-            }}
-          />
-        )}
-        renderOption={(props, option, { inputValue }) => {
-          const matches = match(option.name.value, inputValue);
-          const parts = parse(option.name.value, matches);
+      >
+        <Autocomplete
+          freeSolo
+          margin="normal"
+          required
+          fullWidth
+          id="submit"
+          name="submit"
+          disableClearable
+          inputValue={inputValue}
+          onInputChange={(event, newInputValue) => {
+            if (event != null && event.type === "change") {
+              setInputValue(newInputValue);
+              setValue(event.target.value);
+              handleInputChange(event);
+            }
+          }}
+          onChange={(event, newValue) => {
+            handleChange(event, newValue);
+          }}
+          onKeyDown={(event) => {
+            handleKeyDown(event);
+          }}
+          onHighlightChange={(event, option) => {
+            setHighlightedOption(option);
+          }}
+          sx={{
+            border: "1px solid #D8D8D8",
+            boxSizing: "border-box",
+            boxShadow: "0px 0px 8px rgba(135, 135, 135, 0.25)",
+            borderRadius: 2,
+            "&:hover": {
+              boxShadow: "0px 0px 16px rgba(135, 135, 135, 0.25)",
+            },
+            height: 1,
+          }}
+          open={open}
+          onOpen={() => {
+            setOpen(true);
+          }}
+          onClose={() => {
+            setOpen(false);
+          }}
+          options={options.sort((a, b) =>
+            a.type.value.localeCompare(b.type.value)
+          )}
+          groupBy={(option) => option.type.value}
+          getOptionLabel={(option) => option.name?.value}
+          loading={loading}
+          renderInput={(params) => (
+            <TextField
+              id="search"
+              name="search"
+              label="Search your book by name or author"
+              {...params}
+              InputProps={{
+                ...params.InputProps,
+                endAdornment: (
+                  <>
+                    {loading ? (
+                      <CircularProgress color="inherit" size={20} />
+                    ) : null}
+                    {params.InputProps.endAdornment}
+                  </>
+                ),
+              }}
+            />
+          )}
+          renderOption={(props, option, { inputValue }) => {
+            const matches = match(option.name.value, inputValue);
+            const parts = parse(option.name.value, matches);
 
-          return (
-            <li {...props}>
-              <div>
-                {parts.map((part, index) => (
-                  <span
-                    key={index}
-                    style={{
-                      fontWeight: part.highlight ? 700 : 400,
-                    }}
-                  >
-                    {part.text}
-                  </span>
-                ))}
-              </div>
-            </li>
-          );
-        }}
-      />
+            return (
+              <li {...props}>
+                <div>
+                  {parts.map((part, index) => (
+                    <span
+                      key={index}
+                      style={{
+                        fontWeight: part.highlight ? 700 : 400,
+                      }}
+                    >
+                      {part.text}
+                    </span>
+                  ))}
+                </div>
+              </li>
+            );
+          }}
+        />
+        <ToggleButtonGroup
+          color="primary"
+          value={searchType}
+          exclusive
+          onChange={handleSelectorChange}
+          sx={{
+            pl: 2,
+          }}
+        >
+          <ToggleButton value="Book">Books</ToggleButton>
+          <ToggleButton value="Author">Author</ToggleButton>
+        </ToggleButtonGroup>
+      </Box>
       <Button
         type="submit"
         variant="contained"
@@ -247,7 +278,7 @@ export default function SearchPage() {
         {isLoading ? (
           <Lottie options={defaultOptions} height={400} width={400} />
         ) : (
-          <Results books={searchResults} />
+          <Results type={searchType} data={searchResults} />
         )}
       </Box>
     </Box>

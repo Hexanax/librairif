@@ -14,27 +14,28 @@ export default function Browser() {
       direction="column"
       alignItems="center"
       justifyContent="center"
-      style={{ minHeight: "100vh" }}
+      sx={{ minHeight: "100vh", minWidth: 2 / 3 }}
     >
       <Grid item>
         <Box
           sx={{
+            minWidth: 600,
             marginTop: 8,
             display: "flex",
             flexDirection: "row",
             alignItems: "center",
-            mr: 4,
-            ml: 8,
+            maxWidth: 1500,
           }}
         >
           <Box
             sx={{
+              width: 1,
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
             }}
           >
-            <Typography component="h1" variant="h1">
+            <Typography component="h1" variant="h1" sx={{ mb: 5 }}>
               LibrairIf
             </Typography>
             <SearchPage />
