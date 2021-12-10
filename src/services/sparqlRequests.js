@@ -65,8 +65,6 @@ export async function getEditorInfo(editorName) {
       ${editorRsrc} rdfs:label ?label;
       dbo:abstract ?abstract.
       OPTIONAL{${editorRsrc} dbo:founder ?founder}
-              UNION {${editorRsrc} dbp:founder ?founder
-    }
       OPTIONAL{${editorRsrc} dbo:foundingYear ?founded}
       OPTIONAL{${editorRsrc} foaf:homepage ?homepage}
       OPTIONAL{${editorRsrc} dbp:headquarters ?headquarters}
@@ -439,7 +437,6 @@ export async function researchQuery(name, offset) {
 	    	FILTER(lang(?hypernymLabel) = "en")
 	    	FILTER(regex(?hypernymLabel, "${name}", "i"))
 	    }}
-
      	} ORDER BY ASC(?name) OFFSET ${offset} LIMIT 50`;
   return await axiosQuery(query);
 }
