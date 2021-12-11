@@ -1,8 +1,18 @@
 
-.editorContainer {
-    margin-right: 20%;
-    margin-left: 20%;
-    margin-top: 5%;
+.imageWrapper {
+    margin-left: 3em;
+}
+
+.imageWrapper img {
+    border-radius: 10px;
+    box-shadow: 2px 2px 2px 2px grey;
+
+}
+
+.editorContainer{
+    margin-right:20%;
+    margin-left:20%;
+    margin-top:5%;
     margin-bottom: 5%;
 }
 
@@ -45,15 +55,17 @@
 
 }
 
-.publishersWrapper {
-    width: fit-content;
+.valueWrapper{
+
+    width:fit-content;
     height: fit-content;
 }
 
-.releaseDateWrapper {
-    width: fit-content;
-    height: fit-content;
+
+ul{
+    list-style: none;;
 }
+
 
 .titleOrig {
     width: fit-content;
