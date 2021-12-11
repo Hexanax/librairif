@@ -3,12 +3,10 @@ import {fetchEditorInfo, fetchEditorBooks} from '../services/sparqlRequests'
 import "./Editor.css"
 import {useEffect, useState} from "react";
 import { useParams } from 'react-router';
-import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import BookResult from "./BookResult";
 import * as React from "react";
 import {useNavigate} from "react-router-dom";
-import Box from "@mui/material/Box";
 import {CircularProgress, Typography} from "@mui/material";
 
 
@@ -26,7 +24,7 @@ const Editor = () => {
 
         const loadEditorInfo = async () => {
             setIsLoading(true);
-            const response = await getEditorInfo(editorURI);
+            const response = await fetchEditorInfo(editorURI);
             if (response.length === 0) {
                 setError(true);
             }
@@ -115,34 +113,36 @@ const Editor = () => {
                         <h2>Info</h2>
                             <div className={"infoWrapper"}>
                                 {editorInfo.foundation.value !== "" ?
-                                    <>
-                                        <div className={"foundingYearWrapper"}>
+                                    <>                            
+                                        <div className={"valueWrapper"}>
                                             <span>Founded</span>
-                                            <div>
+                                            
+                                        </div>     
+                                        <span className={"valueWrapper"}>
                                                 {editorInfo.foundation?.value.split(",")[0]}
-                                            </div>
-                                        </div>
+                                        </span>                                   
                                     </>
                                     : null}
                                 {editorInfo.countries.value !== "" ?
                                     <>
-                                        <div className={"countriesWrapper"}>
+                                        <div className={"valueWrapper"}>
                                             <span>Country</span>
-                                            <div className={"countriesWrapper"}>
-                                                {editorInfo.countries?.value.split(",")[0]}
-                                            </div>
+                                           
                                         </div>
+                                        <span className={"value"}>
+                                                {editorInfo.countries?.value.split(",")[0]}
+                                        </span>
                                     </>
                                     : null}
                                 
-                                {editorInfo.countries.value !== "" ?
+                                {editorInfo.founders.value !== "" ?
                                     <>
-                                       <div className={"founders"}>
-                                        <span>Founders</span>
-                                        <ul>
-                                            {editorInfo.founders?.value.split(",").map(founder => <li>{founder.split("http://dbpedia.org/resource/")[1]} </li>)}
-                                        </ul>
-                                    </div>
+                                       <div className={"valueWrapper"}>
+                                            <span>Founders</span>
+                                        </div>
+                                        <div>
+                                                {editorInfo.founders?.value.split(",").map(founder => <span className="founder">{founder.split("http://dbpedia.org/resource/")[1]} </span>)}
+                                        </div>
                                     </>
                                     : null}                     
                                 

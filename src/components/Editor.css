@@ -55,15 +55,17 @@
 
 }
 
-.publishersWrapper {
-    width: fit-content;
-    height: fit-content;
-}
+.valueWrapper{
 
-.foundingYearWrapper{
     width:fit-content;
     height: fit-content;
 }
+
+
+ul{
+    list-style: none;;
+}
+
 
 .titleOrig {
     width: fit-content;
