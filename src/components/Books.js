@@ -23,6 +23,7 @@ const Books = () => {
     let navigate = useNavigate();
     const [bookInfo, setBookInfo] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [isLoadingSupp, setIsLoadingSupp] = useState(true);
     const [error, setError] = useState(false);
 
     const [associatedGames, setAssociatedGames] = useState(null);
@@ -40,7 +41,6 @@ const Books = () => {
     useEffect(() => {
 
         const loadBookInfo = async () => {
-            setIsLoading(true);
             const response = await fetchBookInfo(bookURI);
             if (response.length === 0) {
                 setError(true);
@@ -60,50 +60,40 @@ const Books = () => {
                 imageURL: content.imageURL?.value,
             }
             console.log(bookData);
-            setIsLoading(false);
             setBookInfo(bookData)
-
         }
 
-        loadBookInfo();
+        const loadAssociatedSeriesOfBook = async () => {
+            const response = await fetchListInSeries(bookURI);
+            setSeriesOfBook(response);
+        }
+        const loadBookNeighbors = async () => {
+            const response = await fetchBookNeighbor(bookURI);
+            setNeighbors(response);
+        }
+
+        const loadSameGenreBooks = async () => {
+            const response = await fetchSameGenreBooks(bookURI);
+            setSameGenreBooks(response);
+        }
+
+
+        const load = async () => {
+            setIsLoading(true);
+            await loadBookInfo();
+            await loadAssociatedSeriesOfBook();
+            await loadBookNeighbors();
+            await loadSameGenreBooks();
+            setIsLoading(false);
+        }
+        load();
+
     }, [bookURI]);
 
     useEffect(() => {
 
-
-        const loadAssociatedSeriesOfBook = async () => {
-            setIsLoading(true);
-            const response = await fetchListInSeries(bookURI);
-            setSeriesOfBook(response);
-            setIsLoading(false);
-        }
-        const loadBookNeighbors = async () => {
-            setIsLoading(true);
-            const response = await fetchBookNeighbor(bookURI);
-            setNeighbors(response);
-            setIsLoading(false);
-        }
-
-        const loadSameGenreBooks = async () => {
-            setIsLoading(true);
-            const response = await fetchSameGenreBooks(bookURI);
-            console.log(response);
-            setSameGenreBooks(response);
-            setIsLoading(false);
-        }
-
-        (async () => {
-            await loadAssociatedSeriesOfBook();
-            await loadBookNeighbors();
-            await loadSameGenreBooks();
-
-        })();
-    }, [bookURI])
-
-    useEffect(() => {
-
         const loadAssociatedWork = async () => {
-            setIsLoading(true);
+            setIsLoadingSupp(true);
             const responseBook = await fetchBookAssociatedToAuthor(bookInfo.authorURI);
             const authorBooks = responseBook.filter((book) => {
                 return (book.name.value !== bookInfo.name)
@@ -122,30 +112,14 @@ const Books = () => {
             setAssociatedArts(arts);
             const musics = await fetchAssociatedMusics(bookInfo.name, bookInfo.authorName);
             setAssociatedMusics(musics);
-            setIsLoading(false);
+            setIsLoadingSupp(false);
         }
 
         if (bookInfo !== null && bookInfo.authorName !== undefined && bookInfo.authorURI !== undefined) {
-            console.log(bookInfo);
             loadAssociatedWork();
         }
 
     }, [bookInfo])
-    // useEffect(() => {
-    //     // console.log("Book infos : ")
-    //     // console.log(bookInfo);
-    //     // console.log(associatedGames);
-    //     // console.log(associatedMovies);
-    //     // console.log(associatedMusicals);
-    //     // console.log(associatedTVShows);
-    //     // console.log(associatedArts);
-    //     // console.log(associatedMusics);
-    //     // console.log(seriesOfBook);
-    //     // console.log(neighbors);
-    //     setIsLoading(false)
-    // }, [bookInfo, associatedGames, associatedMovies,
-    //     associatedMusicals, associatedTVShows, associatedArts,
-    //     associatedMusics, seriesOfBook, neighbors, sameGenreBooks])
 
     const render = () => {
         return (
@@ -155,7 +129,7 @@ const Books = () => {
                         Resource not available
                     </Typography>
                 </Box>}
-                {!error && bookInfo === null &&
+                {!error && isLoading &&
                 <Box
                     display={"flex"}
                     alignItems={"center"}
@@ -164,7 +138,7 @@ const Books = () => {
                 >
                     <CircularProgress/>
                 </Box>}
-                {!error && bookInfo !== null &&
+                {!error && !isLoading && bookInfo !== null &&
                 <div className={"bookContainer"}>
                     <div className={"historyBack"}>
                         <IconButton onClick={() => navigate(-1, {state: setIsLoading(true)})} aria-label="delete"
@@ -294,6 +268,7 @@ const Books = () => {
                                     </> : null}
                             </div>
                         </div>
+                        {!isLoadingSupp &&
                         <div>
                             {sameAuthorBooks.length !== 0 &&
                             <>
@@ -344,15 +319,27 @@ const Books = () => {
                                     }
                                 </div>
                             </div>}
+                            {associatedGames !== null && associatedGames.length !== 0 &&
                             <div className={"relatedWrapper"}>
                                 <h3>Related Games</h3>
-                                {associatedGames !== null && associatedGames.map(game => <Game game={game}/>)}
+                                {associatedGames.map(game => <Game game={game}/>)}
                             </div>
-                            <div className={"relatedWrapper"}>
-                                <h3>Related Movies</h3>
-                                {associatedMovies !== null && associatedMovies.map(movie => <Movie movie={movie}/>)}
-                            </div>
-                        </div>
+                            }
+                            {associatedMovies !== null && associatedMovies.length !== 0 &&
+                                <div className={"relatedWrapper"}>
+                                    <h3>Related Movies</h3>
+                                    {associatedMovies.map(movie => <Movie movie={movie}/>)}
+                                </div>
+                            }
+                        </div>}
+                        {isLoadingSupp && <Box
+                            display={"flex"}
+                            alignItems={"center"}
+                            justifyContent={"center"}
+                            height={"100vh"}
+                        >
+                            <CircularProgress/>
+                        </Box>}
                     </div>
                 </div>}
             </div>
