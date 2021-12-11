@@ -1,4 +1,3 @@
-
 const Movie = (props) => {
     return <div className={"movie"}>
         <span>Movie's title : </span>

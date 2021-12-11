@@ -1,21 +1,35 @@
-import {fetchEditorInfo} from '../services/sparqlRequests'
+
+import {fetchEditorInfo, fetchEditorBooks} from '../services/sparqlRequests'
 import "./Editor.css"
 import {useEffect, useState} from "react";
 import { useParams } from 'react-router';
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
+import BookResult from "./BookResult";
+import * as React from "react";
+import {useNavigate} from "react-router-dom";
+import Box from "@mui/material/Box";
+import {CircularProgress, Typography} from "@mui/material";
+
+
 
 const Editor = () => {
 
     const [editorInfo, setEditorInfo] = useState(null);
+    const [editorBooks, setEditorBooks] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState(false);
     let {editorURI} = useParams();
+    let navigate = useNavigate();
 
     useEffect(() => {
 
         const loadEditorInfo = async () => {
             setIsLoading(true);
-            const response = await fetchEditorInfo(editorURI);
+            const response = await getEditorInfo(editorURI);
+            if (response.length === 0) {
+                setError(true);
+            }
             console.log(response);
             setEditorInfo(response[0]);
             setIsLoading(false);
@@ -26,20 +40,37 @@ const Editor = () => {
     useEffect(() => {
         console.log(editorInfo);
         setIsLoading(false)
+
+        const loadEditorBooks = async () => {
+            const response = await fetchEditorBooks(editorURI);
+            console.log(response);
+            setEditorBooks(response);
+        }
+        loadEditorBooks();
     }, [editorInfo])
 
     const render = () => {
         return (
             <div>
-                {editorInfo === null &&
-                <div>
-                    Loading results
-                </div>}
-                {editorInfo !== null &&
+                {error && <Box display={"flex"} alignItems={"center"} justifyContent={"center"} height={"100vh"}>
+                    <Typography fontWeight={"bold"} fontSize={"30px"}>
+                        Resource not available
+                    </Typography>
+                </Box>}
+                {editorInfo === null && !error &&
+                <Box
+                    display={"flex"}
+                    alignItems={"center"}
+                    justifyContent={"center"}
+                    height={"100vh"}
+                >
+                    <CircularProgress/>
+                </Box>}
+                {editorInfo !== null && !error &&
 
                 <div className={"editorContainer"}>
                     <div className={"historyBack"}>
-                        
+
                     </div>
                     <div className={"nameWrapper"}>
                         <h1 className={"editorName"}>
@@ -120,7 +151,23 @@ const Editor = () => {
                         
                         <div>
                             <h2> Published Books</h2>
-                            <div className={"publishedBooksWrapper"}>
+                            <div className={"otherBooksWrapper"}>
+                                {editorBooks.map((obj, index) => {
+                                    const bookData = {
+                                        title: obj.name?.value,
+                                        author: obj.authorNames?.value,
+                                        img: obj.imageUrl?.value,
+                                        releaseDate: obj.releaseDate?.value,
+                                        bookURI: obj.book?.value.split("http://dbpedia.org/resource/")[1],
+                                    };
+                                    return (
+                                        <div className={"cardWrapper"}>
+                                            <BookResult key={index} index={index} data={bookData}
+                                                        navigate={navigate}/>
+                                        </div>
+                                    );
+                                })
+                                }
                             </div>
                         </div>
                     </div>
@@ -128,7 +175,7 @@ const Editor = () => {
             </div>
         )
     }
-    
+
     return (
         <div>
             {render()}

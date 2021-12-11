@@ -12,10 +12,11 @@ export async function fetchBookInfo(resourceURI) {
   //TODO CHANGE HARDCODED URI
   resourceURI = encodeResource(resourceURI);
 
-  console.log(resourceURI);
+  //console.log(resourceURI);
   const book = `dbr:${resourceURI}`;
   const content = `SELECT ?name ?titleOrig ?imageURL ?abstract ?authorURI ?authorName
-    (GROUP_CONCAT(DISTINCT ?publisherURI;   SEPARATOR=", ") AS ?publishers)
+    (GROUP_CONCAT(DISTINCT ?publisherURI;   SEPARATOR=", ") AS ?publishersURI)
+    (GROUP_CONCAT(DISTINCT ?publisher;   SEPARATOR=", ") AS ?publishers)
     (GROUP_CONCAT(DISTINCT ?releaseDate;   SEPARATOR=", ") AS ?releaseDates)
     (GROUP_CONCAT(DISTINCT ?genre;   SEPARATOR=", ") AS ?genres)
         WHERE {
@@ -24,11 +25,15 @@ export async function fetchBookInfo(resourceURI) {
             OPTIONAL{${book} dbp:titleOrig ?titleOrig.}
             OPTIONAL{${book} dbp:releaseDate ?releaseDate.}
             OPTIONAL{${book} dbo:thumbnail ?imageURL.}
-            OPTIONAL{${book} dbo:literaryGenre ?genre.}
-            OPTIONAL{${book} dbp:publisher ?publisherURI.}
+            OPTIONAL{${book} dbo:literaryGenre ?genreURI.
+            ?genreURI rdfs:label ?genre.}
+            OPTIONAL{${book} dbp:publisher ?publisherURI.
+            ?publisherURI rdfs:label ?publisher.
+            FILTER(lang(?publisher)="en")}
             OPTIONAL{${book} dbp:author ?authorURI.}
-            ?authorURI dbp:name ?authorName.
+            OPTIONAL{?authorURI dbp:name ?authorName.}
             FILTER(lang(?abstract) = "en")
+            FILTER(lang(?genre)="en")
         }`;
   console.log(content);
   return await axiosQuery(content);
@@ -76,7 +81,7 @@ export async function fetchSameGenreBooks(resourceURI) {
   const response = await axiosQuery(query);
   const shuffled = response.sort(() => 0.5 - Math.random());
   let selected = shuffled.slice(0, 5);
-  console.log(selected);
+  //console.log(selected);
   return selected;
 }
 
@@ -99,8 +104,33 @@ export async function fetchEditorInfo(editorName) {
       FILTER(lang(?abstract) = "en").
       FILTER(lang(?label) = "en").
     }`;
-  console.log(query);
+  //console.log(query);
   return await axiosQuery(query);
+}
+
+export async function fetchEditorBooks(resourceURI) {
+  resourceURI = encodeResource(resourceURI);
+  const editor = `dbr:${resourceURI}`;
+  let query = [
+    `Select ?book ?genre ?name ?imageUrl
+    (GROUP_CONCAT(DISTINCT ?authorName;   SEPARATOR=", ") AS ?authorNames)
+    (MAX(?releaseDate) AS ?releaseDate)
+        WHERE {
+        ?book a dbo:Book;
+        dbp:name ?name;
+        dbp:author ?author;
+        dbo:publisher ${editor}.
+        ?author dbp:name ?authorName.
+        OPTIONAL {?book dbp:releaseDate ?releaseDate.}
+        OPTIONAL{?book dbo:thumbnail ?imageUrl}
+        OPTIONAL{?book dbp:author ?authorURI.}
+        }`,
+  ].join("");
+  const response = await axiosQuery(query);
+  const shuffled = response.sort(() => 0.5 - Math.random());
+  let selected = shuffled.slice(0, 5);
+  //console.log(selected);
+  return selected;
 }
 
 /**
@@ -173,7 +203,7 @@ export async function fetchAssociatedMovies(name, author) {
       Filter(( lang(?label)="en" and lang(?abstract)="en" ) and (regex(?abstract,"${name}","i")) and (regex(?abstract,"${author}","i")))
     }`,
   ].join("");
-  console.log(query);
+  //console.log(query);
   return await axiosQuery(query);
 }
 
@@ -278,10 +308,11 @@ export async function fetchAssociatedMusics(name, author) {
   return await axiosQuery(query);
 }
 
+
 export async function queryAuthor(authorURI) {
   authorURI = encodeResource(authorURI);
   let author = `dbr:${authorURI}`;
-  let query = `SELECT ?name ?description ?birthDate ?deathDate ?image 
+  let query = `SELECT (MIN(?name) AS ?name) ?description ?birthDate ?deathDate ?image 
     GROUP_CONCAT(DISTINCT ?education, ", ") as ?education
     GROUP_CONCAT(DISTINCT ?listGenres, ",") as ?listGenres
     GROUP_CONCAT(DISTINCT ?listAwards, ";") as ?listAwards 
@@ -310,13 +341,20 @@ export async function queryAuthor(authorURI) {
     FILTER(?listGenres != ""@en)
     FILTER(lang(?listGenres) = "en")
   }
+  FILTER(?name != ""@en)
   FILTER(lang(?description) = "en")
   FILTER(lang(?listAwards) = "en")
   }`;
-  console.log("query" + query);
+  //console.log("query" + query);
   return await axiosQuery(query);
 }
 
+/**
+ * Allows to try to get on DBpedia the advanced information of an author 
+ * that the user wants to know more about
+ * @param {String} authorURI URI that allows to identify the resource in DBpedia 
+ * @returns Advanced information available
+ */
 export async function queryAuthorAdvancedInfo(authorURI) {
   authorURI = encodeResource(authorURI);
   let author = `dbr:${authorURI}`;
@@ -355,11 +393,16 @@ export async function queryAuthorAdvancedInfo(authorURI) {
           FILTER(lang(?movement) = "en")
         }
   }`;
-  console.log("query" + query);
+  //console.log("query" + query);
   return await axiosQuery(query);
 }
 
-export async function fetchBookAssiociatedToAuthor(authorURI) {
+/**
+ * Allows to get the list of books with resources in DBpedia written by the current author
+ * @param {String} authorURI URI that allows to identify the resource in DBpedia 
+ * @returns list of books written by the author
+ */
+export async function fetchBookAssociatedToAuthor(authorURI) {
   authorURI = encodeResource(authorURI);
   let author = `dbr:${authorURI}`;
   let query = `SELECT ?book
@@ -377,24 +420,32 @@ export async function fetchBookAssiociatedToAuthor(authorURI) {
         FILTER(lang(?abstract) = "en")
     } ORDER BY ASC(?name)
     `;
-  return await axiosQuery(query);
+  console.log(query);
+  let response = await axiosQuery(query);
+  console.log(response);
+  return response;
 }
 
 export async function getAuthorTimeLife(resourceURI) {
   resourceURI = encodeResource(resourceURI);
   const currentAuthor = `dbr:${resourceURI}`;
-  let query = [
-    `SELECT ?birthDate ?deathDate GROUP_CONCAT(?notableWorkName, ";") GROUP_CONCAT(?releaseDate, ";") WHERE {
-        ${currentAuthor} a dbo:Writer;
-        dbo:birthDate ?birthDate;
-        dbo:notableWork ?notableWork.
+  let query = `SELECT GROUP_CONCAT(?notableWorkName, ";") as ?notableWorkName GROUP_CONCAT(?releaseDate, ";") as ?releaseDate WHERE {
+        ${currentAuthor} dbo:notableWork ?notableWork.
         ?notableWork dbp:name ?notableWorkName;
-          dbp:releaseDate ?releaseDate.
-        OPTIONAL{${currentAuthor} dbo:deathDate ?deathDate }}`,
-  ].join("");
+        dbp:releaseDate ?releaseDate.
+      }`;
+  
   return await axiosQuery(query);
 }
 
+/**
+ * Allows to get the list of author in DBpedia that have influenced the author or that have been 
+ * influenced by the current author
+ * @param {String} resourceURI URI that allows to identify the resource in DBpedia 
+ * @param {Boolean} isInspiratedBy true if we want author inspirated by the current author 
+ * false if we want author that inspirated the current author
+ * @returns the list of associated author depending on the boolean isInspiratedBy
+ */
 export async function getAuthorInspiration(resourceURI,isInspiratedBy){
   resourceURI = encodeResource(resourceURI);
   const currentAuthor = `dbr:${resourceURI}`;
@@ -453,7 +504,13 @@ export async function getAuthorInspiration(resourceURI,isInspiratedBy){
   return await axiosQuery(query);
 }
 
-
+/**
+ * Allows to get the list of authors in DBpedia associated with the current author
+ * filter with parameter
+ * @param {String} resourceURI URI that allows to identify the resource in DBpedia 
+ * @param {String} filtre the SPARQL filter used
+ * @returns  the list of associated author depending on the filter
+ */
 export async function getRelatedAuthor(resourceURI, filtre){
   resourceURI = encodeResource(resourceURI);
   const currentAuthor = `dbr:${resourceURI}`;
@@ -464,8 +521,7 @@ export async function getRelatedAuthor(resourceURI, filtre){
   (MIN(?deathDate) AS ?deathDate)
   WHERE {
       ?writer dbp:name ?name.
-      {
-        {
+      {{
           ?writer a dbo:Writer.
         } UNION {
           ?writer a dbo:Scientist.
@@ -482,6 +538,11 @@ export async function getRelatedAuthor(resourceURI, filtre){
   return await axiosQuery(query);
 }
 
+/**
+ * Allows to get the family tree with name of the current author
+ * @param {String} resourceURI URI that allows to identify the resource in DBpedia 
+ * @returns the list of names of children of the author and name of his/her spouse
+ */
 export async function getFamilyTree(resourceURI){
   resourceURI = encodeResource(resourceURI);
   const currentAuthor = `dbr:${resourceURI}`;
@@ -643,7 +704,7 @@ async function axiosQuery(query) {
   let url = "http://dbpedia.org/sparql";
   query = query.replace(/&/g, "\\&");
   query = query.replace(/#/g, "%23");
-  console.log(query);
+  //console.log(query);
   let config = {
     params: {
       "default-graph-uri": "http://dbpedia.org",
