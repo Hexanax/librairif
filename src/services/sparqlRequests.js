@@ -289,6 +289,7 @@ export async function fetchAssociatedMusics(name, author) {
   return await axiosQuery(query);
 }
 
+
 export async function queryAuthor(authorURI) {
   authorURI = encodeResource(authorURI);
   let author = `dbr:${authorURI}`;
@@ -340,6 +341,12 @@ export async function queryAuthor(authorURI) {
   return await axiosQuery(query);
 }
 
+/**
+ * Allows to try to get on DBpedia the advanced information of an author 
+ * that the user wants to know more about
+ * @param {String} authorURI URI that allows to identify the resource in DBpedia 
+ * @returns Advanced information available
+ */
 export async function queryAuthorAdvancedInfo(authorURI) {
   authorURI = encodeResource(authorURI);
   let author = `dbr:${authorURI}`;
@@ -394,6 +401,11 @@ export async function queryAuthorAdvancedInfo(authorURI) {
   return await axiosQuery(query);
 }
 
+/**
+ * Allows to get the list of books with resources in DBpedia written by the current author
+ * @param {String} authorURI URI that allows to identify the resource in DBpedia 
+ * @returns list of books written by the author
+ */
 export async function fetchBookAssociatedToAuthor(authorURI) {
   authorURI = encodeResource(authorURI);
   let author = `dbr:${authorURI}`;
@@ -430,6 +442,14 @@ export async function getAuthorTimeLife(resourceURI) {
   return await axiosQuery(query);
 }
 
+/**
+ * Allows to get the list of author in DBpedia that have influenced the author or that have been 
+ * influenced by the current author
+ * @param {String} resourceURI URI that allows to identify the resource in DBpedia 
+ * @param {Boolean} isInspiratedBy true if we want author inspirated by the current author 
+ * false if we want author that inspirated the current author
+ * @returns the list of associated author depending on the boolean isInspiratedBy
+ */
 export async function getAuthorInspiration(resourceURI,isInspiratedBy){
   resourceURI = encodeResource(resourceURI);
   const currentAuthor = `dbr:${resourceURI}`;
@@ -490,7 +510,13 @@ export async function getAuthorInspiration(resourceURI,isInspiratedBy){
   return await axiosQuery(query);
 }
 
-
+/**
+ * Allows to get the list of authors in DBpedia associated with the current author
+ * filter with parameter
+ * @param {String} resourceURI URI that allows to identify the resource in DBpedia 
+ * @param {String} filtre the SPARQL filter used
+ * @returns  the list of associated author depending on the filter
+ */
 export async function getRelatedAuthor(resourceURI, filtre){
   resourceURI = encodeResource(resourceURI);
   const currentAuthor = `dbr:${resourceURI}`;
@@ -502,7 +528,7 @@ export async function getRelatedAuthor(resourceURI, filtre){
   WHERE {
       ?writer dbp:name ?name.
       {{
-        ?writer a dbo:Writer.
+          ?writer a dbo:Writer.
         } UNION {
           ?writer a dbo:Scientist.
         } UNION {
@@ -518,6 +544,11 @@ export async function getRelatedAuthor(resourceURI, filtre){
   return await axiosQuery(query);
 }
 
+/**
+ * Allows to get the family tree with name of the current author
+ * @param {String} resourceURI URI that allows to identify the resource in DBpedia 
+ * @returns the list of names of children of the author and name of his/her spouse
+ */
 export async function getFamilyTree(resourceURI){
   resourceURI = encodeResource(resourceURI);
   const currentAuthor = `dbr:${resourceURI}`;
