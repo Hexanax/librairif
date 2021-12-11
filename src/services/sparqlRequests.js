@@ -5,6 +5,7 @@ function encodeResource(resourceURI) {
   resourceURI = resourceURI.replace(/[)]/g, "\\)");
   resourceURI = resourceURI.replace(/[']/g, "\\'");
   resourceURI = resourceURI.replace(/["]/g, `\\"`);
+
   return resourceURI;
 }
 
@@ -26,14 +27,14 @@ export async function fetchBookInfo(resourceURI) {
             OPTIONAL{${book} dbp:releaseDate ?releaseDate.}
             OPTIONAL{${book} dbo:thumbnail ?imageURL.}
             OPTIONAL{${book} dbo:literaryGenre ?genreURI.
-            ?genreURI rdfs:label ?genre.}
+            ?genreURI rdfs:label ?genre.
+            FILTER(lang(?genreURI)="en")}
             OPTIONAL{${book} dbp:publisher ?publisherURI.
             ?publisherURI rdfs:label ?publisher.
             FILTER(lang(?publisher)="en")}
             OPTIONAL{${book} dbp:author ?authorURI.}
             OPTIONAL{?authorURI dbp:name ?authorName.}
             FILTER(lang(?abstract) = "en")
-            FILTER(lang(?genre)="en")
         }`;
   console.log(content);
   return await axiosQuery(content);

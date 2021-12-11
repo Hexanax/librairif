@@ -25,6 +25,8 @@ const Books = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [isLoadingSupp, setIsLoadingSupp] = useState(true);
     const [error, setError] = useState(false);
+    const [errorSupp, setErrorSupp] = useState(false);
+
 
     const [associatedGames, setAssociatedGames] = useState(null);
     const [associatedMovies, setAssociatedMovies] = useState(null);
@@ -80,10 +82,14 @@ const Books = () => {
 
         const load = async () => {
             setIsLoading(true);
-            await loadBookInfo();
-            await loadAssociatedSeriesOfBook();
-            await loadBookNeighbors();
-            await loadSameGenreBooks();
+            try {
+                await loadBookInfo();
+                await loadAssociatedSeriesOfBook();
+                await loadBookNeighbors();
+                await loadSameGenreBooks();
+            }catch(err){
+                console.log(err);
+            }
             setIsLoading(false);
         }
         load();
@@ -93,37 +99,48 @@ const Books = () => {
     useEffect(() => {
 
         const loadAssociatedWork = async () => {
-            setIsLoadingSupp(true);
-            const responseBook = await fetchBookAssociatedToAuthor(bookInfo.authorURI);
-            const authorBooks = responseBook.filter((book) => {
-                return (book.name.value !== bookInfo.name)
-            })
-            console.log(authorBooks);
-            setSameAuthorBooks(authorBooks);
-            const games = await fetchAssociatedGames(bookInfo.name, bookInfo.authorName);
-            setAssociatedGames(games);
-            const movies = await fetchAssociatedMovies(bookInfo.name, bookInfo.authorName);
-            setAssociatedMovies(movies);
-            const musicals = await fetchAssociatedMusicals(bookInfo.name, bookInfo.authorName);
-            setAssociatedMusicals(musicals);
-            const tvShows = await fetchAssociatedTVShow(bookInfo.name, bookInfo.authorName);
-            setAssociatedTVShows(tvShows);
-            const arts = await fetchAssociatedArts(bookInfo.name, bookInfo.authorName);
-            setAssociatedArts(arts);
-            const musics = await fetchAssociatedMusics(bookInfo.name, bookInfo.authorName);
-            setAssociatedMusics(musics);
+            console.log("loading");
+            try {
+                setIsLoadingSupp(true);
+                const responseBook = await fetchBookAssociatedToAuthor(bookInfo.authorURI);
+                const authorBooks = responseBook.filter((book) => {
+                    return (book.name.value !== bookInfo.name)
+                })
+                console.log(authorBooks);
+                setSameAuthorBooks(authorBooks);
+                const games = await fetchAssociatedGames(bookInfo.name, bookInfo.authorName);
+                setAssociatedGames(games);
+                const movies = await fetchAssociatedMovies(bookInfo.name, bookInfo.authorName);
+                setAssociatedMovies(movies);
+                const musicals = await fetchAssociatedMusicals(bookInfo.name, bookInfo.authorName);
+                setAssociatedMusicals(musicals);
+                const tvShows = await fetchAssociatedTVShow(bookInfo.name, bookInfo.authorName);
+                setAssociatedTVShows(tvShows);
+                const arts = await fetchAssociatedArts(bookInfo.name, bookInfo.authorName);
+                setAssociatedArts(arts);
+                const musics = await fetchAssociatedMusics(bookInfo.name, bookInfo.authorName);
+                setAssociatedMusics(musics);
+            }catch(err){
+                console.log(err);
+                setErrorSupp(true);
+            }
             setIsLoadingSupp(false);
         }
 
         if (bookInfo !== null && bookInfo.authorName !== undefined && bookInfo.authorURI !== undefined) {
+            setErrorSupp(false);
             loadAssociatedWork();
+        }else{
+            console.log(bookInfo)
+            setIsLoadingSupp(false);
+            setErrorSupp(true);
         }
 
     }, [bookInfo])
 
     const render = () => {
         return (
-            <div>
+            <>
                 {error && <Box display={"flex"} alignItems={"center"} justifyContent={"center"} height={"100vh"}>
                     <Typography fontWeight={"bold"} fontSize={"30px"}>
                         Resource not available
@@ -268,7 +285,12 @@ const Books = () => {
                                     </> : null}
                             </div>
                         </div>
-                        {!isLoadingSupp &&
+                        {errorSupp && <Box display={"flex"} alignItems={"center"} justifyContent={"center"} height={"100%"}>
+                            <Typography fontWeight={"bold"} fontSize={"30px"}>
+                                Resource not available
+                            </Typography>
+                        </Box>}
+                        {!errorSupp && !isLoadingSupp &&
                         <div>
                             {sameAuthorBooks.length !== 0 &&
                             <>
@@ -332,7 +354,7 @@ const Books = () => {
                                 </div>
                             }
                         </div>}
-                        {isLoadingSupp && <Box
+                        {!errorSupp && isLoadingSupp && <Box
                             display={"flex"}
                             alignItems={"center"}
                             justifyContent={"center"}
@@ -342,13 +364,13 @@ const Books = () => {
                         </Box>}
                     </div>
                 </div>}
-            </div>
+            </>
         )
     }
     return (
-        <div>
+        <>
             {render()}
-        </div>
+        </>
     )
 
 }

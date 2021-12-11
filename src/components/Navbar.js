@@ -1,4 +1,3 @@
-import "./Navbar.css"
 import Typography from "@mui/material/Typography";
 import * as React from "react";
 import HomeIcon from '@mui/icons-material/Home';
@@ -8,7 +7,14 @@ import {useNavigate} from "react-router-dom";
 export default function Navbar() {
     let navigate = useNavigate();
     return (
-        <div className={"navbarWrapper"}>
+        <Box
+            display={"grid"}
+            width={"100vw"}
+            height={"37px"}
+            boxShadow={"0 2px 2px -2px rgba(0,0,0,.2)"}
+            gridTemplateColumns={"1fr 1fr 1fr"}
+            alignItems={"center"}
+        >
             <Box
                 display={"flex"}
                 alignItems={"center"}
@@ -26,9 +32,9 @@ export default function Navbar() {
             >
                 LibrairIf
             </Typography>
-            <div>
+            <Box>
 
-            </div>
-        </div>
+            </Box>
+        </Box>
     )
 }
