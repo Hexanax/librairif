@@ -112,6 +112,18 @@ const Editor = () => {
                         </div>
                         <h2>Info</h2>
                             <div className={"infoWrapper"}>
+                            {editorInfo.countries.value !== "" ?
+                                    <>
+                                        <div className={"valueWrapper"}>
+                                            <span>Country</span>
+                                           
+                                        </div>
+                                        <span className={"value"}>
+                                                {editorInfo.countries?.value.split(",")[0]}
+                                        </span>
+                                    </>
+                                    : null}
+                                    
                                 {editorInfo.foundation.value !== "" ?
                                     <>                            
                                         <div className={"valueWrapper"}>
@@ -123,17 +135,7 @@ const Editor = () => {
                                         </span>                                   
                                     </>
                                     : null}
-                                {editorInfo.countries.value !== "" ?
-                                    <>
-                                        <div className={"valueWrapper"}>
-                                            <span>Country</span>
-                                           
-                                        </div>
-                                        <span className={"value"}>
-                                                {editorInfo.countries?.value.split(",")[0]}
-                                        </span>
-                                    </>
-                                    : null}
+                                
                                 
                                 {editorInfo.founders.value !== "" ?
                                     <>

@@ -101,7 +101,7 @@ export async function fetchEditorInfo(editorName) {
       OPTIONAL{${editorRsrc} dbo:thumbnail ?imageUrl.}
       OPTIONAL{${editorRsrc} dbo:foundingYear | dbp:founded ?year}
       OPTIONAL{${editorRsrc} foaf:homepage ?homepage}
-      OPTIONAL{${editorRsrc} dbp:country /foaf:name | dbo:country /foaf:name   ?country}
+      OPTIONAL{${editorRsrc} dbp:country /foaf:name | dbp:country | dbo:country /foaf:name   ?country}
       FILTER(lang(?abstract) = "en").
       FILTER(lang(?label) = "en").
     }`;
