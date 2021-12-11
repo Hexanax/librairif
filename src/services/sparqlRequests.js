@@ -86,20 +86,22 @@ export async function fetchSameGenreBooks(resourceURI) {
   return selected;
 }
 
-export async function getEditorInfo(editorName) {
+export async function fetchEditorInfo(editorName) {
   editorName = encodeResource(editorName);
   let editorRsrc = `dbr:${editorName}`;
   let query = `SELECT ?label ?abstract
-    (GROUP_CONCAT(DISTINCT ?founded;   SEPARATOR=", ") AS ?foundingYears)
+    (GROUP_CONCAT(DISTINCT ?year;   SEPARATOR=", ") AS ?foundation)
+    (GROUP_CONCAT(DISTINCT ?imageUrl;   SEPARATOR=", ") AS ?imageURL)
     (GROUP_CONCAT(DISTINCT ?founder;   SEPARATOR=", ") AS ?founders)
     (GROUP_CONCAT(DISTINCT ?homepage;    SEPARATOR=", ") AS ?homepages)
-    (GROUP_CONCAT(DISTINCT ?headquarters; SEPARATOR=", ") AS ?headquartersLocations) WHERE {
+    (GROUP_CONCAT(DISTINCT ?country; SEPARATOR=", ") AS ?countries) WHERE {
       ${editorRsrc} rdfs:label ?label;
       dbo:abstract ?abstract.
       OPTIONAL{${editorRsrc} dbo:founder ?founder}
-      OPTIONAL{${editorRsrc} dbo:foundingYear ?founded}
+      OPTIONAL{${editorRsrc} dbo:thumbnail ?imageUrl.}
+      OPTIONAL{${editorRsrc} dbo:foundingYear | dbp:founded ?year}
       OPTIONAL{${editorRsrc} foaf:homepage ?homepage}
-      OPTIONAL{${editorRsrc} dbp:headquarters ?headquarters}
+      OPTIONAL{${editorRsrc} dbp:country /foaf:name | dbo:country /foaf:name   ?country}
       FILTER(lang(?abstract) = "en").
       FILTER(lang(?label) = "en").
     }`;
@@ -288,26 +290,18 @@ export async function fetchAssociatedMusics(name, author) {
   name = encodeResource(name);
   author = encodeResource(author);
   let query = [
-    `SELECT DISTINCT(STR(?label)) as ?music ?uri ?type ?artist
-         WHERE{
-        {{
-      ?uri a dbo:Song;
-      dbo:abstract ?abstract;
-      dbo:artist ?artist;
-      rdfs:label ?label.
-      BIND("song" as ?type)
-      } UNION {
-      ?uri a dbo:Single;
-      dbo:abstract ?abstract;
-      rdfs:label ?label;
-      dbo:artist ?artist.
-      BIND("single" as ?type)
-      } UNION {
-      ?uri a dbo:Sound;
-      dbo:abstract ?abstract;
-      rdfs:label ?label.
-      BIND("sound" as ?type)
-      }}
+    `SELECT DISTINCT(STR(?label)) as ?music ?uri ?artist
+     WHERE{
+      { {
+          ?uri a dbo:Song ;
+        } UNION {
+          ?uri a dbo:Single.    
+        } UNION {
+          ?uri a dbo:Sound;
+        }
+        ?uri dbo:abstract ?abstract;
+        dbo:artist ?artist;
+        rdfs:label ?label.
         Filter(( lang(?label)="en" and lang(?abstract)="en" ) and (regex(?abstract,"${name}","i")) and (regex(?abstract,"${author}","i")))
        }
         GROUP BY ?music ?uri ?type ORDER BY ASC(?music)`,
@@ -331,13 +325,7 @@ export async function queryAuthor(authorURI) {
   OPTIONAL{${author} dbo:thumbnail ?image}
   OPTIONAL {
     {{
-    	${author} dbo:education ?educationLink.
-    	?educationLink rdfs:label ?education
-    	} UNION {
-    	${author} dbp:education ?educationLink.
-    	?educationLink rdfs:label ?education
-    	} UNION {
-    	${author} dbp:education ?education
+    	${author} dbo:education / rdfs:label | dbp:education / rdfs:label | dbp:education ?education
     }}
     FILTER(?education != ""@en)
     FILTER(lang(?education) = "en")
@@ -348,13 +336,8 @@ export async function queryAuthor(authorURI) {
   }
   OPTIONAL {
     {{
-    	${author} dbo:genre ?genreLink.
-    	?genreLink rdfs:label ?listGenres
-    	} UNION {
-    	${author} dbp:genre ?genreLink.
-    	?genreLink rdfs:label ?listGenres
-    	} UNION {
-    	${author} dbp:genre ?listGenres
+    	${author} dbo:genre / rdfs:label | dbp:genre / rdfs:label |  dbp:genre ?listGenres
+    	
     }}
     FILTER(?listGenres != ""@en)
     FILTER(lang(?listGenres) = "en")
@@ -386,40 +369,28 @@ export async function queryAuthorAdvancedInfo(authorURI) {
     ?movement
   WHERE {
     ${author} dbp:name ?name.
-    OPTIONAL{${author} dbo:mainInterest ?mainInterestLink. ?mainInterestLink rdfs:label ?mainInterest. FILTER(lang(?mainInterest) = "en")}
-    OPTIONAL{${author} dbo:notableIdea ?notableIdeaLink. ?notableIdeaLink rdfs:label ?notableIdea. FILTER(lang(?notableIdea) = "en")}
-    OPTIONAL{${author} dbo:philosophicalSchool ?philosophicalSchoolLink. ?philosophicalSchoolLink rdfs:label ?philosophicalSchool. FILTER(lang(?philosophicalSchool) = "en")}
-    OPTIONAL{${author} dbo:academicDiscipline ?academicDisciplineLink. ?academicDisciplineLink rdfs:label ?academicDiscipline. FILTER(lang(?academicDiscipline) = "en")}
+    OPTIONAL{${author} dbo:mainInterest / rdfs:label ?mainInterest. FILTER(lang(?mainInterest) = "en")}
+    OPTIONAL{${author} dbo:notableIdea / rdfs:label ?notableIdea. FILTER(lang(?notableIdea) = "en")}
+    OPTIONAL{${author} dbo:philosophicalSchool / rdfs:label ?philosophicalSchool. FILTER(lang(?philosophicalSchool) = "en")}
+    OPTIONAL{${author} dbo:academicDiscipline / rdfs:label ?academicDiscipline. FILTER(lang(?academicDiscipline) = "en")}
     OPTIONAL {
         {{
-            ${author} dbo:occupation ?occupationLink.
-            ?occupationLink rdfs:label ?occupation
-            } UNION {
-            ${author} dbp:occupation ?occupationLink.
-            ?occupationLink rdfs:label ?occupation
-            } UNION {
-            ${author} dbp:occupation ?occupation
+            ${author} dbo:occupation / rdfs:label | dbo:occupation / rdfs:label | dbp:occupation  ?occupation.
+            
         }}
         FILTER(?occupation != ""@en)
         FILTER(lang(?occupation) = "en")
       }
       OPTIONAL {
         {{
-            ${author} dbo:nationality ?nationalityLink.
-            ?nationalityLink rdfs:label ?nationality
-            } UNION {
-            ${author} dbp:nationality ?nationalityLink.
-            ?nationalityLink rdfs:label ?nationality
-            } UNION {
-            ${author} dbp:nationality ?nationality
+            ${author} dbo:nationality / rdfs:label | dbp:nationality / rdfs:label | dbo:nationality ?nationality.
         }}
         FILTER(?nationality != ""@en)
         FILTER(lang(?nationality) = "en")
       }
       OPTIONAL{
-          ${author} dbo:movement ?movementLink. 
-          ?movementLink rdfs:label ?movement.
-          FILTER(?movement != ""@en)
+          ${author} dbo:movement / rdfs:label ?movement.
+          FILTER(?movement != "")
           FILTER(lang(?movement) = "en")
         }
   }`;
@@ -440,10 +411,10 @@ export async function fetchBookAssociatedToAuthor(authorURI) {
     (MAX(?releaseDate) AS ?releaseDate)
     (MAX(?imageURL) AS ?imageUrl)
     WHERE {
-        ?book a dbo:Book.
-        ?book dbp:name ?name.
-        ?book dbo:author ${author};
-        dbo:abstract ?abstract.
+        ?book a dbo:Book;
+          dbp:name ?name;
+          dbo:author ${author};
+          dbo:abstract ?abstract.
         OPTIONAL {?book dbo:thumbnail ?imageURL.}
         OPTIONAL {?book dbp:releaseDate ?releaseDate.}
         FILTER(lang(?name) = "en")
@@ -461,8 +432,8 @@ export async function getAuthorTimeLife(resourceURI) {
   const currentAuthor = `dbr:${resourceURI}`;
   let query = `SELECT GROUP_CONCAT(?notableWorkName, ";") as ?notableWorkName GROUP_CONCAT(?releaseDate, ";") as ?releaseDate WHERE {
         ${currentAuthor} dbo:notableWork ?notableWork.
-        ?notableWork dbp:name ?notableWorkName.
-        ?notableWork dbp:releaseDate ?releaseDate.
+        ?notableWork dbp:name ?notableWorkName;
+        dbp:releaseDate ?releaseDate.
       }`;
   
   return await axiosQuery(query);
@@ -500,9 +471,8 @@ export async function getAuthorInspiration(resourceURI,isInspiratedBy){
         OPTIONAL {?writer dbp:birthDate ?birthDate.}
         OPTIONAL {?writer dbp:deathDate ?deathDate.}
         {{
-            ?writer dbo:influencedBy ${currentAuthor}.
-        } UNION {
-            ?writer dbp:influences ${currentAuthor}.
+            ?writer dbo:influencedBy | dbp:influences  ${currentAuthor}.
+        
         }}
     } ORDER BY ASC(?name)  
     `
@@ -526,9 +496,8 @@ export async function getAuthorInspiration(resourceURI,isInspiratedBy){
         OPTIONAL {?writer dbp:birthDate ?birthDate.}
         OPTIONAL {?writer dbp:deathDate ?deathDate.}
         {{
-            ?writer dbo:influenced ${currentAuthor}.
-        } UNION {
-            ?writer dbp:influenced ${currentAuthor}.
+            ?writer dbo:influenced | dbp:influenced ${currentAuthor}.
+        
         }}
     } ORDER BY ASC(?name)    
     `
@@ -583,20 +552,13 @@ export async function getFamilyTree(resourceURI){
   WHERE {
       OPTIONAL {
       {{
-          ${currentAuthor} dbo:spouse ?spouseLink.
-          ?spouseLink rdfs:label ?spouse
-          } UNION {
-          ${currentAuthor} dbp:spouse ?spouseLink.
-          ?spouseLink rdfs:label ?spouse
-          } UNION {
-          ${currentAuthor} dbp:spouse ?spouse
+          ${currentAuthor} dbo:spouse / rdfs:label | dbp:spouse / rdfs:label | dbp:spouse ?spouse.
       }}
       FILTER(?spouse != ""@en)
       FILTER(lang(?spouse) = "en")
     }
     OPTIONAL {
-      ${currentAuthor} dbo:child ?childLink.
-      ?childLink rdfs:label ?children
+      ${currentAuthor} dbo:child / rdfs:label ?children
       FILTER(?children != ""@en)
       FILTER(lang(?children) = "en")
     }

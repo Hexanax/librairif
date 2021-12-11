@@ -1,12 +1,15 @@
-import {fetchEditorBooks, getEditorInfo} from '../services/sparqlRequests'
+
+import {fetchEditorInfo, fetchEditorBooks} from '../services/sparqlRequests'
 import "./Editor.css"
 import {useEffect, useState} from "react";
-import {useParams} from 'react-router';
+import { useParams } from 'react-router';
+import Box from "@mui/material/Box";
 import BookResult from "./BookResult";
 import * as React from "react";
 import {useNavigate} from "react-router-dom";
-import Box from "@mui/material/Box";
 import {CircularProgress, Typography} from "@mui/material";
+
+
 
 const Editor = () => {
 
@@ -21,7 +24,7 @@ const Editor = () => {
 
         const loadEditorInfo = async () => {
             setIsLoading(true);
-            const response = await getEditorInfo(editorURI);
+            const response = await fetchEditorInfo(editorURI);
             if (response.length === 0) {
                 setError(true);
             }
@@ -69,39 +72,83 @@ const Editor = () => {
                     </div>
                     <div className={"nameWrapper"}>
                         <h1 className={"editorName"}>
-                            {editorInfo.name?.value}
+                            {editorInfo.label.value}
                         </h1>
-                        <h2>Info</h2>
-                        <div className={"infoWrapper"}>
-                            <div className={"founders"}>
-                                Founders
-                            </div>
-                            <div>
-                                <ul>
-                                    {editorInfo.founders?.value.split(",").map(founder =>
-                                        <li>{founder.split("http://dbpedia.org/resource/")[1]} </li>)}
-                                </ul>
-                            </div>
-                            <div className={"foundingYearWrapper"}>
-                                <span>Foundation Year</span>
-                            </div>
-                            <div>
-                                {editorInfo.foundingYears?.value.split(",")[0]}
-                            </div>
-                            <div className={"headquartersWrapper"}>
-                                <span>HeadQuarters</span>
-                            </div>
-                            <div>
-                                {editorInfo.headquarters?.value.split(",")[0]}
-                            </div>
-                        </div>
                         <div className={"mainContent"}>
                             <div className={"abstractWrapper"}>
                                 <h2>Abstract</h2>
                                 {editorInfo.abstract?.value}
                             </div>
-
+                            <div className={"imageWrapper"}>
+                                {editorInfo.imageURL ?
+                                    <img src={editorInfo.imageURL.value}/> :
+                                    <Box
+                                        sx={{
+                                            pt: 8,
+                                            pr: 2,
+                                            pl: 1,
+                                            borderRadius: 2,
+                                            backgroundColor: "#2F2F2F",
+                                            height: 2 / 3,
+                                            width: "100%",
+                                            filter: "drop-shadow(0px 0px 10px rgba(0, 0, 0, 0.25))",
+                                            display: "flex",
+                                            flexDirection: "column",
+                                            alignItems: "center",
+                                            textAlign: "center",
+                                        }}
+                                    >
+                                        <Typography
+                                            gutterBottom
+                                            variant="h5"
+                                            component="div"
+                                            color="primary.contrastText"
+                                        >
+                                            {editorInfo.label.value}
+                                        </Typography>
+                                        
+                                    </Box>}
+                            </div>
                         </div>
+                        <h2>Info</h2>
+                            <div className={"infoWrapper"}>
+                                {editorInfo.foundation.value !== "" ?
+                                    <>                            
+                                        <div className={"valueWrapper"}>
+                                            <span>Founded</span>
+                                            
+                                        </div>     
+                                        <span className={"valueWrapper"}>
+                                                {editorInfo.foundation?.value.split(",")[0]}
+                                        </span>                                   
+                                    </>
+                                    : null}
+                                {editorInfo.countries.value !== "" ?
+                                    <>
+                                        <div className={"valueWrapper"}>
+                                            <span>Country</span>
+                                           
+                                        </div>
+                                        <span className={"value"}>
+                                                {editorInfo.countries?.value.split(",")[0]}
+                                        </span>
+                                    </>
+                                    : null}
+                                
+                                {editorInfo.founders.value !== "" ?
+                                    <>
+                                       <div className={"valueWrapper"}>
+                                            <span>Founders</span>
+                                        </div>
+                                        <div>
+                                                {editorInfo.founders?.value.split(",").map(founder => <span className="founder">{founder.split("http://dbpedia.org/resource/")[1]} </span>)}
+                                        </div>
+                                    </>
+                                    : null}                     
+                                
+                                
+                            </div>
+                        
                         <div>
                             <h2> Published Books</h2>
                             <div className={"otherBooksWrapper"}>
