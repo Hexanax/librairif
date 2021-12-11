@@ -1,4 +1,13 @@
 
+.imageWrapper {
+    margin-left: 3em;
+}
+
+.imageWrapper img {
+    border-radius: 10px;
+    box-shadow: 2px 2px 2px 2px grey;
+
+}
 
 .editorContainer{
     margin-right:20%;
@@ -51,7 +60,7 @@
     height: fit-content;
 }
 
-.releaseDateWrapper{
+.foundingYearWrapper{
     width:fit-content;
     height: fit-content;
 }
