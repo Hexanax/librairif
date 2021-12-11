@@ -15,13 +15,15 @@ import * as React from "react";
 import Game from "./Game";
 import Movie from "./Movie";
 import BookResult from "./BookResult";
+import {CircularProgress} from "@mui/material";
 
 const Books = () => {
 
     let {bookURI} = useParams();
     let navigate = useNavigate();
     const [bookInfo, setBookInfo] = useState(null);
-    const [isLoading, setIsLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState(false);
 
     const [associatedGames, setAssociatedGames] = useState(null);
     const [associatedMovies, setAssociatedMovies] = useState(null);
@@ -40,17 +42,21 @@ const Books = () => {
         const loadBookInfo = async () => {
             setIsLoading(true);
             const response = await fetchBookInfo(bookURI);
+            if (response.length === 0) {
+                setError(true);
+            }
             const content = response[0]
             console.log(content);
+
             const bookData = {
-                name: content.name.value,
-                abstract: content.abstract.value,
-                authorURI: content.authorURI.value.split("http://dbpedia.org/resource/")[1],
-                authorName: content.authorName.value,
-                publishersURI: content.publishersURI.value.split(","),
-                publishers: content.publishers.value.split(","),
-                releaseDates: content.releaseDates.value.split(","),
-                genres: content.genres.value.split(","),
+                name: content.name?.value,
+                abstract: content.abstract?.value,
+                authorURI: content.authorURI?.value.split("http://dbpedia.org/resource/")[1],
+                authorName: content.authorName?.value,
+                publishersURI: content.publishersURI?.value.split(","),
+                publishers: content.publishers?.value.split(","),
+                releaseDates: content.releaseDates?.value.split(","),
+                genres: content.genres.value?.split(","),
                 imageURL: content.imageURL?.value,
             }
             console.log(bookData);
@@ -119,7 +125,7 @@ const Books = () => {
             setIsLoading(false);
         }
 
-        if (bookInfo !== null) {
+        if (bookInfo !== null && bookInfo.authorName !== undefined && bookInfo.authorURI !== undefined) {
             console.log(bookInfo);
             loadAssociatedWork();
         }
@@ -144,14 +150,25 @@ const Books = () => {
     const render = () => {
         return (
             <div>
-                {bookInfo === null &&
-                <div>
-                    Loading results
-                </div>}
-                {bookInfo !== null &&
+                {error && <Box display={"flex"} alignItems={"center"} justifyContent={"center"} height={"100vh"}>
+                    <Typography fontWeight={"bold"} fontSize={"30px"}>
+                        Resource not available
+                    </Typography>
+                </Box>}
+                {!error && bookInfo === null &&
+                <Box
+                    display={"flex"}
+                    alignItems={"center"}
+                    justifyContent={"center"}
+                    height={"100vh"}
+                >
+                    <CircularProgress/>
+                </Box>}
+                {!error && bookInfo !== null &&
                 <div className={"bookContainer"}>
                     <div className={"historyBack"}>
-                        <IconButton onClick={() => navigate(-1, {state: {}})} aria-label="delete" size="large">
+                        <IconButton onClick={() => navigate(-1, {state: setIsLoading(true)})} aria-label="delete"
+                                    size="large">
                             <ArrowBackRounded fontSize="inherit"/>
                         </IconButton>
                     </div>
@@ -206,7 +223,7 @@ const Books = () => {
                         <div style={{'margin-bottom': '10px'}}>
                             <h2>Info</h2>
                             <div className={"infoWrapper"}>
-                                {bookInfo.publishers[0]!=="" ?
+                                {bookInfo.publishers[0] !== "" ?
                                     <>
                                         <div className={"publishersWrapper"}>
                                             Publishers

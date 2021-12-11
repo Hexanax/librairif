@@ -1,4 +1,4 @@
- import * as React from 'react';
+import * as React from 'react';
 import Timeline from "@mui/lab/Timeline";
 import TimelineItem from "@mui/lab/TimelineItem";
 import TimelineSeparator from "@mui/lab/TimelineSeparator";
@@ -15,31 +15,31 @@ function TimelineElement(props) {
     console.log("data rendered" + JSON.stringify(props.data));
     return (
         <React.Fragment>
-            <Timeline position="alternate">     
-                    {props.data.map((obj) => {
-                        let value = <MenuBookTwoToneIcon />;
-                        if(obj.type === "birth"){
-                            value = <CakeTwoToneIcon />;
-                        } else if(obj.type === "death") {
-                            value = <LocalFireDepartmentTwoToneIcon />;
-                        } 
-                        return (
-                        <TimelineItem key={obj.date + " "+ obj.work}>
+            <Timeline position="alternate">
+                {props.data.map((obj) => {
+                    let value = <MenuBookTwoToneIcon/>;
+                    if (obj.type === "birth") {
+                        value = <CakeTwoToneIcon/>;
+                    } else if (obj.type === "death") {
+                        value = <LocalFireDepartmentTwoToneIcon/>;
+                    }
+                    return (
+                        <TimelineItem key={obj.date + " " + obj.work}>
                             <TimelineOppositeContent color="text.secondary">
                                 {obj.date}
                             </TimelineOppositeContent>
 
                             <TimelineSeparator>
                                 <TimelineDot>
-                                    {value}   
+                                    {value}
                                 </TimelineDot>
-                                <TimelineConnector />
+                                <TimelineConnector/>
                             </TimelineSeparator>
 
                             <TimelineContent>{obj.work}</TimelineContent>
                         </TimelineItem>
-                        )
-                    })}      
+                    )
+                })}
             </Timeline>
         </React.Fragment>
     );

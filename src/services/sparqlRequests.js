@@ -31,7 +31,7 @@ export async function fetchBookInfo(resourceURI) {
             ?publisherURI rdfs:label ?publisher.
             FILTER(lang(?publisher)="en")}
             OPTIONAL{${book} dbp:author ?authorURI.}
-            ?authorURI dbp:name ?authorName.
+            OPTIONAL{?authorURI dbp:name ?authorName.}
             FILTER(lang(?abstract) = "en")
             FILTER(lang(?genre)="en")
         }`;

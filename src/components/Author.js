@@ -28,6 +28,8 @@ import FamilyTree from "./FamilyTree";
 import {fetchBookInfo} from "../services/sparqlRequests";
 import animationData from "../lotties/book-loading.json";
 import useEnhancedEffect from "@mui/utils/useEnhancedEffect";
+import Box from "@mui/material/Box";
+import {CircularProgress} from "@mui/material";
 
 
 const defaultOptions = {
@@ -42,6 +44,7 @@ const defaultOptions = {
 function Author(data) {
     const navigate = useNavigate();
     const {authorURI} = useParams();
+    const [error, setError] = useState(false);
     const [authorInfo, setAuthorInfo] = useState(null);
     const [advancedInfo, setAdvancedInfo] = useState(null);
     const [relatedAuthor, setRelatedAuthor] = useState(null);
@@ -78,6 +81,9 @@ function Author(data) {
         const loadAuthorInfo = async () => {
             setIsLoading(true);
             const response = await queryAuthor(authorURI);
+            if (response.length === 0) {
+                setError(true);
+            }
             setAuthorInfo(response[0]);
             setIsLoading(false);
 
@@ -267,8 +273,22 @@ function Author(data) {
 
         return (
             <div>
-                {authorInfo === null && <div>Loading results</div>}
-                {authorInfo !== null &&
+                {error &&
+                <Box display={"flex"} alignItems={"center"} justifyContent={"center"} height={"100vh"}>
+                    <Typography fontWeight={"bold"} fontSize={"30px"}>
+                        Resource not available
+                    </Typography>
+                </Box>}
+                {!error && authorInfo === null && <Box
+                    display={"flex"}
+                    alignItems={"center"}
+                    justifyContent={"center"}
+                    height={"100vh"}
+                >
+                    <CircularProgress/>
+                </Box>}
+                {!error &&
+                authorInfo !== null &&
                 advancedInfo !== null &&
                 books !== null &&
                 relatedAuthor != null &&
@@ -527,7 +547,7 @@ function Author(data) {
                                 <>
                                     <div>
                                         <Typography component="h2" variant="h2" sx={{mb: 3}}>
-                                            Writer influenced this author
+                                            Authors that influenced {authorInfo.name?.value}
                                         </Typography>
                                     </div>
                                     <Grid
@@ -557,7 +577,7 @@ function Author(data) {
                                 <>
                                     <div>
                                         <Typography component="h2" variant="h2" sx={{mb: 3}}>
-                                            Writer influenced by this author
+                                            {authorInfo.name?.value} influenced these authors
                                         </Typography>
                                     </div>
                                     <Grid

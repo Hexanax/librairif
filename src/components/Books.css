@@ -1,23 +1,22 @@
 
-
 .bookContainer {
     margin: 5% 20%;
 }
 
-.bookContainer h1{
+.bookContainer h1 {
     font-size: xxx-large;
 }
 
-.bookContainer h2{
-    font-size:xx-large;
+.bookContainer h2 {
+    font-size: xx-large;
 }
 
-.author{
+.author {
     font-size: large;
-    color:grey;
+    color: grey;
 }
 
-.mainContent{
+.mainContent {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -28,38 +27,37 @@
 }
 
 
-
 .imageWrapper img {
     border-radius: 10px;
     box-shadow: 2px 2px 2px 2px grey;
 }
 
-.timelineWrapper{
+.timelineWrapper {
     display: grid;
 }
 
 .infoWrapper {
-    display:grid;
-    width:100%;
-    height:100%;
-    grid-gap:20px;
+    display: grid;
+    width: 100%;
+    height: 100%;
+    grid-gap: 20px;
     grid-template-columns: 30% 50%;
     margin-bottom: 50px;
 
 }
 
 .publishersWrapper {
-    width:fit-content;
+    width: fit-content;
     height: fit-content;
 }
 
-.releaseDateWrapper{
-    width:fit-content;
+.releaseDateWrapper {
+    width: fit-content;
     height: fit-content;
 }
 
-.titleOrig{
-    width:fit-content;
+.titleOrig {
+    width: fit-content;
     height: fit-content;
 }
 
@@ -74,13 +72,14 @@
     margin: 10px;
     width: fit-content;
 }
-.otherBooksWrapper{
-    display:flex;
+
+.otherBooksWrapper {
+    display: flex;
     align-items: center;
     justify-content: center;
     flex-wrap: wrap;
 }
 
-.cardWrapper{
-    margin:10px;
+.cardWrapper {
+    margin: 10px;
 }

@@ -8,6 +8,8 @@ import Books from "./components/Books";
 import Editor from "./components/Editor";
 import Results from "./components/Results";
 import Author from "./components/Author";
+import Navbar from "./components/Navbar";
+import ScrollToTop from "./components/ScrollToTop";
 
 export default function App() {
     const theme = createTheme(lightTheme);
@@ -16,6 +18,8 @@ export default function App() {
             <CssBaseline/>
             <Router>
                 <div>
+                    <Navbar/>
+                    <ScrollToTop/>
                     <Routes>
                         <>
                             <Route path="/" element={<Browser/>}>

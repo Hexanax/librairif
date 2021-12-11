@@ -35,9 +35,9 @@ export default function Browser() {
               alignItems: "center",
             }}
           >
-            <Typography component="h1" variant="h1" sx={{ mb: 5 }}>
-              LibrairIf
-            </Typography>
+              <Typography component="h1" variant="h1" sx={{mb: 5}}>
+                  LibrairIf
+              </Typography>
             <SearchPage />
           </Box>
         </Box>
