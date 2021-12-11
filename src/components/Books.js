@@ -206,7 +206,7 @@ const Books = () => {
                         <div style={{'margin-bottom': '10px'}}>
                             <h2>Info</h2>
                             <div className={"infoWrapper"}>
-                                {bookInfo.publishers !== "" ?
+                                {bookInfo.publishers[0]!=="" ?
                                     <>
                                         <div className={"publishersWrapper"}>
                                             Publishers

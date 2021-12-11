@@ -106,6 +106,31 @@ export async function getEditorInfo(editorName) {
   return await axiosQuery(query);
 }
 
+export async function fetchEditorBooks(resourceURI) {
+  resourceURI = encodeResource(resourceURI);
+  const editor = `dbr:${resourceURI}`;
+  let query = [
+    `Select ?book ?genre ?name ?imageUrl
+    (GROUP_CONCAT(DISTINCT ?authorName;   SEPARATOR=", ") AS ?authorNames)
+    (MAX(?releaseDate) AS ?releaseDate)
+        WHERE {
+        ?book a dbo:Book;
+        dbp:name ?name;
+        dbp:author ?author;
+        dbo:publisher ${editor}.
+        ?author dbp:name ?authorName.
+        OPTIONAL {?book dbp:releaseDate ?releaseDate.}
+        OPTIONAL{?book dbo:thumbnail ?imageUrl}
+        OPTIONAL{?book dbp:author ?authorURI.}
+        }`,
+  ].join("");
+  const response = await axiosQuery(query);
+  const shuffled = response.sort(() => 0.5 - Math.random());
+  let selected = shuffled.slice(0, 5);
+  //console.log(selected);
+  return selected;
+}
+
 /**
  * Allows to get the previous and the following book of the current one
  * @param {String} ressourceURI Uri of the current book
