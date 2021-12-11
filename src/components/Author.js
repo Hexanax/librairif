@@ -233,8 +233,8 @@ function Author(data) {
                 ) {
                     query = `?writer dbo:academicDiscipline ?filtre.
           ?filtre rdfs:label "${listAcademicDiscipline[0]}"@en.`;
-                } else if (advancedInfo.movement !== null) {
-                    query = `?writer dbo:movement ?filtre.
+        } else if (advancedInfo.movement !== null && advancedInfo.movement !== undefined) {
+          query = `?writer dbo:movement ?filtre.
           ?filtre rdfs:label "${advancedInfo.movement}"@en.`;
                 } else if (listGenres !== null && listGenres !== null) {
                     query = `?writer dbo:genre ?filtre.
