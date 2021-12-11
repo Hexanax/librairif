@@ -134,6 +134,25 @@ export async function fetchEditorBooks(resourceURI) {
   return selected;
 }
 
+export async function fetchRelatedEditors(resourceURI) {
+  resourceURI = encodeResource(resourceURI);
+  const editor = `dbr:${resourceURI}`;
+  let query = [
+    `Select ?publisher ?countryAns WHERE {
+          ${editor} dbp:country | dbp:country / foaf:name | dbo:country / foaf:name ?countryReq.
+          ?publisher a dbo:Publisher;
+          dbp:country | dbp:country / foaf:name | dbo:country / foaf:name ?countryAns.
+          FILTER(?countryAns = ?countryReq)
+        
+        }`,
+  ].join("");
+  const response = await axiosQuery(query);
+  const shuffled = response.sort(() => 0.5 - Math.random());
+  let selected = shuffled.slice(0, 5);
+  //console.log(selected);
+  return selected;
+}
+
 /**
  * Allows to get the previous and the following book of the current one
  * @param {String} ressourceURI Uri of the current book
@@ -290,21 +309,21 @@ export async function fetchAssociatedMusics(name, author) {
   name = encodeResource(name);
   author = encodeResource(author);
   let query = [
-    `SELECT DISTINCT(STR(?label)) as ?music ?uri ?artist
-     WHERE{
-      { {
-          ?uri a dbo:Song ;
-        } UNION {
-          ?uri a dbo:Single.    
-        } UNION {
-          ?uri a dbo:Sound;
-        }
-        ?uri dbo:abstract ?abstract;
-        dbo:artist ?artist;
-        rdfs:label ?label.
-        Filter(( lang(?label)="en" and lang(?abstract)="en" ) and (regex(?abstract,"${name}","i")) and (regex(?abstract,"${author}","i")))
+    `SELECT DISTINCT ?uri  (STR(?label)) as  ?music ?artist
+    WHERE{
+       {
+         ?uri a dbo:Song .
+       } UNION {
+         ?uri a dbo:Single.    
+       } UNION {
+         ?uri a dbo:Sound.
        }
-        GROUP BY ?music ?uri ?type ORDER BY ASC(?music)`,
+       ?uri dbo:abstract ?abstract;
+       dbo:artist ?artist;
+       rdfs:label ?label.
+       Filter(( lang(?label)="en" and lang(?abstract)="en" ) and (regex(?abstract,"${name}","i")) )
+      }
+       GROUP BY ?uri `,
   ].join("");
   return await axiosQuery(query);
 }
