@@ -30,7 +30,7 @@ export default function SearchPage() {
   //used to push a new page to the history stack
   const [searchResults, setSearchResults] = useState([]);
   const [viewableResults, setViewableResults] = useState([]);
-  const [offset, setOffset] = useState(0);
+  const [offset, setOffset] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   /**
    * Set animation settings
@@ -100,6 +100,7 @@ export default function SearchPage() {
       setSearchResults([]);
       setViewableResults([]);
       setInputValue("");
+      setOffset(1);
     }
   };
 

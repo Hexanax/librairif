@@ -771,7 +771,7 @@ export async function getAuthors(name) {
     OPTIONAL {?writer dbp:deathDate ?deathDate.}
     OPTIONAL  {?writer dbo:thumbnail ?image.}
     FILTER (regex(?name, "${name}", "i"))
-    } ORDER BY ASC(?name) OFFSET ${offset}`;
+    } ORDER BY ASC(?name)`;
   return await axiosQuery(query);
 }
 
@@ -785,7 +785,7 @@ async function getNationality(name, limit) {
         OPTIONAL  {?writer dbo:thumbnail ?image.}
         ?writer dbp:nationality ?nationality.
             FILTER(lang(?nationality) = "en")
-            FILTER (regex(?nationality, "fr", "i"))
+            FILTER (regex(?nationality, "${name}", "i"))
     
         } ORDER BY ASC(?name) OFFSET ${limit}`;
   return await axiosQuery(query);
@@ -915,22 +915,29 @@ export async function getBookSearch(name) {
       // Comparaison par nom de l'auteur
       // a est supérieur à b si son titre contiens le mot dans la recherche et que b non
       if (
-        a.authorNames?.value.includes(name) &&
-        !b.authorNames?.value.includes(name)
+        a.authorNames?.value.toUpperCase().includes(name.toUpperCase()) &&
+        !b.authorNames?.value.toUpperCase().includes(name.toUpperCase())
       )
         return 1;
       // b est supérieur à a si son titre contiens le mot dans la recherche et que a non
       if (
-        !a.authorNames?.value.includes(name) &&
-        b.authorNames?.value.includes(name)
+        !a.authorNames?.value.toUpperCase().includes(name.toUpperCase()) &&
+        b.authorNames?.value.toUpperCase().includes(name.toUpperCase())
       )
         return -1;
 
       // Comparaison par titre du livre
       // a est supérieur à b si son titre contiens le mot dans la recherche et que b non
-      if (a.name.value.includes(name) && !b.name.value.includes(name)) return 1;
+      if (
+        a.name.value.toUpperCase().includes(name.toUpperCase()) &&
+        !b.name.value.includes(name.toUpperCase())
+      )
+        return 1;
       // b est supérieur à a si son titre contiens le mot dans la recherche et que a non
-      if (!a.name.value.includes(name) && b.name.value.includes(name))
+      if (
+        !a.name.value.toUpperCase().includes(name.toUpperCase()) &&
+        b.name.value.toUpperCase().includes(name.toUpperCase())
+      )
         return -1;
 
       return 0;
@@ -947,20 +954,34 @@ export async function getAuthorSearch(name) {
     getNationality(name, 200).then((result) => {
       result.forEach(resultSet.add, resultSet);
     }),
-    getOccupation(name, 100).then((result) => {
-      result.forEach(resultSet.add, resultSet);
-    }),
-    getAuthorGenre(name, 200).then((result) => {
-      result.forEach(resultSet.add, resultSet);
-    }),
-    getAuthorSubject(name, 200).then((result) => {
-      result.forEach(resultSet.add, resultSet);
-    }),
-    getMovement(name, 200).then((result) => {
-      result.forEach(resultSet.add, resultSet);
-    }),
+    // getOccupation(name, 100).then((result) => {
+    //   result.forEach(resultSet.add, resultSet);
+    // }),
+    // getAuthorGenre(name, 200).then((result) => {
+    //   result.forEach(resultSet.add, resultSet);
+    // }),
+    // getAuthorSubject(name, 200).then((result) => {
+    //   result.forEach(resultSet.add, resultSet);
+    // }),
+    // getMovement(name, 200).then((result) => {
+    //   result.forEach(resultSet.add, resultSet);
+    // }),
   ]).then(() => {
-    return Array.from(resultSet);
+    return Array.from(resultSet).sort(function (a, b) {
+      /**
+       * Criteres de comparaisons pour l'ordre des résultats:
+       * 1. Le titre du livre contiens la chaine de characacteres `name` dans la recherche
+       */
+
+      // Comparaison par titre du livre
+      // a est supérieur à b si son titre contiens le mot dans la recherche et que b non
+      if (a.name.value.includes(name) && !b.name.value.includes(name)) return 1;
+      // b est supérieur à a si son titre contiens le mot dans la recherche et que a non
+      if (!a.name.value.includes(name) && b.name.value.includes(name))
+        return -1;
+
+      return 0;
+    });
   });
 }
 
