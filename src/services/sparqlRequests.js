@@ -325,7 +325,7 @@ export async function fetchAssociatedMusics(name, author) {
   name = encodeResource(name);
   author = encodeResource(author);
   let query = [
-    `SELECT DISTINCT ?uri  (STR(?label)) as  ?music ?artist
+    `SELECT DISTINCT ?uri  (STR(?label)) as  ?music ?artist ?artistName
     WHERE{
        {
          ?uri a dbo:Song .
@@ -337,7 +337,8 @@ export async function fetchAssociatedMusics(name, author) {
        ?uri dbo:abstract ?abstract;
        dbo:artist ?artist;
        rdfs:label ?label.
-       Filter(( lang(?label)="en" and lang(?abstract)="en" ) and (regex(?abstract,"${name}","i")) )
+       ?artist rdfs:label ?artistName
+       Filter(( lang(?label)="en" and lang(?abstract)="en" and lang(?artistName)="en" ) and (regex(?abstract,"${name}","i")) )
       }`,
   ].join("");
   return await axiosQuery(query);

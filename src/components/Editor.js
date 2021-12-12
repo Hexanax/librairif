@@ -178,7 +178,7 @@ const Editor = () => {
                     </div>
                     <div>
                         <h2> Published Books</h2>
-                        <div className={"otherBooksWrapper"}>
+                        <div className={"otherResourceWrapper"}>
                             {editorBooks.map((obj, index) => {
                                 const bookData = {
                                     title: obj.name?.value,
