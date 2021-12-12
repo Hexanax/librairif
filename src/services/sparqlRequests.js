@@ -220,15 +220,18 @@ export async function fetchAssociatedMovies(name, author) {
   name = encodeResource(name);
   author = encodeResource(author);
   let query = [
-    `SELECT DISTINCT(STR(?label)) as ?movie ?uri ?runtime
+    `SELECT DISTINCT(STR(?label)) as ?movie ?uri ?runtime ?thumbnail
     (GROUP_CONCAT(DISTINCT ?producer; SEPARATOR=", ") AS ?producers)
+    (GROUP_CONCAT(DISTINCT ?producerName; SEPARATOR=", ") AS ?producersName)
     WHERE{
       ?uri rdf:type dbo:Film;
       dbo:abstract ?abstract;
       dbo:producer ?producer;
       dbo:runtime ?runtime;
       rdfs:label ?label.
-      Filter(( lang(?label)="en" and lang(?abstract)="en" ) and (regex(?abstract,"${name}","i")) and (regex(?abstract,"${author}","i")))
+      ?producer foaf:name ?producerName
+      OPTIONAL{?uri dbo:thumbnail ?thumbnail}
+      Filter(( lang(?label)="en" and lang(?abstract)="en" and lang(?producerName)="en" ) and (regex(?abstract,"${name}","i")) and (regex(?abstract,"${author}","i")))
     }`,
   ].join("");
   //console.log(query);
@@ -245,7 +248,7 @@ export async function fetchAssociatedMusicals(name, author) {
   name = encodeResource(name);
   author = encodeResource(author);
   let query = [
-    `SELECT DISTINCT(STR(?label)) as ?musical ?uri ?author ?lyric ?music
+    `SELECT DISTINCT(STR(?label)) as ?musical ?uri ?author ?authorName ?lyric ?lyricistName ?music ?composerName
          WHERE{
             ?uri rdf:type dbo:Musical;
             dbo:abstract ?abstract;
@@ -253,7 +256,10 @@ export async function fetchAssociatedMusicals(name, author) {
             dbo:lyrics ?lyric; 
             dbo:musicBy ?music;
             rdfs:label ?label.
-            Filter(( lang(?label)="en" and lang(?abstract)="en" ) and (regex(?abstract,"${name}","i")) and (regex(?abstract,"${author}","i")))
+            ?author rdfs:label ?authorName.
+            ?music rdfs:label ?composerName.
+            ?lyric rdfs:label ?lyricistName.
+            Filter(( lang(?label)="en" and lang(?abstract)="en" and lang(?authorName)="en" and lang(?lyricistName)="en" and lang(?composerName)="en" ) and (regex(?abstract,"${name}","i")) and (regex(?abstract,"${author}","i")))
         }
         GROUP BY ?musical ?uri ORDER BY ASC(?musical)`,
   ].join("");
