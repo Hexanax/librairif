@@ -94,13 +94,19 @@ export async function fetchEditorInfo(editorName) {
     (GROUP_CONCAT(DISTINCT ?imageUrl;   SEPARATOR=", ") AS ?imageURL)
     (GROUP_CONCAT(DISTINCT ?founder;   SEPARATOR=", ") AS ?founders)
     (GROUP_CONCAT(DISTINCT ?homepage;    SEPARATOR=", ") AS ?homepages)
-    (GROUP_CONCAT(DISTINCT ?country; SEPARATOR=", ") AS ?countries) WHERE {
+    (GROUP_CONCAT(DISTINCT ?country; SEPARATOR=", ") AS ?countries)
+    (GROUP_CONCAT(DISTINCT ?relatedEditor; SEPARATOR=", ") AS ?relatedEditors) WHERE {
       ${editorRsrc} rdfs:label ?label;
       dbo:abstract ?abstract.
       OPTIONAL{${editorRsrc} dbo:founder ?founder}
       OPTIONAL{${editorRsrc} dbo:thumbnail ?imageUrl.}
       OPTIONAL{${editorRsrc} dbo:foundingYear | dbp:founded ?year}
       OPTIONAL{${editorRsrc} foaf:homepage ?homepage}
+      OPTIONAL{
+        ?relatedEditor a dbo:Publisher;
+        dbp:country | dbp:country / foaf:name | dbo:country / foaf:name ?countryRel.
+        FILTER(?countryRel = ?country)
+      }
       OPTIONAL{${editorRsrc} dbp:country /foaf:name | dbp:country | dbo:country /foaf:name   ?country}
       FILTER(lang(?abstract) = "en").
       FILTER(lang(?label) = "en").
@@ -143,10 +149,10 @@ export async function fetchRelatedEditors(resourceURI) {
           ?publisher a dbo:Publisher;
           dbp:country | dbp:country / foaf:name | dbo:country / foaf:name ?countryAns.
           FILTER(?countryAns = ?countryReq)
-        
-        }`,
+        }LIMIT 10`,
   ].join("");
   const response = await axiosQuery(query);
+  console.log(response);
   const shuffled = response.sort(() => 0.5 - Math.random());
   let selected = shuffled.slice(0, 5);
   //console.log(selected);
@@ -321,7 +327,7 @@ export async function fetchAssociatedMusics(name, author) {
        ?uri dbo:abstract ?abstract;
        dbo:artist ?artist;
        rdfs:label ?label.
-       Filter(( lang(?label)="en" and lang(?abstract)="en" ) and (regex(?abstract,"${name}","i")) )
+       Filter(( lang(?label)="en" and lang(?abstract)="en" ) and (regex(?abstract,"${name}","i")) and (regex(?abstract,"${author}","i")) )
       }
        GROUP BY ?uri `,
   ].join("");
