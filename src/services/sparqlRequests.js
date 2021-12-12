@@ -196,14 +196,15 @@ export async function fetchAssociatedGames(name, author) {
   name = encodeResource(name);
   author = encodeResource(author);
   let query = [
-    `SELECT DISTINCT(STR(?label)) as ?game ?uri ?date ?developer
+    `SELECT DISTINCT(STR(?label)) as ?game ?uri ?date ?developer ?developerName
     WHERE{
         ?uri rdf:type dbo:VideoGame; 
         dbo:abstract ?abstract;
         dbo:releaseDate ?date;
         dbo:developer ?developer;
         rdfs:label ?label.
-        Filter(( lang(?label)="en" and lang(?abstract)="en" ) and (regex(?abstract,"${name}","i")) and (regex(?abstract,"${author}","i")))}
+        ?developer foaf:name ?developerName
+        Filter(( lang(?label)="en" and lang(?abstract)="en" and lang(?developerName)="en" ) and (regex(?abstract,"${name}","i")) and (regex(?abstract,"${author}","i")))}
     GROUP BY ?game ?uri ?date ORDER BY ASC(?date) ASC(?game)`,
   ].join("");
   return await axiosQuery(query);
