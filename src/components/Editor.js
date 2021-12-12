@@ -7,7 +7,7 @@ import Box from "@mui/material/Box";
 import BookResult from "./BookResult";
 import * as React from "react";
 import {useNavigate} from "react-router-dom";
-import {CircularProgress, Typography} from "@mui/material";
+import {CircularProgress, Link, Typography} from "@mui/material";
 import IconButton from "@mui/material/IconButton";
 import ArrowBackRounded from "@bit/mui-org.material-ui-icons.arrow-back-rounded";
 
@@ -197,6 +197,32 @@ const Editor = () => {
                             }
                         </div>
                     </div>
+                    { editorInfo.countries !== null && !error &&
+
+                    
+                    <div>
+                        <h2> More Editors From {editorInfo.countries?.value.split(",")[0]}</h2>
+                        <div className={"relatedEditors"}>
+                            {relatedEditors.map((obj, index) => {
+                                const editorsData = {
+                                    name: obj.publisher?.value.split("http://dbpedia.org/resource/")[1],
+                                };
+                                return (
+                                    <div>
+                                        <span className={"editor"}>
+                                            { (
+                                                <a href={`../../editorInfo/${editorsData.name}`}>
+                                                    {" "}
+                                                    {editorsData.name}
+                                                </a>
+                                            )}
+                                        </span>
+                                    </div>
+                                );
+                            })
+                            }
+                        </div>
+                    </div>}
 
                 </div>}
             </div>
