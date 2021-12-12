@@ -106,16 +106,24 @@ export default function SearchPage() {
   const handleChange = async (event, newValue) => {
     event.preventDefault();
     setIsLoading(true);
+    let queryText=""
     if (newValue.name === undefined) {
       setValue(newValue);
       setInputValue(newValue);
-      const response = await getBookSearch(newValue);
-      setSearchResults(response);
+      queryText = newValue;
     } else {
       setValue(newValue.name.value);
       setInputValue(newValue.name.value);
-      const response = await getBookSearch(newValue.name.value);
-      setSearchResults(response);
+      queryText = newValue.name.value;
+    }
+    if (searchType === "Book") {
+      const bookResponse = await getBookSearch(queryText);
+      setSearchResults(bookResponse);
+      setViewableResults(bookResponse.slice(0, 50));
+    } else if (searchType === "Author") {
+      const authorResponse = await getAuthorSearch(queryText);
+      setSearchResults(authorResponse);
+      setViewableResults(authorResponse.slice(0, 50));
     }
     setIsLoading(false);
   };
