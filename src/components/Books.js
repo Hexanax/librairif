@@ -370,7 +370,7 @@ const Books = () => {
                                         <>
                                             <div className={"relatedWrapper"}>
                                                 <h3>From the same author</h3>
-                                                <div className={"otherBooksWrapper"}>
+                                                <div className={"otherResourceWrapper"}>
                                                     {sameAuthorBooks.map((obj, index) => {
                                                         const bookData = {
                                                             title: obj.name?.value,
@@ -400,7 +400,7 @@ const Books = () => {
                                     {sameGenreBooks.length !== 0 && (
                                         <div className={"relatedWrapper"}>
                                             <h3>From the same genre</h3>
-                                            <div className={"otherBooksWrapper"}>
+                                            <div className={"otherResourceWrapper"}>
                                                 {sameGenreBooks.map((obj, index) => {
                                                     const bookData = {
                                                         title: obj.name?.value,
@@ -429,42 +429,107 @@ const Books = () => {
                                     {associatedGames !== null && associatedGames.length !== 0 && (
                                         <div className={"relatedWrapper"}>
                                             <h3>Related games</h3>
-                                            {associatedGames.map((game) => (
-                                                <CardResult onClick={() => {
-                                                    window.open(`https://www.google.com/search?q=${game.game.value}+game`)
-                                                }}
-                                                            title={game.game.value}
-                                                            secondaryTitle={`Developed by ${game.developerName.value} released in ${game.date.value}`}/>
-                                            ))}
+                                            <div className={"otherResourceWrapper"}>
+                                                {associatedGames.map((game) => (
+                                                    <div className={"cardWrapper"}>
+                                                        <CardResult onClick={() => {
+                                                            window.open(`https://www.google.com/search?q=${game.game.value}+game`)
+                                                        }}
+                                                                    title={game.game.value}
+                                                                    secondaryTitle={`Developed by ${game.developerName.value} released in ${game.date.value}`}/>
+                                                    </div>
+                                                ))}
+                                            </div>
                                         </div>
                                     )}
                                     {associatedMovies !== null && associatedMovies.length !== 0 && (
                                         <div className={"relatedWrapper"}>
                                             <h3>Related movies</h3>
-                                            {associatedMovies.map((movie) => (
-                                                <CardResult onClick={() => {
-                                                    window.open(`https://www.google.com/search?q=${movie.movie.value}+movie`)
-                                                }}
-                                                            title={movie.movie.value}
-                                                            secondaryTitle={`Produced by ${movie.producersName.value} lasting ${convertSecondsToHoursMinutesSeconds(movie.runtime.value)}`}
-                                                            img={movie.thumbnail !== undefined ? movie.thumbnail.value : undefined}
-                                                />
-                                            ))}
+                                            <div className={"otherResourceWrapper"}>
+                                                {associatedMovies.map((movie) => (
+                                                    <div className={"cardWrapper"}>
+                                                        <CardResult onClick={() => {
+                                                            window.open(`https://www.google.com/search?q=${movie.movie.value}+movie`)
+                                                        }}
+                                                                    title={movie.movie.value}
+                                                                    secondaryTitle={`Produced by ${movie.producersName.value} lasting ${convertSecondsToHoursMinutesSeconds(movie.runtime.value)}`}
+                                                                    img={movie.thumbnail !== undefined ? movie.thumbnail.value : undefined}
+                                                        />
+                                                    </div>
+                                                ))}
+                                            </div>
                                         </div>
                                     )}
-
                                     {associatedMusicals !== null && associatedMusicals.length !== 0 && (
                                         <div className={"relatedWrapper"}>
                                             <h3>Related musicals</h3>
-                                            {associatedMusicals.map((musical) => (
-                                                <CardResult onClick={() => {
-                                                    window.open(`https://www.google.com/search?q=${"musical.musical.value"}+musical`)
-                                                }}
-                                                            title={musical.musical.value}
-                                                            secondaryTitle={`Authored by ${musical.authorName.value}, lyrics by ${musical.lyricistName.value} and music composed by ${musical.composerName.value}`}
-                                                            img={""}
-                                                />
-                                            ))}
+                                            <div className={"otherResourceWrapper"}>
+                                                {associatedMusicals.map((musical) => (
+                                                    <div className={"cardWrapper"}>
+                                                        <CardResult onClick={() => {
+                                                            window.open(`https://www.google.com/search?q=${musical.musical.value}+musical`)
+                                                        }}
+                                                                    title={musical.musical.value}
+                                                                    secondaryTitle={`Authored by ${musical.authorName.value}, lyrics by ${musical.lyricistName.value} and music composed by ${musical.composerName.value}`}
+                                                                    img={""}
+                                                        />
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+                                    {associatedTVShows !== null && associatedTVShows.length !== 0 && (
+                                        <div className={"relatedWrapper"}>
+                                            <h3>Related TV shows</h3>
+                                            <div className={"otherResourceWrapper"}>
+                                                {associatedTVShows.map((tvShow) => (
+                                                    <div className={"cardWrapper"}>
+                                                        <CardResult onClick={() => {
+                                                            window.open(`https://www.google.com/search?q=${tvShow.serie.value}+TV+show`)
+                                                        }}
+                                                                    title={`${tvShow.serie.value} - ${tvShow.season.value} Season(s)`}
+                                                                    secondaryTitle={`Written by ${tvShow.writer.value} and music composed by ${tvShow.composerName.value}`}
+                                                                    img={""}
+                                                        />
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+                                    {associatedArts !== null && associatedArts.length !== 0 && (
+                                        <div className={"relatedWrapper"}>
+                                            <h3>Related arts</h3>
+                                            <div className={"otherResourceWrapper"}>
+                                                {associatedArts.map((tvShow) => (
+                                                    <div className={"cardWrapper"}>
+                                                        <CardResult onClick={() => {
+                                                            window.open(`https://www.google.com/search?q=${tvShow.serie.value}+TV+show`)
+                                                        }}
+                                                                    title={`${tvShow.serie.value} - ${tvShow.season.value} Season(s)`}
+                                                                    secondaryTitle={`Written by ${tvShow.writer.value} and music composed by ${tvShow.composerName.value}`}
+                                                                    img={""}
+                                                        />
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+                                    {associatedMusics !== null && associatedMusics.length !== 0 && (
+                                        <div className={"relatedWrapper"}>
+                                            <h3>Related musics</h3>
+                                            <div className={"otherResourceWrapper"}>
+                                                {associatedMusics.map((music) => (
+                                                    <div className={"cardWrapper"}>
+                                                        <CardResult onClick={() => {
+                                                            window.open(`https://www.google.com/search?q=${music.music.value}+music`)
+                                                        }}
+                                                                    title={`${music.music.value}`}
+                                                                    secondaryTitle={`Artist : ${music.artistName.value}`}
+                                                                    img={""}
+                                                        />
+                                                    </div>
+                                                ))}
+                                            </div>
                                         </div>
                                     )}
                                 </div>
