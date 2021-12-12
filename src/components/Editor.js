@@ -56,7 +56,6 @@ const Editor = () => {
 
         const loadRelatedEditors = async () => {
             const response = await fetchRelatedEditors(editorURI);
-            console.log(`relatedEditors -> ${response}`);
             setRelatedEditors(response);
         }
         loadRelatedEditors();
@@ -92,125 +91,114 @@ const Editor = () => {
                             >
                                 <ArrowBackRounded fontSize="inherit"/>
                             </IconButton>
-                        </div>
+                    </div>
                     <div className={"nameWrapper"}>
                         <h1 className={"editorName"}>
                             {editorInfo.label.value}
                         </h1>
-                        <div className={"mainContent"}>
-                            <div className={"abstractWrapper"}>
-                                <h2>Abstract</h2>
-                                {editorInfo.abstract?.value}
-                            </div>
-                            <div className={"imageWrapper"}>
-                                {editorInfo.imageURL ?
-                                    <img src={editorInfo.imageURL.value}/> :
-                                    <Box
-                                        sx={{
-                                            pt: 8,
-                                            pr: 2,
-                                            pl: 1,
-                                            borderRadius: 2,
-                                            backgroundColor: "#2F2F2F",
-                                            height: 2 / 3,
-                                            width: "100%",
-                                            filter: "drop-shadow(0px 0px 10px rgba(0, 0, 0, 0.25))",
-                                            display: "flex",
-                                            flexDirection: "column",
-                                            alignItems: "center",
-                                            textAlign: "center",
-                                        }}
+                    </div>
+                    <div className={"mainContent"}>
+                        <div className={"abstractWrapper"}>
+                            <h2>Abstract</h2>
+                            {editorInfo.abstract?.value}
+                        </div>
+                        
+                        <div className={"imageWrapper"}>
+                            {editorInfo.imageURL ?
+                                <img src={editorInfo.imageURL.value}/> :
+                                <Box
+                                    sx={{
+                                        pt: 8,
+                                        pr: 2,
+                                        pl: 1,
+                                        borderRadius: 2,
+                                        backgroundColor: "#2F2F2F",
+                                        height: 2 / 3,
+                                        width: "100%",
+                                        filter: "drop-shadow(0px 0px 10px rgba(0, 0, 0, 0.25))",
+                                        display: "flex",
+                                        flexDirection: "column",
+                                        alignItems: "center",
+                                        textAlign: "center",
+                                    }}
+                                >
+                                    <Typography
+                                        gutterBottom
+                                        variant="h5"
+                                        component="div"
+                                        color="primary.contrastText"
                                     >
-                                        <Typography
-                                            gutterBottom
-                                            variant="h5"
-                                            component="div"
-                                            color="primary.contrastText"
-                                        >
-                                                {editorInfo.label.value}
-                                        </Typography>
-                                            
-                                        </Box>}
-                                </div>
-                            </div>
-                            <h2>Info</h2>
-                                <div className={"infoWrapper"}>
-                                {editorInfo.countries.value !== "" ?
-                                        <>
-                                            <div className={"valueWrapper"}>
-                                                <span>Country</span>
-                                            
-                                            </div>
-                                            <span className={"value"}>
-                                                    {editorInfo.countries?.value.split(",")[0]}
-                                            </span>
-                                        </>
-                                        : null}
+                                            {editorInfo.label.value}
+                                    </Typography>
                                         
-                                    {editorInfo.foundation.value !== "" ?
-                                        <>                            
-                                            <div className={"valueWrapper"}>
-                                                <span>Founded</span>
-                                                
-                                            </div>     
-                                            <span className={"valueWrapper"}>
-                                                    {editorInfo.foundation?.value.split(",")[0]}
-                                            </span>                                   
-                                        </>
-                                        : null}
-                                    
-                                    
-                                    {editorInfo.founders.value !== "" ?
-                                        <>
-                                        <div className={"valueWrapper"}>
-                                                <span>Founders</span>
-                                            </div>
-                                            <div>
-                                                    {editorInfo.founders?.value.split(",").map(founder => <span className="founder">{founder.split("http://dbpedia.org/resource/")[1]} </span>)}
-                                            </div>
-                                        </>
-                                        : null}                     
-                                    
-                                    
-                                </div>
+                                </Box>}
+                        </div>
+                        
+                    </div>
+                    <h2>Info</h2>
+                    <div className={"infoWrapper"}>
                             
-                            <div>
-                                <h2> Published Books</h2>
-                                <div className={"otherBooksWrapper"}>
-                                    {editorBooks.map((obj, index) => {
-                                        const bookData = {
-                                            title: obj.name?.value,
-                                            author: obj.authorNames?.value,
-                                            img: obj.imageUrl?.value,
-                                            releaseDate: obj.releaseDate?.value,
-                                            bookURI: obj.book?.value.split("http://dbpedia.org/resource/")[1],
-                                        };
-                                        return (
-                                            <div className={"cardWrapper"}>
-                                                <BookResult key={index} index={index} data={bookData}
-                                                            navigate={navigate}/>
-                                            </div>
-                                        );
-                                    })
-                                    }
-                                </div>
-
-                                <div>
-                                    <h2> From the same country</h2>
-                                    <div className={"sameCountryEditors"}>
-                                        {relatedEditors.map( editor => {
-                                            <span className={"value"}>
-                                                {editor.publisher}         
-                                            </span>
+                            {editorInfo.countries.value !== "" ?
+                                    <>
+                                        <div className={"valueWrapper"}>
+                                            <span>Country</span>
                                         
-                                        })
-                                        }
+                                        </div>
+                                        <span className={"value"}>
+                                                {editorInfo.countries?.value.split(",")[0]}
+                                        </span>
+                                    </>
+                                    : null}
+                                    
+                                {editorInfo.foundation.value !== "" ?
+                                    <>                            
+                                        <div className={"valueWrapper"}>
+                                            <span>Founded</span>
+                                            
+                                        </div>     
+                                        <span className={"valueWrapper"}>
+                                                {editorInfo.foundation?.value.split(",")[0]}
+                                        </span>                                   
+                                    </>
+                                    : null}
+                                
+                                
+                                {editorInfo.founders.value !== "" ?
+                                    <>
+                                    <div className={"valueWrapper"}>
+                                            <span>Founders</span>
+                                        </div>
+                                        <div>
+                                                {editorInfo.founders?.value.split(",").map(founder => <span className="founder">{founder.split("http://dbpedia.org/resource/")[1]} </span>)}
+                                        </div>
+                                    </>
+                                    : null}                     
+                                    
+                                    
+                    </div>
+                    <div>
+                        <h2> Published Books</h2>
+                        <div className={"otherBooksWrapper"}>
+                            {editorBooks.map((obj, index) => {
+                                const bookData = {
+                                    title: obj.name?.value,
+                                    author: obj.authorNames?.value,
+                                    img: obj.imageUrl?.value,
+                                    releaseDate: obj.releaseDate?.value,
+                                    bookURI: obj.book?.value.split("http://dbpedia.org/resource/")[1],
+                                };
+                                return (
+                                    <div className={"cardWrapper"}>
+                                        <BookResult key={index} index={index} data={bookData}
+                                                    navigate={navigate}/>
                                     </div>
-                                </div>
-                            </div>
+                                );
+                            })
+                            }
                         </div>
                     </div>
-                    }
+
+                </div>}
             </div>
         )
     }
