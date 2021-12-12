@@ -310,6 +310,14 @@ export async function fetchAssociatedMusics(name, author) {
   return await axiosQuery(query);
 }
 
+
+/**
+ * Returns from DBPedia the general information of an author : his name, description, image,
+ * birth and death dates, and a list of his genres and awards
+ * These information are to be displayed on an author's page 
+ * @param {String} authorURI 
+ * @returns the general information of an author
+ */
 export async function queryAuthor(authorURI) {
   authorURI = encodeResource(authorURI);
   let author = `dbr:${authorURI}`;
@@ -427,6 +435,12 @@ export async function fetchBookAssociatedToAuthor(authorURI) {
   return response;
 }
 
+
+/**
+ * Returns from DBPedia  the information needed for the author's timeline, i.e. his notable works like books and their release dates 
+ * @param {String} resourceURI 
+ * @returns list of notable works and their release dates 
+ */
 export async function getAuthorTimeLife(resourceURI) {
   resourceURI = encodeResource(resourceURI);
   const currentAuthor = `dbr:${resourceURI}`;
