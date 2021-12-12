@@ -220,14 +220,17 @@ export async function fetchAssociatedMovies(name, author) {
   name = encodeResource(name);
   author = encodeResource(author);
   let query = [
-    `SELECT DISTINCT(STR(?label)) as ?movie ?uri ?runtime
+    `SELECT DISTINCT(STR(?label)) as ?movie ?uri ?runtime ?thumbnail
     (GROUP_CONCAT(DISTINCT ?producer; SEPARATOR=", ") AS ?producers)
+    (GROUP_CONCAT(DISTINCT ?producerName; SEPARATOR=", ") AS ?producersName)
     WHERE{
       ?uri rdf:type dbo:Film;
       dbo:abstract ?abstract;
       dbo:producer ?producer;
       dbo:runtime ?runtime;
       rdfs:label ?label.
+      ?producer foaf:name ?producerName
+      OPTIONAL{?uri dbo:thumbnail ?thumbnail}
       Filter(( lang(?label)="en" and lang(?abstract)="en" ) and (regex(?abstract,"${name}","i")) and (regex(?abstract,"${author}","i")))
     }`,
   ].join("");
