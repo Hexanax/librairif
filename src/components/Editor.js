@@ -8,6 +8,8 @@ import BookResult from "./BookResult";
 import * as React from "react";
 import {useNavigate} from "react-router-dom";
 import {CircularProgress, Typography} from "@mui/material";
+import IconButton from "@mui/material/IconButton";
+import ArrowBackRounded from "@bit/mui-org.material-ui-icons.arrow-back-rounded";
 
 
 
@@ -68,8 +70,16 @@ const Editor = () => {
 
                 <div className={"editorContainer"}>
                     <div className={"historyBack"}>
-
-                    </div>
+                            <IconButton
+                                onClick={() => {
+                                    navigate(-1);
+                                }}
+                                aria-label="delete"
+                                size="large"
+                            >
+                                <ArrowBackRounded fontSize="inherit"/>
+                            </IconButton>
+                        </div>
                     <div className={"nameWrapper"}>
                         <h1 className={"editorName"}>
                             {editorInfo.label.value}
