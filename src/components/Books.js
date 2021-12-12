@@ -452,6 +452,21 @@ const Books = () => {
                                             ))}
                                         </div>
                                     )}
+
+                                    {associatedMusicals !== null && associatedMusicals.length !== 0 && (
+                                        <div className={"relatedWrapper"}>
+                                            <h3>Related musicals</h3>
+                                            {associatedMusicals.map((musical) => (
+                                                <CardResult onClick={() => {
+                                                    window.open(`https://www.google.com/search?q=${"musical.musical.value"}+musical`)
+                                                }}
+                                                            title={musical.musical.value}
+                                                            secondaryTitle={`Authored by ${musical.authorName.value}, lyrics by ${musical.lyricistName.value} and music composed by ${musical.composerName.value}`}
+                                                            img={""}
+                                                />
+                                            ))}
+                                        </div>
+                                    )}
                                 </div>
                             )}
                             {!errorSupp && isLoadingSupp && (
