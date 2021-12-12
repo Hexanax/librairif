@@ -276,14 +276,16 @@ export async function fetchAssociatedTVShow(name, author) {
   name = encodeResource(name);
   author = encodeResource(author);
   let query = [
-    `SELECT DISTINCT(STR(?label)) as ?serie ?uri ?composer ?season
+    `SELECT DISTINCT(STR(?label)) as ?serie ?uri ?writer ?authorName ?composer ?composerName ?season
          WHERE{
             ?uri rdf:type dbo:TelevisionShow;
             dbo:abstract ?abstract;
             dbo:composer ?composer;
             dbo:numberOfSeasons ?season;
             rdfs:label ?label.
-            Filter(( lang(?label)="en" and lang(?abstract)="en" ) and (regex(?abstract,"${name}","i")) and (regex(?abstract,"${author}","i")))
+            ?composer rdfs:label ?composerName.
+            OPTIONAL{?uri dbp:writer ?writer.}
+            Filter(( lang(?label)="en" and lang(?abstract)="en" and lang(?composerName)="en" and lang(?writer)="en" ) and (regex(?abstract,"${name}","i")) and (regex(?abstract,"${author}","i")))
         }
         ORDER BY ASC(?serie)`,
   ].join("");

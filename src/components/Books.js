@@ -452,16 +452,29 @@ const Books = () => {
                                             ))}
                                         </div>
                                     )}
-
                                     {associatedMusicals !== null && associatedMusicals.length !== 0 && (
                                         <div className={"relatedWrapper"}>
                                             <h3>Related musicals</h3>
                                             {associatedMusicals.map((musical) => (
                                                 <CardResult onClick={() => {
-                                                    window.open(`https://www.google.com/search?q=${"musical.musical.value"}+musical`)
+                                                    window.open(`https://www.google.com/search?q=${musical.musical.value}+musical`)
                                                 }}
                                                             title={musical.musical.value}
                                                             secondaryTitle={`Authored by ${musical.authorName.value}, lyrics by ${musical.lyricistName.value} and music composed by ${musical.composerName.value}`}
+                                                            img={""}
+                                                />
+                                            ))}
+                                        </div>
+                                    )}
+                                    {associatedTVShows !== null && associatedTVShows.length !== 0 && (
+                                        <div className={"relatedWrapper"}>
+                                            <h3>Related TV shows</h3>
+                                            {associatedTVShows.map((tvShow) => (
+                                                <CardResult onClick={() => {
+                                                    window.open(`https://www.google.com/search?q=${tvShow.serie.value}+TV+show`)
+                                                }}
+                                                            title={`${tvShow.serie.value} - ${tvShow.season.value} Season(s)`}
+                                                            secondaryTitle={`Written by ${tvShow.writer.value} and music composed by ${tvShow.composerName.value}`}
                                                             img={""}
                                                 />
                                             ))}
