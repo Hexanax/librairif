@@ -605,13 +605,12 @@ export async function researchQuery(name, limit) {
   (MAX(?releaseDate) AS ?releaseDate)
   (MAX(?imageURL) AS ?imageUrl)
       WHERE {
-          ?book a dbo:Book.
-          ?book dbp:name ?name.
-          ?book dbo:author ?author;
-          dbo:abstract ?abstract.
-          OPTIONAL {?book dbo:thumbnail ?imageURL.}
-          OPTIONAL {?book dbp:releaseDate ?releaseDate.}
-          ?author dbp:name ?authorName.
+          ?book a dbo:Book;
+            dbp:name ?name;
+            dbo:author / dbp:name ?authorName;
+            dbo:abstract ?abstract.
+            OPTIONAL {?book dbo:thumbnail ?imageURL.}
+            OPTIONAL {?book dbp:releaseDate ?releaseDate.}
           FILTER(lang(?name) = "en")
           FILTER(lang(?abstract) = "en")
           FILTER (regex(?name, "${name}", "i") || regex(?authorName, "${name}","i"))
@@ -626,20 +625,20 @@ async function getLiteraryGenre(name, limit) {
     (MAX(?releaseDate) AS ?releaseDate)
     (MAX(?imageURL) AS ?imageUrl)
         WHERE {
-         	?book a dbo:Book.
-	        ?book dbp:name ?name.
-	        ?book dbo:author ?author;
+         	?book a dbo:Book;
+	        dbp:name ?name;
+	        dbo:author / dbp:name ?authorName;
 	        dbo:abstract ?abstract.
 	        OPTIONAL {?book dbo:thumbnail ?imageURL.}
 	        OPTIONAL {?book dbp:releaseDate ?releaseDate.}
-	        ?author dbp:name ?authorName.
+
 	        FILTER(lang(?name) = "en")
 	        FILTER(lang(?abstract) = "en")
         {
-            ?book dbo:literaryGenre / rdfs:label | dbp:genre ?literaryGenreLabel.
-	    	FILTER(lang(?literaryGenreLabel) = "en")
-	    	FILTER(regex(?literaryGenreLabel, "${name}", "i"))
-     	}} ORDER BY ASC(?name) LIMIT ${limit}`;
+          ?book dbo:literaryGenre / rdfs:label | dbp:genre ?literaryGenreLabel.
+          FILTER(lang(?literaryGenreLabel) = "en" && regex(?literaryGenreLabel, "${name}", "i")
+        }
+      } ORDER BY ASC(?name) LIMIT ${limit}`;
   return await axiosQuery(query);
 }
 
@@ -675,22 +674,21 @@ async function getCountry(name, limit) {
     (MAX(?releaseDate) AS ?releaseDate)
     (MAX(?imageURL) AS ?imageUrl)
         WHERE {
-         	?book a dbo:Book.
-	        ?book dbp:name ?name.
-	        ?book dbo:author ?author;
-	        dbo:abstract ?abstract.
+         	?book a dbo:Book;
+            dbp:name ?name;
+	          dbo:author / dbp:name ?authorName;
+	          dbo:abstract ?abstract.
 	        OPTIONAL {?book dbo:thumbnail ?imageURL.}
 	        OPTIONAL {?book dbp:releaseDate ?releaseDate.}
-	        ?author dbp:name ?authorName.
 	        FILTER(lang(?name) = "en")
 	        FILTER(lang(?abstract) = "en")
-        {
-               ?book dbp:country ?country;
-	    	dbp:language ?language.
-	    	FILTER(lang(?country) = "en")
-	    	FILTER(lang(?language) = "en")
-	    	FILTER (regex(?country, "${name}", "i") || regex(?language, "${name}","i"))
-	   }
+          {
+            ?book dbp:country ?country;
+            dbp:language ?language.
+            FILTER(lang(?country) = "en")
+            FILTER(lang(?language) = "en")
+            FILTER (regex(?country, "${name}", "i") || regex(?language, "${name}","i"))
+          }
      	} ORDER BY ASC(?name) LIMIT ${limit}`;
   return await axiosQuery(query);
 }
@@ -704,19 +702,19 @@ async function getSubject(name, limit) {
         WHERE {
          	?book a dbo:Book.
 	        ?book dbp:name ?name.
-	        ?book dbo:author ?author;
+	        ?book dbo:author / dbp:name ?authorName;
 	        dbo:abstract ?abstract.
 	        OPTIONAL {?book dbo:thumbnail ?imageURL.}
 	        OPTIONAL {?book dbp:releaseDate ?releaseDate.}
-	        ?author dbp:name ?authorName.
+	        
 	        FILTER(lang(?name) = "en")
 	        FILTER(lang(?abstract) = "en")
-        {
-               ?book dbp:subject ?subject.
-	    	?subject rdfs:label ?subjectLabel.
-	    	FILTER(lang(?subjectLabel) = "en")
-	    	FILTER(regex(?subjectLabel, "${name}", "i"))
-	   }
+          {
+            ?book dbp:subject ?subject.
+            ?subject rdfs:label ?subjectLabel.
+            FILTER(lang(?subjectLabel) = "en")
+            FILTER(regex(?subjectLabel, "${name}", "i"))
+          }
      	} ORDER BY ASC(?name) LIMIT ${limit}`;
   return await axiosQuery(query);
 }
@@ -728,21 +726,21 @@ async function getHypernym(name, limit) {
     (MAX(?releaseDate) AS ?releaseDate)
     (MAX(?imageURL) AS ?imageUrl)
         WHERE {
-         	?book a dbo:Book.
-	        ?book dbp:name ?name.
-	        ?book dbo:author ?author;
-	        dbo:abstract ?abstract.
+         	?book a dbo:Book;
+            dbp:name ?name;
+            dbo:author / dbp:name ?authorName;
+            dbo:abstract ?abstract.
+
 	        OPTIONAL {?book dbo:thumbnail ?imageURL.}
 	        OPTIONAL {?book dbp:releaseDate ?releaseDate.}
-	        ?author dbp:name ?authorName.
+	        
 	        FILTER(lang(?name) = "en")
 	        FILTER(lang(?abstract) = "en")
-        {
-            ?book gold:hypernym ?hypernym.
-	    	?hypernym rdfs:label ?hypernymLabel.
-	    	FILTER(lang(?hypernymLabel) = "en")
-	    	FILTER(regex(?hypernymLabel, "${name}", "i"))
-	   }
+          {
+            ?book gold:hypernym / rdfs:label ?hypernymLabel.
+            FILTER(lang(?hypernymLabel) = "en")
+            FILTER(regex(?hypernymLabel, "${name}", "i"))
+          }
      	} ORDER BY ASC(?name) LIMIT ${limit}`;
   return await axiosQuery(query);
 }
@@ -751,8 +749,9 @@ export async function getAuthors(name) {
   const offset = 0;
   name = encodeResource(name);
   let query = `SELECT ?writer (MIN(?name) AS ?name) (MAX(?image) AS ?imageUrl) (MIN(?birthDate) AS ?birthDate) (MIN(?deathDate) AS ?deathDate) WHERE {
-    ?writer a dbo:Writer.
-    ?writer dbp:name ?name.
+    ?writer a dbo:Writer;
+    dbp:name ?name.
+
     OPTIONAL {?writer dbp:birthDate ?birthDate.}
     OPTIONAL {?writer dbp:deathDate ?deathDate.}
     OPTIONAL  {?writer dbo:thumbnail ?image.}
@@ -764,15 +763,16 @@ export async function getAuthors(name) {
 async function getNationality(name, limit) {
   name = encodeResource(name);
   let query = `SELECT ?writer (MIN(?name) AS ?name) (MAX(?image) AS ?imageUrl) (MIN(?birthDate) AS ?birthDate) (MIN(?deathDate) AS ?deathDate) WHERE {
-        ?writer a dbo:Writer.
-        ?writer dbp:name ?name.
+        ?writer a dbo:Writer;
+        dbp:name ?name;
+        dbp:nationality ?nationality.
         OPTIONAL {?writer dbp:birthDate ?birthDate.}
         OPTIONAL {?writer dbp:deathDate ?deathDate.}
         OPTIONAL  {?writer dbo:thumbnail ?image.}
-        ?writer dbp:nationality ?nationality.
-            FILTER(lang(?nationality) = "en")
-            FILTER (regex(?nationality, "${name}", "i"))
-    
+        
+        FILTER(lang(?nationality) = "en")
+        FILTER (regex(?nationality, "${name}", "i"))
+
         } ORDER BY ASC(?name) OFFSET ${limit}`;
   return await axiosQuery(query);
 }
