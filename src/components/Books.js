@@ -19,11 +19,8 @@ import Box from "@mui/material/Box";
 import IconButton from "@mui/material/IconButton";
 import ArrowBackRounded from "@bit/mui-org.material-ui-icons.arrow-back-rounded";
 import * as React from "react";
-import Game from "./Game";
-import Movie from "./Movie";
 import BookResult from "./BookResult";
 import {CircularProgress} from "@mui/material";
-import AuthorResult from "./AuthorResult";
 import CardResult from "./CardResult";
 
 const Books = () => {
@@ -39,7 +36,6 @@ const Books = () => {
     const [associatedMovies, setAssociatedMovies] = useState(null);
     const [associatedMusicals, setAssociatedMusicals] = useState(null);
     const [associatedTVShows, setAssociatedTVShows] = useState(null);
-    const [associatedArts, setAssociatedArts] = useState(null);
     const [associatedMusics, setAssociatedMusics] = useState(null);
 
     const [seriesOfBook, setSeriesOfBook] = useState(null);
@@ -360,6 +356,68 @@ const Books = () => {
                             )}
                             {!errorSupp && !isLoadingSupp && (
                                 <div>
+                                    {neighbors.length !== 0 && (
+                                        <>
+                                            <div className={"relatedWrapper"}>
+                                                <h3>Neighbor books</h3>
+                                                <div className={"otherResourceWrapper"}>
+                                                    {neighbors.map((obj, index) => {
+                                                        const bookData = {
+                                                            title: obj.name?.value,
+                                                            author: obj.authorNames?.value,
+                                                            img: obj.imageUrl?.value,
+                                                            releaseDate: obj.releaseDate?.value,
+                                                            bookURI: obj.book?.value.split(
+                                                                "http://dbpedia.org/resource/"
+                                                            )[1],
+                                                        };
+
+                                                        return (
+                                                            <div className={"cardWrapper"}>
+                                                                <BookResult
+                                                                    key={index}
+                                                                    index={index}
+                                                                    data={bookData}
+                                                                    navigate={navigate}
+                                                                />
+                                                            </div>
+                                                        );
+                                                    })}
+                                                </div>
+                                            </div>
+                                        </>
+                                    )}
+                                    {seriesOfBook.length !== 0 && (
+                                        <>
+                                            <div className={"relatedWrapper"}>
+                                                <h3>From the same series</h3>
+                                                <div className={"otherResourceWrapper"}>
+                                                    {seriesOfBook.map((obj, index) => {
+                                                        const bookData = {
+                                                            title: obj.name?.value,
+                                                            author: obj.authorNames?.value,
+                                                            img: obj.imageUrl?.value,
+                                                            releaseDate: obj.releaseDate?.value,
+                                                            bookURI: obj.book?.value.split(
+                                                                "http://dbpedia.org/resource/"
+                                                            )[1],
+                                                        };
+
+                                                        return (
+                                                            <div className={"cardWrapper"}>
+                                                                <BookResult
+                                                                    key={index}
+                                                                    index={index}
+                                                                    data={bookData}
+                                                                    navigate={navigate}
+                                                                />
+                                                            </div>
+                                                        );
+                                                    })}
+                                                </div>
+                                            </div>
+                                        </>
+                                    )}
                                     {sameAuthorBooks.length !== 0 && (
                                         <>
                                             <div className={"relatedWrapper"}>
