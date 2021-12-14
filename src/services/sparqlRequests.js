@@ -636,8 +636,7 @@ async function getLiteraryGenre(name, limit) {
 	        FILTER(lang(?name) = "en")
 	        FILTER(lang(?abstract) = "en")
         {
-            ?book dbo:literaryGenre ?literaryGenre.
-	    	?literaryGenre rdfs:label ?literaryGenreLabel.
+            ?book dbo:literaryGenre / rdfs:label | dbp:genre ?literaryGenreLabel.
 	    	FILTER(lang(?literaryGenreLabel) = "en")
 	    	FILTER(regex(?literaryGenreLabel, "${name}", "i"))
      	}} ORDER BY ASC(?name) LIMIT ${limit}`;
@@ -878,9 +877,6 @@ export async function getBookSearch(name) {
       result.forEach(resultSet.add, resultSet);
     }),
     getLiteraryGenre(name, 200).then((result) => {
-      result.forEach(resultSet.add, resultSet);
-    }),
-    getGenre(name, 200).then((result) => {
       result.forEach(resultSet.add, resultSet);
     }),
     getCountry(name, 100).then((result) => {
