@@ -29,7 +29,7 @@ export async function fetchBookInfo(resourceURI) {
             OPTIONAL{${book} dbo:thumbnail ?imageURL.}
             OPTIONAL{${book} dbo:literaryGenre ?genreURI.
             ?genreURI rdfs:label ?genre.
-            FILTER(lang(?genreURI)="en")}
+            FILTER(lang(?genre)="en")}
             OPTIONAL{${book} dbp:publisher ?publisherURI.
             ?publisherURI rdfs:label ?publisher.
             FILTER(lang(?publisher)="en")}
