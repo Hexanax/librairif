@@ -51,7 +51,7 @@ export async function fetchListInSeries(resourceURI) {
   const currentBook = `dbr:${resourceURI}`;
   let query = [
     `Select ?bookUri ?serie ?name ?imageURL WHERE {
-        ${currentBook} ^dbo:series ?serie.
+        ${currentBook} dbo:series ?serie.
         ?bookUri a dbo:Book;
         dbp:name ?name;
         dbo:series ?serie.
