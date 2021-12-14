@@ -4,7 +4,6 @@ import {
     fetchAssociatedMovies,
     fetchAssociatedMusicals,
     fetchAssociatedTVShow,
-    fetchAssociatedArts,
     fetchAssociatedMusics,
     fetchListInSeries,
     fetchBookNeighbor,
@@ -136,11 +135,6 @@ const Books = () => {
                     bookInfo.authorName
                 );
                 setAssociatedTVShows(tvShows);
-                const arts = await fetchAssociatedArts(
-                    bookInfo.name,
-                    bookInfo.authorName
-                );
-                setAssociatedArts(arts);
                 const musics = await fetchAssociatedMusics(
                     bookInfo.name,
                     bookInfo.authorName
@@ -150,7 +144,6 @@ const Books = () => {
                 console.log("Associated movies = " + JSON.stringify(movies))
                 console.log("Associated musicals = " + JSON.stringify(musicals))
                 console.log("Associated tv shows = " + JSON.stringify(tvShows))
-                console.log("Associated arts = " + JSON.stringify(arts))
                 console.log("Associated musics = " + JSON.stringify(musics))
             } catch (err) {
                 console.log(err);
@@ -483,24 +476,6 @@ const Books = () => {
                                             <h3>Related TV shows</h3>
                                             <div className={"otherResourceWrapper"}>
                                                 {associatedTVShows.map((tvShow) => (
-                                                    <div className={"cardWrapper"}>
-                                                        <CardResult onClick={() => {
-                                                            window.open(`https://www.google.com/search?q=${tvShow.serie.value}+TV+show`)
-                                                        }}
-                                                                    title={`${tvShow.serie.value} - ${tvShow.season.value} Season(s)`}
-                                                                    secondaryTitle={`Written by ${tvShow.writer.value} and music composed by ${tvShow.composerName.value}`}
-                                                                    img={""}
-                                                        />
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    )}
-                                    {associatedArts !== null && associatedArts.length !== 0 && (
-                                        <div className={"relatedWrapper"}>
-                                            <h3>Related arts</h3>
-                                            <div className={"otherResourceWrapper"}>
-                                                {associatedArts.map((tvShow) => (
                                                     <div className={"cardWrapper"}>
                                                         <CardResult onClick={() => {
                                                             window.open(`https://www.google.com/search?q=${tvShow.serie.value}+TV+show`)
