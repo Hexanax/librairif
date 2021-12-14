@@ -233,6 +233,8 @@ const Books = () => {
                                         <img src={bookInfo.imageURL}/>
                                     ) : (
                                         <Box
+                                            minWidth={"200px"}
+                                            minHeight={"300px"}
                                             sx={{
                                                 pt: 8,
                                                 pr: 2,
@@ -240,7 +242,6 @@ const Books = () => {
                                                 borderRadius: 2,
                                                 backgroundColor: "#2F2F2F",
                                                 height: 2 / 3,
-                                                width: "100%",
                                                 filter: "drop-shadow(0px 0px 10px rgba(0, 0, 0, 0.25))",
                                                 display: "flex",
                                                 flexDirection: "column",
