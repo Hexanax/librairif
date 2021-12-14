@@ -203,7 +203,7 @@ export async function fetchAssociatedGames(name, author) {
         dbo:releaseDate ?date;
         dbo:developer ?developer;
         rdfs:label ?label.
-        ?developer foaf:name ?developerName
+        ?developer rdfs:label ?developerName
         Filter(( lang(?label)="en" and lang(?abstract)="en" and lang(?developerName)="en" ) and (regex(?abstract,"${name}","i")) and (regex(?abstract,"${author}","i")))}
     GROUP BY ?game ?uri ?date ORDER BY ASC(?date) ASC(?game)`,
   ].join("");
@@ -229,7 +229,7 @@ export async function fetchAssociatedMovies(name, author) {
       dbo:producer ?producer;
       dbo:runtime ?runtime;
       rdfs:label ?label.
-      ?producer foaf:name ?producerName
+      ?producer rdfs:label ?producerName
       OPTIONAL{?uri dbo:thumbnail ?thumbnail}
       Filter(( lang(?label)="en" and lang(?abstract)="en" and lang(?producerName)="en" ) and (regex(?abstract,"${name}","i")) and (regex(?abstract,"${author}","i")))
     }`,
@@ -288,29 +288,6 @@ export async function fetchAssociatedTVShow(name, author) {
             Filter(( lang(?label)="en" and lang(?abstract)="en" and lang(?composerName)="en" and lang(?writer)="en" ) and (regex(?abstract,"${name}","i")) and (regex(?abstract,"${author}","i")))
         }
         ORDER BY ASC(?serie)`,
-  ].join("");
-  return await axiosQuery(query);
-}
-
-/**
- * Allows to get the list of arts based on the book
- * @param {String} name the name of the current book
- * @param {String} author the author of the current book
- * @returns
- */
-export async function fetchAssociatedArts(name, author) {
-  name = encodeResource(name);
-  author = encodeResource(author);
-  let query = [
-    `select DISTINCT(STR(?label)) as ?art ?uri ?image ?artist WHERE{
-        ?uri rdf:type dbo:Artwork;
-        dbo:abstract ?abstract;
-        dbo:artist ?artist;
-        dbo:thumbnail ?image;
-        rdfs:label ?label.
-        Filter(( lang(?label)="en" and lang(?abstract)="en" ) and (regex(?abstract,"${name}","i")) and (regex(?abstract,"${author}","i")))
-        }
-        GROUP BY ?art ?uri ?image ORDER BY ASC(?art)`,
   ].join("");
   return await axiosQuery(query);
 }
@@ -659,8 +636,7 @@ async function getLiteraryGenre(name, limit) {
 	        FILTER(lang(?name) = "en")
 	        FILTER(lang(?abstract) = "en")
         {
-            ?book dbo:literaryGenre ?literaryGenre.
-	    	?literaryGenre rdfs:label ?literaryGenreLabel.
+            ?book dbo:literaryGenre / rdfs:label | dbp:genre ?literaryGenreLabel.
 	    	FILTER(lang(?literaryGenreLabel) = "en")
 	    	FILTER(regex(?literaryGenreLabel, "${name}", "i"))
      	}} ORDER BY ASC(?name) LIMIT ${limit}`;
@@ -901,9 +877,6 @@ export async function getBookSearch(name) {
       result.forEach(resultSet.add, resultSet);
     }),
     getLiteraryGenre(name, 200).then((result) => {
-      result.forEach(resultSet.add, resultSet);
-    }),
-    getGenre(name, 200).then((result) => {
       result.forEach(resultSet.add, resultSet);
     }),
     getCountry(name, 100).then((result) => {
