@@ -138,6 +138,20 @@ const Editor = () => {
                     <h2>Info</h2>
                     <div className={"infoWrapper"}>
                             
+                            {editorInfo.homepages.value !== "" ?
+                                    <>
+                                        <div className={"valueWrapper"}>
+                                            <span>Website</span>
+                                        
+                                        </div>
+                                        <span className={"value"}>
+                                                <a href={`${editorInfo.homepages?.value.split(",")[0]}`}>
+                                                    {" "}
+                                                    {editorInfo.homepages?.value.split(",")[0]}
+                                                </a>
+                                        </span>
+                                    </>
+                                    : null}
                             {editorInfo.countries.value !== "" ?
                                     <>
                                         <div className={"valueWrapper"}>
@@ -169,7 +183,9 @@ const Editor = () => {
                                             <span>Founders</span>
                                         </div>
                                         <div>
-                                                {editorInfo.founders?.value.split(",").map(founder => <span className="founder">{founder.split("http://dbpedia.org/resource/")[1]} </span>)}
+                                            <ul>
+                                                {editorInfo.founders?.value.split(",").map(founder => <li className="founder">{founder.split("http://dbpedia.org/resource/")[1].replace(/_/g, " ")} </li>)}
+                                            </ul>
                                         </div>
                                     </>
                                     : null}                     
@@ -195,7 +211,7 @@ const Editor = () => {
                                                 navigate={navigate} />
                                         </div>
                                     );
-                                })} : null
+                                })} 
                                 
                             </div>
                             </>

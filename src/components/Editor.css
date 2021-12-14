@@ -66,6 +66,11 @@ ul{
     list-style: none;;
 }
 
+ul, li{
+    
+    padding: 0;
+    margin: 0;
+}
 
 .titleOrig {
     width: fit-content;
