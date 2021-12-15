@@ -752,7 +752,14 @@ export async function getAuthors(name) {
   const offset = 0;
   name = encodeResource(name);
   let query = `SELECT ?writer (MIN(?name) AS ?name) (MAX(?image) AS ?imageUrl) (MIN(?birthDate) AS ?birthDate) (MIN(?deathDate) AS ?deathDate) WHERE {
-    ?writer a dbo:Writer.
+    {{
+      ?writer a dbo:Writer.
+    } UNION {
+      ?writer a dbo:Scientist.
+    } UNION {
+      ?writer a dbo:Philosopher.
+    }
+  }
     ?writer dbp:name ?name.
     OPTIONAL {?writer dbp:birthDate ?birthDate.}
     OPTIONAL {?writer dbp:deathDate ?deathDate.}
@@ -765,7 +772,14 @@ export async function getAuthors(name) {
 async function getNationality(name, limit) {
   name = encodeResource(name);
   let query = `SELECT ?writer (MIN(?name) AS ?name) (MAX(?image) AS ?imageUrl) (MIN(?birthDate) AS ?birthDate) (MIN(?deathDate) AS ?deathDate) WHERE {
-        ?writer a dbo:Writer.
+          {{
+            ?writer a dbo:Writer.
+          } UNION {
+            ?writer a dbo:Scientist.
+          } UNION {
+            ?writer a dbo:Philosopher.
+          }
+        }
         ?writer dbp:name ?name.
         OPTIONAL {?writer dbp:birthDate ?birthDate.}
         OPTIONAL {?writer dbp:deathDate ?deathDate.}
