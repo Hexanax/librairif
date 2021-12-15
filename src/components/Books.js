@@ -102,7 +102,6 @@ const Books = () => {
         const loadAssociatedWork = async () => {
             console.log("loading");
             try {
-                setIsLoadingSupp(true);
                 const responseBook = await fetchBookAssociatedToAuthor(
                     bookInfo.authorURI
                 );
