@@ -29,7 +29,7 @@ export async function fetchBookInfo(resourceURI) {
             OPTIONAL{${book} dbo:thumbnail ?imageURL.}
             OPTIONAL{${book} dbo:literaryGenre ?genreURI.
             ?genreURI rdfs:label ?genre.
-            FILTER(lang(?genreURI)="en")}
+            FILTER(lang(?genre)="en")}
             OPTIONAL{${book} dbp:publisher ?publisherURI.
             ?publisherURI rdfs:label ?publisher.
             FILTER(lang(?publisher)="en")}
@@ -51,7 +51,7 @@ export async function fetchListInSeries(resourceURI) {
   const currentBook = `dbr:${resourceURI}`;
   let query = [
     `Select ?bookUri ?serie ?name ?imageURL WHERE {
-        ${currentBook} ^dbo:series ?serie.
+        ${currentBook} dbo:series ?serie.
         ?bookUri a dbo:Book;
         dbp:name ?name;
         dbo:series ?serie.
@@ -87,6 +87,13 @@ export async function fetchSameGenreBooks(resourceURI) {
   return selected;
 }
 
+/**
+ * Returns from DBPedia the general information of an editor : their name, abstract, image, country
+ * foundation year, their website and a list of their founders
+ * These information are to be displayed on an editor's page 
+ * @param {String} authorURI 
+ * @returns the general information of an editor
+ */
 export async function fetchEditorInfo(editorName) {
   editorName = encodeResource(editorName);
   let editorRsrc = `dbr:${editorName}`;
@@ -95,27 +102,25 @@ export async function fetchEditorInfo(editorName) {
     (GROUP_CONCAT(DISTINCT ?imageUrl;   SEPARATOR=", ") AS ?imageURL)
     (GROUP_CONCAT(DISTINCT ?founder;   SEPARATOR=", ") AS ?founders)
     (GROUP_CONCAT(DISTINCT ?homepage;    SEPARATOR=", ") AS ?homepages)
-    (GROUP_CONCAT(DISTINCT ?country; SEPARATOR=", ") AS ?countries)
-    (GROUP_CONCAT(DISTINCT ?relatedEditor; SEPARATOR=", ") AS ?relatedEditors) WHERE {
+    (GROUP_CONCAT(DISTINCT ?country; SEPARATOR=", ") AS ?countries) WHERE {
       ${editorRsrc} rdfs:label ?label;
       dbo:abstract ?abstract.
       OPTIONAL{${editorRsrc} dbo:founder ?founder}
       OPTIONAL{${editorRsrc} dbo:thumbnail ?imageUrl.}
       OPTIONAL{${editorRsrc} dbo:foundingYear | dbp:founded ?year}
       OPTIONAL{${editorRsrc} foaf:homepage ?homepage}
-      OPTIONAL{
-        ?relatedEditor a dbo:Publisher;
-        dbp:country | dbp:country / foaf:name | dbo:country / foaf:name ?countryRel.
-        FILTER(?countryRel = ?country)
-      }
       OPTIONAL{${editorRsrc} dbp:country /foaf:name | dbp:country | dbo:country /foaf:name   ?country}
       FILTER(lang(?abstract) = "en").
       FILTER(lang(?label) = "en").
     }`;
-  //console.log(query);
+  
   return await axiosQuery(query);
 }
 
+/**
+ * Fetches the list of maximum 5 books published by the current editor.
+ * @param {*} ressourceURI
+ */
 export async function fetchEditorBooks(resourceURI) {
   resourceURI = encodeResource(resourceURI);
   const editor = `dbr:${resourceURI}`;
@@ -137,7 +142,7 @@ export async function fetchEditorBooks(resourceURI) {
   const response = await axiosQuery(query);
   const shuffled = response.sort(() => 0.5 - Math.random());
   let selected = shuffled.slice(0, 5);
-  //console.log(selected);
+  
   return selected;
 }
 
@@ -636,8 +641,7 @@ async function getLiteraryGenre(name, limit) {
 	        FILTER(lang(?name) = "en")
 	        FILTER(lang(?abstract) = "en")
         {
-            ?book dbo:literaryGenre ?literaryGenre.
-	    	?literaryGenre rdfs:label ?literaryGenreLabel.
+            ?book dbo:literaryGenre / rdfs:label | dbp:genre ?literaryGenreLabel.
 	    	FILTER(lang(?literaryGenreLabel) = "en")
 	    	FILTER(regex(?literaryGenreLabel, "${name}", "i"))
      	}} ORDER BY ASC(?name) LIMIT ${limit}`;
@@ -892,9 +896,6 @@ export async function getBookSearch(name) {
       result.forEach(resultSet.add, resultSet);
     }),
     getLiteraryGenre(name, 200).then((result) => {
-      result.forEach(resultSet.add, resultSet);
-    }),
-    getGenre(name, 200).then((result) => {
       result.forEach(resultSet.add, resultSet);
     }),
     getCountry(name, 100).then((result) => {

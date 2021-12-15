@@ -138,6 +138,20 @@ const Editor = () => {
                     <h2>Info</h2>
                     <div className={"infoWrapper"}>
                             
+                            {editorInfo.homepages.value !== "" ?
+                                    <>
+                                        <div className={"valueWrapper"}>
+                                            <span>Website</span>
+                                        
+                                        </div>
+                                        <span className={"value"}>
+                                                <a href={`${editorInfo.homepages?.value.split(",")[0]}`}>
+                                                    {" "}
+                                                    {editorInfo.homepages?.value.split(",")[0]}
+                                                </a>
+                                        </span>
+                                    </>
+                                    : null}
                             {editorInfo.countries.value !== "" ?
                                     <>
                                         <div className={"valueWrapper"}>
@@ -169,7 +183,9 @@ const Editor = () => {
                                             <span>Founders</span>
                                         </div>
                                         <div>
-                                                {editorInfo.founders?.value.split(",").map(founder => <span className="founder">{founder.split("http://dbpedia.org/resource/")[1]} </span>)}
+                                            <ul>
+                                                {editorInfo.founders?.value.split(",").map(founder => <li className="founder">{founder.split("http://dbpedia.org/resource/")[1].replace(/_/g, " ")} </li>)}
+                                            </ul>
                                         </div>
                                     </>
                                     : null}                     
@@ -177,25 +193,29 @@ const Editor = () => {
                                     
                     </div>
                     <div>
-                        <h2> Published Books</h2>
-                        <div className={"otherResourceWrapper"}>
-                            {editorBooks.map((obj, index) => {
-                                const bookData = {
-                                    title: obj.name?.value,
-                                    author: obj.authorNames?.value,
-                                    img: obj.imageUrl?.value,
-                                    releaseDate: obj.releaseDate?.value,
-                                    bookURI: obj.book?.value.split("http://dbpedia.org/resource/")[1],
-                                };
-                                return (
-                                    <div className={"cardWrapper"}>
-                                        <BookResult key={index} index={index} data={bookData}
-                                                    navigate={navigate}/>
-                                    </div>
-                                );
-                            })
-                            }
-                        </div>
+                        {editorBooks.length !=0 ?
+                            <>
+                            <h2> Published Books</h2>
+                            <div className={"otherResourceWrapper"}>
+                                {editorBooks.map((obj, index) => {
+                                    const bookData = {
+                                        title: obj.name?.value,
+                                        author: obj.authorNames?.value,
+                                        img: obj.imageUrl?.value,
+                                        releaseDate: obj.releaseDate?.value,
+                                        bookURI: obj.book?.value.split("http://dbpedia.org/resource/")[1],
+                                    };
+                                    return (
+                                        <div className={"cardWrapper"}>
+                                            <BookResult key={index} index={index} data={bookData}
+                                                navigate={navigate} />
+                                        </div>
+                                    );
+                                })} 
+                                
+                            </div>
+                            </>
+                        : null}
                     </div>
                     { editorInfo.countries !== null && !error &&
 
