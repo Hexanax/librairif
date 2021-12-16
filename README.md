@@ -12,3 +12,4 @@ Vérifiez si vous avez `yarn` installé, sinon, installez le avec `npm install -
 Installez les dependencies la commande `yarn`. Assurez vous de faire `yarn` à chaque fois que vous changez de branche car les dependencies pourraient être différente sur une autre branche.
 
 Lancez l'application avec `yarn start`. Ouvrez [http://localhost:3000](http://localhost:3000) dans votre navigateur web pour consulter l'application.
+Il est possible que vous deviez rafraichir la page après le lancement dans le cas ou elle resterait vide. 
