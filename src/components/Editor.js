@@ -31,7 +31,7 @@ const Editor = () => {
             if (response.length === 0) {
                 setError(true);
             }
-            console.log(response);
+            //console.log(response);
             setEditorInfo(response[0]);
             setIsLoading(false);
         }
@@ -39,12 +39,12 @@ const Editor = () => {
     }, []);
 
     useEffect(() => {
-        console.log(editorInfo);
+        //console.log(editorInfo);
         setIsLoading(false)
 
         const loadEditorBooks = async () => {
             const response = await fetchEditorBooks(editorURI);
-            console.log(response);
+            //console.log(response);
             setEditorBooks(response);
         }
         loadEditorBooks();

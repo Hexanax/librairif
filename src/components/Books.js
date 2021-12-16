@@ -50,7 +50,7 @@ const Books = () => {
                 setError(true);
             }
             const content = response[0];
-            console.log(content);
+            //console.log(content);
 
             const bookData = {
                 name: content.name?.value,
@@ -65,7 +65,7 @@ const Books = () => {
                 genres: content.genres.value?.split(","),
                 imageURL: content.imageURL?.value,
             };
-            console.log(bookData);
+            //console.log(bookData);
             setBookInfo(bookData);
         };
 
@@ -91,7 +91,7 @@ const Books = () => {
                 await loadBookNeighbors();
                 await loadSameGenreBooks();
             } catch (err) {
-                console.log(err);
+                //console.log(err);
             }
             setIsLoading(false);
         };
@@ -100,7 +100,7 @@ const Books = () => {
 
     useEffect(() => {
         const loadAssociatedWork = async () => {
-            console.log("loading");
+            //console.log("loading");
             try {
                 const responseBook = await fetchBookAssociatedToAuthor(
                     bookInfo.authorURI
@@ -108,7 +108,7 @@ const Books = () => {
                 const authorBooks = responseBook.filter((book) => {
                     return book.name.value !== bookInfo.name;
                 });
-                console.log(authorBooks);
+                //console.log(authorBooks);
                 setSameAuthorBooks(authorBooks);
                 const games = await fetchAssociatedGames(
                     bookInfo.name,
@@ -135,13 +135,13 @@ const Books = () => {
                     bookInfo.authorName
                 );
                 setAssociatedMusics(musics);
-                console.log("Associated games = " + JSON.stringify(games))
-                console.log("Associated movies = " + JSON.stringify(movies))
-                console.log("Associated musicals = " + JSON.stringify(musicals))
-                console.log("Associated tv shows = " + JSON.stringify(tvShows))
-                console.log("Associated musics = " + JSON.stringify(musics))
+                //console.log("Associated games = " + JSON.stringify(games))
+                //console.log("Associated movies = " + JSON.stringify(movies))
+                //console.log("Associated musicals = " + JSON.stringify(musicals))
+                //console.log("Associated tv shows = " + JSON.stringify(tvShows))
+                //console.log("Associated musics = " + JSON.stringify(musics))
             } catch (err) {
-                console.log(err);
+                //console.log(err);
                 setErrorSupp(true);
             }
             setIsLoadingSupp(false);
@@ -155,7 +155,7 @@ const Books = () => {
             setErrorSupp(false);
             loadAssociatedWork();
         } else {
-            console.log(bookInfo);
+            //console.log(bookInfo);
             setIsLoadingSupp(false);
             setErrorSupp(true);
         }
@@ -318,7 +318,6 @@ const Books = () => {
 
                                     {bookInfo.genres[0] !== "" ? (
                                         <>
-                                            {console.log(bookInfo.genres)}
                                             <div className={"literaryGenres"}>
                                                 <span>Literary genre </span>
                                             </div>
@@ -363,9 +362,6 @@ const Books = () => {
                                                     {neighbors.map((obj, index) => {
                                                         const bookData = {
                                                             title: obj.name?.value,
-                                                            author: obj.authorNames?.value,
-                                                            img: obj.imageUrl?.value,
-                                                            releaseDate: obj.releaseDate?.value,
                                                             bookURI: obj.book?.value.split(
                                                                 "http://dbpedia.org/resource/"
                                                             )[1],

@@ -19,7 +19,7 @@ import * as React from "react";
  * @constructor
  */
 const CardResult = (props) => {
-    console.log("Data" + JSON.stringify(props.data))
+    //console.log("Data" + JSON.stringify(props.data))
     let bookCover;
     if (props.img) {
         bookCover = (

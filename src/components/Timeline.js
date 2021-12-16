@@ -12,7 +12,7 @@ import MenuBookTwoToneIcon from '@mui/icons-material/MenuBookTwoTone';
 import LocalFireDepartmentTwoToneIcon from '@mui/icons-material/LocalFireDepartmentTwoTone';
 
 function TimelineElement(props) {
-    console.log("data rendered" + JSON.stringify(props.data));
+    //console.log("data rendered" + JSON.stringify(props.data));
     return (
         <React.Fragment>
             <Timeline position="alternate">

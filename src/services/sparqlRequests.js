@@ -45,7 +45,7 @@ export async function fetchBookInfo(resourceURI) {
             OPTIONAL{?authorURI dbp:name ?authorName.}
             FILTER(lang(?abstract) = "en")
         }`;
-  console.log(content);
+  //console.log(content);
   return await axiosQuery(content);
 }
 
@@ -69,6 +69,11 @@ export async function fetchListInSeries(resourceURI) {
   return await axiosQuery(query);
 }
 
+/**
+ * Fetches the list of books having the same literary genre than the one provided in parameter by its URI
+ * @param resourceURI
+ * @returns {Promise<*>} The books with their name and optional image URL
+ */
 export async function fetchSameGenreBooks(resourceURI) {
   resourceURI = encodeResource(resourceURI);
   const currentBook = `dbr:${resourceURI}`;
@@ -171,7 +176,7 @@ export async function fetchRelatedEditors(resourceURI) {
         }LIMIT 10`,
   ].join("");
   const response = await axiosQuery(query);
-  console.log(response);
+  //console.log(response);
   const shuffled = response.sort(() => 0.5 - Math.random());
   let selected = shuffled.slice(0, 5);
   //console.log(selected);
@@ -458,9 +463,9 @@ export async function fetchBookAssociatedToAuthor(authorURI) {
         FILTER(lang(?abstract) = "en")
     } ORDER BY ASC(?name)
     `;
-  console.log(query);
+  //console.log(query);
   let response = await axiosQuery(query);
-  console.log(response);
+  //console.log(response);
   return response;
 }
 

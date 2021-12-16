@@ -109,7 +109,7 @@ function Author(data) {
         const loadBookInfo = async () => {
             setIsLoading(true);
             const responseBook = await fetchBookAssociatedToAuthor(authorURI);
-            console.log(responseBook);
+            //console.log(responseBook);
             setIsLoading(false);
             setBooks(responseBook);
         };
@@ -170,7 +170,7 @@ function Author(data) {
         const loadTimeline = async () => {
             setIsLoading(true);
             const timeline = await getAuthorTimeLife(authorURI);
-            console.log("author timeline" + JSON.stringify(timeline));
+            //console.log("author timeline" + JSON.stringify(timeline));
             let works, dates;
             if (timeline[0].notableWorkName !== null) {
                 works = timeline[0].notableWorkName?.value.split(";");
