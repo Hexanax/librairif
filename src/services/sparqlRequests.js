@@ -1,6 +1,10 @@
-import { NearMe } from "@mui/icons-material";
 import axios from "axios";
 
+/**
+ * Allows to encode the URI
+ * @param {String} resourceURI the URI to encode
+ * @returns the encoded URI
+ */
 function encodeResource(resourceURI) {
   resourceURI = resourceURI.replace(/[(]/g, "\\(");
   resourceURI = resourceURI.replace(/[)]/g, "\\)");
@@ -10,11 +14,15 @@ function encodeResource(resourceURI) {
   return resourceURI;
 }
 
+/**
+ * Returns from DBPedia the general information of a book : his name, description, image,
+ * title, author, publishers, release date, genre
+ * These information are to be displayed on a book's page 
+ * @param {String} resourceURI the book URI
+ * @returns the general information of a book
+ */
 export async function fetchBookInfo(resourceURI) {
-  //TODO CHANGE HARDCODED URI
   resourceURI = encodeResource(resourceURI);
-
-  //console.log(resourceURI);
   const book = `dbr:${resourceURI}`;
   const content = `SELECT ?name ?titleOrig ?imageURL ?abstract ?authorURI ?authorName
     (GROUP_CONCAT(DISTINCT ?publisherURI;   SEPARATOR=", ") AS ?publishersURI)
@@ -146,6 +154,11 @@ export async function fetchEditorBooks(resourceURI) {
   return selected;
 }
 
+/**
+ * Allows to get a list of related editors to the current one filtering by the country
+ * @param {String} resourceURI 
+ * @returns the assiocated list of editor
+ */
 export async function fetchRelatedEditors(resourceURI) {
   resourceURI = encodeResource(resourceURI);
   const editor = `dbr:${resourceURI}`;
@@ -598,10 +611,10 @@ export async function getFamilyTree(resourceURI) {
 }
 
 /**
- * Research books containing the correct name and author
- * @param {*} bookName
- * @param {*} author
- * @returns result array
+ * Research books containing the correct name
+ * @param {*} name the research text
+ * @param {*} limit the maximum number of result
+ * @returns result list of books
  */
 export async function researchQuery(name, limit) {
   name = encodeResource(name);
@@ -624,6 +637,12 @@ export async function researchQuery(name, limit) {
   return await axiosQuery(query);
 }
 
+/**
+ * Research books containing the correct literary genre that match with the name
+ * @param {*} name the research text
+ * @param {*} limit the maximum number of result
+ * @returns result list of books
+ */
 async function getLiteraryGenre(name, limit) {
   name = encodeResource(name);
   let query = `SELECT ?book (GROUP_CONCAT(DISTINCT ?authorName;   SEPARATOR=", ") AS ?authorNames)
@@ -648,6 +667,12 @@ async function getLiteraryGenre(name, limit) {
   return await axiosQuery(query);
 }
 
+/**
+ * Research books containing the correct genre that match with the name
+ * @param {*} name the research text
+ * @param {*} limit the maximum number of result
+ * @returns result list of books
+ */
 async function getGenre(name, limit) {
   name = encodeResource(name);
   let query = `SELECT ?book (GROUP_CONCAT(DISTINCT ?authorName;   SEPARATOR=", ") AS ?authorNames)
@@ -673,6 +698,12 @@ async function getGenre(name, limit) {
   return await axiosQuery(query);
 }
 
+/**
+ * Research books containing the correct country that match with the name
+ * @param {*} name the research text
+ * @param {*} limit the maximum number of result
+ * @returns result list of books
+ */
 async function getCountry(name, limit) {
   name = encodeResource(name);
   let query = `SELECT ?book (GROUP_CONCAT(DISTINCT ?authorName;   SEPARATOR=", ") AS ?authorNames)
@@ -700,6 +731,12 @@ async function getCountry(name, limit) {
   return await axiosQuery(query);
 }
 
+/**
+ * Research books containing the correct subject that match with the name
+ * @param {*} name the research text
+ * @param {*} limit the maximum number of result
+ * @returns result list of books
+ */
 async function getSubject(name, limit) {
   name = encodeResource(name);
   let query = `SELECT ?book (GROUP_CONCAT(DISTINCT ?authorName;   SEPARATOR=", ") AS ?authorNames)
@@ -726,6 +763,12 @@ async function getSubject(name, limit) {
   return await axiosQuery(query);
 }
 
+/**
+ * Research books containing the correct hypernym that match with the name
+ * @param {*} name the research text
+ * @param {*} limit the maximum number of result
+ * @returns result list of books
+ */
 async function getHypernym(name, limit) {
   name = encodeResource(name);
   let query = `SELECT ?book (GROUP_CONCAT(DISTINCT ?authorName;   SEPARATOR=", ") AS ?authorNames)
@@ -752,6 +795,11 @@ async function getHypernym(name, limit) {
   return await axiosQuery(query);
 }
 
+/**
+ * Research authors containing the correct name
+ * @param {*} name the research text
+ * @returns result list of authors
+ */
 export async function getAuthors(name) {
   const offset = 0;
   name = encodeResource(name);
@@ -773,6 +821,12 @@ export async function getAuthors(name) {
   return await axiosQuery(query);
 }
 
+/**
+ * Research authors containing the correct nationality that match with the name
+ * @param {*} name the research text
+ * @param {*} limit the maximum number of result
+ * @returns result list of authors
+ */
 async function getNationality(name, limit) {
   name = encodeResource(name);
   let query = `SELECT ?writer (MIN(?name) AS ?name) (MAX(?image) AS ?imageUrl) (MIN(?birthDate) AS ?birthDate) (MIN(?deathDate) AS ?deathDate) WHERE {
@@ -796,10 +850,23 @@ async function getNationality(name, limit) {
   return await axiosQuery(query);
 }
 
+/**
+ * Research authors containing the correct occupation that match with the name
+ * @param {*} name the research text
+ * @param {*} limit the maximum number of result
+ * @returns result list of authors
+ */
 async function getOccupation(name, limit) {
   name = encodeResource(name);
   let query = `SELECT ?writer (MIN(?name) AS ?name) (MAX(?image) AS ?imageUrl) (MIN(?birthDate) AS ?birthDate) (MIN(?deathDate) AS ?deathDate) WHERE {
-        ?writer a dbo:Writer.
+    {{
+      ?writer a dbo:Writer.
+    } UNION {
+      ?writer a dbo:Scientist.
+    } UNION {
+      ?writer a dbo:Philosopher.
+    }
+  }
         ?writer dbp:name ?name.
         OPTIONAL {?writer dbp:birthDate ?birthDate.}
         OPTIONAL {?writer dbp:deathDate ?deathDate.}
@@ -812,10 +879,24 @@ async function getOccupation(name, limit) {
         } ORDER BY ASC(?name) OFFSET ${limit}`;
   return await axiosQuery(query);
 }
+
+/**
+ * Research authors containing the correct subject that match with the name
+ * @param {*} name the research text
+ * @param {*} limit the maximum number of result
+ * @returns result list of authors
+ */
 async function getAuthorSubject(name, limit) {
   name = encodeResource(name);
   let query = `SELECT ?writer (MIN(?name) AS ?name) (MAX(?image) AS ?imageUrl) (MIN(?birthDate) AS ?birthDate) (MIN(?deathDate) AS ?deathDate) WHERE {
-        ?writer a dbo:Writer.
+    {{
+      ?writer a dbo:Writer.
+    } UNION {
+      ?writer a dbo:Scientist.
+    } UNION {
+      ?writer a dbo:Philosopher.
+    }
+  }
         ?writer dbp:name ?name.
         OPTIONAL {?writer dbp:birthDate ?birthDate.}
         OPTIONAL {?writer dbp:deathDate ?deathDate.}
@@ -828,10 +909,24 @@ async function getAuthorSubject(name, limit) {
         } ORDER BY ASC(?name) OFFSET ${limit}`;
   return await axiosQuery(query);
 }
+
+/**
+ * Research authors containing the correct movement that match with the name
+ * @param {*} name the research text
+ * @param {*} limit the maximum number of result
+ * @returns result list of authors
+ */
 async function getMovement(name, limit) {
   name = encodeResource(name);
   let query = `SELECT ?writer (MIN(?name) AS ?name) (MAX(?image) AS ?imageUrl) (MIN(?birthDate) AS ?birthDate) (MIN(?deathDate) AS ?deathDate) WHERE {
-        ?writer a dbo:Writer.
+    {{
+      ?writer a dbo:Writer.
+    } UNION {
+      ?writer a dbo:Scientist.
+    } UNION {
+      ?writer a dbo:Philosopher.
+    }
+  }
         ?writer dbp:name ?name.
         OPTIONAL {?writer dbp:birthDate ?birthDate.}
         OPTIONAL {?writer dbp:deathDate ?deathDate.}
@@ -844,10 +939,24 @@ async function getMovement(name, limit) {
         } ORDER BY ASC(?name) OFFSET ${limit}`;
   return await axiosQuery(query);
 }
+
+/**
+ * Research authors containing the correct author genre that match with the name
+ * @param {*} name the research text
+ * @param {*} limit the maximum number of result
+ * @returns result list of authors
+ */
 async function getAuthorGenre(name, limit) {
   name = encodeResource(name);
   let query = `SELECT ?writer (MIN(?name) AS ?name) (MAX(?image) AS ?imageUrl) (MIN(?birthDate) AS ?birthDate) (MIN(?deathDate) AS ?deathDate) WHERE {
-        ?writer a dbo:Writer.
+    {{
+      ?writer a dbo:Writer.
+    } UNION {
+      ?writer a dbo:Scientist.
+    } UNION {
+      ?writer a dbo:Philosopher.
+    }
+  }
         ?writer dbp:name ?name.
         OPTIONAL {?writer dbp:birthDate ?birthDate.}
         OPTIONAL {?writer dbp:deathDate ?deathDate.}
@@ -889,6 +998,12 @@ export async function autocompleteQuery(text) {
   return await axiosQuery(query);
 }
 
+/**
+ * Allows to research books in DBpedia database by filtering on different parameters
+ * The different list of books will be sorted
+ * @param {*} name the research text
+ * @returns result list of books
+ */
 export async function getBookSearch(name) {
   let resultSet = new Set();
   return Promise.all([
@@ -947,6 +1062,12 @@ export async function getBookSearch(name) {
   });
 }
 
+/**
+ * Allows to research authors in DBpedia database by filtering on different parameters
+ * The different list of authors will be sorted
+ * @param {*} name the research text
+ * @returns result list of authors
+ */
 export async function getAuthorSearch(name) {
   let resultSet = new Set();
   return Promise.all([
@@ -987,6 +1108,12 @@ export async function getAuthorSearch(name) {
   });
 }
 
+/**
+ * Allows to use Axios API in order to do an HTTP GET request that contains a SPARQL query 
+ * on DBPEDIA. The API will handle the result and return it in JSON format.
+ * @param {String} query the sparql query 
+ * @returns the result of the request GET
+ */
 async function axiosQuery(query) {
   let url = "http://dbpedia.org/sparql";
   query = query.replace(/&/g, "\\&");
