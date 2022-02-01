@@ -14,29 +14,35 @@ import ScrollToTop from "./components/ScrollToTop";
 export default function App() {
     const theme = createTheme(lightTheme);
     return (
-        <ThemeProvider theme={theme}>
-            <CssBaseline/>
-            <Router>
-                <div>
-                    <Navbar/>
-                    <ScrollToTop/>
-                    <Routes>
-                        <>
-                            <Route path="/" element={<Browser/>}>
-                            </Route>
-                            <Route path="/bookSearch/:searchInput" element={<Results/>}>
-                            </Route>
-                            <Route path="/bookInfo/:bookURI" element={<Books/>}>
-                            </Route>
-                            <Route path="/authorInfo/:authorURI" element={<Author/>}>
-                            </Route>
-                            <Route path="/editorInfo/:editorURI" element={<Editor/>}>
-                            </Route>
-
-                        </>
-                    </Routes>
-                </div>
-            </Router>
-        </ThemeProvider>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <Router>
+          <div>
+            <Navbar />
+            <ScrollToTop />
+            <Routes>
+              <>
+                <Route path="/librairif/" element={<Browser />}></Route>
+                <Route
+                  path="/librairif/bookSearch/:searchInput"
+                  element={<Results />}
+                ></Route>
+                <Route
+                  path="/librairif/bookInfo/:bookURI"
+                  element={<Books />}
+                ></Route>
+                <Route
+                  path="/librairif/authorInfo/:authorURI"
+                  element={<Author />}
+                ></Route>
+                <Route
+                  path="/librairif/editorInfo/:editorURI"
+                  element={<Editor />}
+                ></Route>
+              </>
+            </Routes>
+          </div>
+        </Router>
+      </ThemeProvider>
     );
 }

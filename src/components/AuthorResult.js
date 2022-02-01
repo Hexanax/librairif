@@ -19,7 +19,7 @@ function AuthorResult(index, data, navigate, resetState) {
         if (resetState !== null) {
             resetState();
         }
-        navigate(`../../authorInfo/${data.authorURI}`);
+        navigate(`../../librairif/authorInfo/${data.authorURI}`);
     };
     // uri, nom date naissance, date mort, thumbnail
     let authorCover;

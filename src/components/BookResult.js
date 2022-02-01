@@ -8,7 +8,9 @@ import { CardActionArea, Grid } from "@mui/material";
 
 function BookResult({ index, data, navigate }) {
   const handleClick = () => {
-    navigate(`../../bookInfo/${data.bookURI}`, { state: { redirect: true } });
+    navigate(`../../librairif/bookInfo/${data.bookURI}`, {
+      state: { redirect: true },
+    });
   };
   let bookCover;
   if (data.img) {

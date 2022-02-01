@@ -263,20 +263,21 @@ const Books = () => {
                           {" "}
                             {bookInfo.publishers.map((publisher, index) => {
                                 return (
-                                    <span>
-                                <Link
-                                    to={`../../editorInfo/${
+                                  <span>
+                                    <Link
+                                      to={`../../librairif/editorInfo/${
                                         bookInfo.publishersURI[index].split(
-                                            "http://dbpedia.org/resource/"
+                                          "http://dbpedia.org/resource/"
                                         )[1]
-                                    }`}
-                                >
-                                  {publisher}
-                                </Link>
-                                        {index !== bookInfo.publishers.length - 1 && (
-                                            <span>,</span>
-                                        )}
-                              </span>
+                                      }`}
+                                    >
+                                      {publisher}
+                                    </Link>
+                                    {index !==
+                                      bookInfo.publishers.length - 1 && (
+                                      <span>,</span>
+                                    )}
+                                  </span>
                                 );
                             })}
                         </span>
